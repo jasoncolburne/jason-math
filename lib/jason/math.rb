@@ -1,6 +1,7 @@
 require "jason/math/version"
 require "jason/math/analysis"
 require "jason/math/combinatorics"
+require "jason/math/graph_theory"
 require "jason/math/number_theory"
 
 module Jason
