@@ -55,3 +55,43 @@ module Math
     Jason::Math::NumberTheory.triangular_number(offset)
   end
 end
+
+class Integer
+  def choose(k)
+    Math.n_choose_k(self, k)
+  end
+
+  def factorial
+    Math.factorial(self)
+  end
+
+  def factors
+    Math.factors(self)
+  end
+
+  def prime_factors
+    Math.prime_factors(self)
+  end
+
+  def primes
+    Math.primes(self)
+  end
+end
+
+class Array
+  def co_prime?
+    Math.co_prime?(self)
+  end
+end
+
+class Set
+  def co_prime?
+    Math.co_prime?(self)
+  end
+end
+
+class Hash
+  def chinese_remainder_theorem
+    Math.chinese_remainder_theorem(self)
+  end
+end
