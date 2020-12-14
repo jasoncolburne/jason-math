@@ -75,6 +75,10 @@ module Jason
           return false unless factor_sets[(index + 1)..].all? { |set| factors.intersection(set).empty? }
         end
       end
+
+      def self.perfect?(number)
+        proper_divisors(number).sum == number
+      end
       
       def self.chinese_remainder_theorem(mapping)
         raise "moduli not co-prime" unless co_prime?(mapping.keys)

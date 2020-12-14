@@ -47,6 +47,10 @@ module Math
     Jason::Math::NumberTheory.proper_divisors(n)
   end
 
+  def self.perfect?(n)
+    Jason::Math::NumberTheory.perfect?(n)
+  end
+
   def self.co_prime?(numbers)
     Jason::Math::NumberTheory.co_prime?(numbers)
   end
@@ -75,6 +79,10 @@ class Integer
 
   def divisors
     Math.divisors(self)
+  end
+
+  def perfect?
+    Math.perfect?(self)
   end
 
   def proper_divisors
