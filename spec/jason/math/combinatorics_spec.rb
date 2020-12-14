@@ -6,6 +6,16 @@ RSpec.describe Jason::Math::Combinatorics do
       let(:n) { 13 }
       it { is_expected.to eq(6227020800) }
     end
+
+    context "for 0" do
+      let(:n) { 0 }
+      it { is_expected.to eq(1) }
+    end
+
+    context "for 1" do
+      let(:n) { 1 }
+      it { is_expected.to eq(1) }
+    end
   end
 
   context "#n_choose_k" do
