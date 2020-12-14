@@ -125,4 +125,55 @@ RSpec.describe Jason::Math::NumberTheory do
       it { is_expected.to be_falsey }
     end
   end
+
+  context "#palindrome?" do
+    subject { described_class.palindrome?(n) }
+
+    context "71317" do
+      let(:n) { 71317 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "24566" do
+      let(:n) { 24566 }
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  context "#lychrel?" do
+    subject { described_class.lychrel?(n, depth) }
+
+    context "47" do
+      let(:n) { 47 }
+      let(:depth) { 1 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "349, depth 3" do
+      let(:n) { 349 }
+      let(:depth) { 3 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "349, depth 2" do
+      let(:n) { 349 }
+      let(:depth) { 2 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "196, depth 100" do
+      let(:n) { 196 }
+      let(:depth) { 100 }
+      it { is_expected.to be_truthy }
+    end
+  end
+
+  context "#reverse" do
+    subject { described_class.reverse(n) }
+
+    context "9294745263867334858" do
+      let(:n) { 9294745263867334858 }
+      it { is_expected.to eq(8584337683625474929) }
+    end
+  end
 end

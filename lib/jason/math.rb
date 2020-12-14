@@ -59,6 +59,18 @@ module Math
     Jason::Math::NumberTheory.abundant?(n)
   end
 
+  def self.lychrel?(n, depth = 50)
+    Jason::Math::NumberTheory.lychrel?(n, depth)
+  end
+
+  def self.palindrome?(n)
+    Jason::Math::NumberTheory.palindrome?(n)
+  end
+
+  def self.reverse(n)
+    Jason::Math::NumberTheory.reverse(n)
+  end
+
   def self.co_prime?(numbers)
     Jason::Math::NumberTheory.co_prime?(numbers)
   end
@@ -99,6 +111,18 @@ class Integer
 
   def abundant?
     Math.abundant?(self)
+  end
+
+  def lychrel?(depth = 50)
+    Math.lychrel?(self, depth)
+  end
+
+  def palindrome?
+    Math.palindrome?(self)
+  end
+
+  def reverse
+    Math.reverse(self)
   end
 
   def proper_divisors

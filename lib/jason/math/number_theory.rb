@@ -87,6 +87,21 @@ module Jason
       def self.abundant?(number)
         proper_divisors(number).sum > number
       end
+
+      def self.palindrome?(number)
+        number.to_s == number.to_s.reverse
+      end
+
+      def self.lychrel?(number, depth = 50)
+        return true if depth.zero?
+        next_number = number + reverse(number)
+        return false if palindrome?(next_number)
+        lychrel?(next_number, depth - 1)
+      end
+
+      def self.reverse(number)
+        number.to_s.reverse.to_i
+      end
       
       def self.chinese_remainder_theorem(mapping)
         raise "moduli not co-prime" unless co_prime?(mapping.keys)
