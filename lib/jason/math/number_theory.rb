@@ -79,6 +79,14 @@ module Jason
       def self.perfect?(number)
         proper_divisors(number).sum == number
       end
+
+      def self.deficient?(number)
+        proper_divisors(number).sum < number
+      end
+
+      def self.abundant?(number)
+        proper_divisors(number).sum > number
+      end
       
       def self.chinese_remainder_theorem(mapping)
         raise "moduli not co-prime" unless co_prime?(mapping.keys)

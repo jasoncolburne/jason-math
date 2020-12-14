@@ -51,6 +51,14 @@ module Math
     Jason::Math::NumberTheory.perfect?(n)
   end
 
+  def self.deficient?(n)
+    Jason::Math::NumberTheory.deficient?(n)
+  end
+
+  def self.abundant?(n)
+    Jason::Math::NumberTheory.abundant?(n)
+  end
+
   def self.co_prime?(numbers)
     Jason::Math::NumberTheory.co_prime?(numbers)
   end
@@ -83,6 +91,14 @@ class Integer
 
   def perfect?
     Math.perfect?(self)
+  end
+
+  def deficient?
+    Math.deficient?(self)
+  end
+
+  def abundant?
+    Math.abundant?(self)
   end
 
   def proper_divisors

@@ -19,8 +19,8 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
-  context "#prime_factors" do
-    subject { described_class.prime_factors(n) }
+  context "#factors" do
+    subject { described_class.factors(n) }
 
     context "of #{ 2*2*2*3*5*5*7*7*7*11*13*17*17*19 }" do
       let(:n) { 2*2*2*3*5*5*7*7*7*11*13*17*17*19 }
@@ -28,8 +28,8 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
-  context "#factors" do
-    subject { described_class.factors(n) }
+  context "#divisors" do
+    subject { described_class.divisors(n) }
 
     context "of 24" do
       let(:n) { 24 }
@@ -66,6 +66,63 @@ RSpec.describe Jason::Math::NumberTheory do
     context "10th triangular number" do
       let(:n) { 10 }
       it { is_expected.to eq(55) }
+    end
+  end
+
+  context "#perfect?" do
+    subject { described_class.perfect?(n) }
+
+    context "28" do
+      let(:n) { 28 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "12" do
+      let(:n) { 12 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "2" do
+      let(:n) { 2 }
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  context "#deficient?" do
+    subject { described_class.deficient?(n) }
+
+    context "28" do
+      let(:n) { 28 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "12" do
+      let(:n) { 12 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "2" do
+      let(:n) { 2 }
+      it { is_expected.to be_truthy }
+    end
+  end
+
+  context "#abundant?" do
+    subject { described_class.abundant?(n) }
+
+    context "28" do
+      let(:n) { 28 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "12" do
+      let(:n) { 12 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "2" do
+      let(:n) { 2 }
+      it { is_expected.to be_falsey }
     end
   end
 end
