@@ -51,6 +51,21 @@ module Jason
       
           distances[destination]
         end
+
+        def negate_edge_weights
+          @graph.each do |vertex, edges|
+            edges.each do |edge|
+              edge[:weight] = -edge[:weight]
+            end
+          end
+        end
+
+        def longest_path(origin, destination)
+          negate_edge_weights
+          distance = dijkstra(origin, destination)
+          negate_edge_weights
+          -distance
+        end
       end      
     end
   end
