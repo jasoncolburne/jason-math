@@ -35,12 +35,16 @@ module Math
     Jason::Math::NumberTheory.primes_below(limit)
   end
 
-  def self.prime_factors(n)
-    Jason::Math::NumberTheory.prime_factors(n)
-  end
-
   def self.factors(n)
     Jason::Math::NumberTheory.factors(n)
+  end
+
+  def self.divisors(n)
+    Jason::Math::NumberTheory.divisors(n)
+  end
+
+  def self.proper_divisors(n)
+    Jason::Math::NumberTheory.proper_divisors(n)
   end
 
   def self.co_prime?(numbers)
@@ -69,8 +73,12 @@ class Integer
     Math.factors(self)
   end
 
-  def prime_factors
-    Math.prime_factors(self)
+  def divisors
+    Math.divisors(self)
+  end
+
+  def proper_divisors
+    Math.proper_divisors(self)
   end
 
   def primes

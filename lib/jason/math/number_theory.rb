@@ -26,7 +26,7 @@ module Jason
         primes
       end
         
-      def self.prime_factors(number)
+      def self.factors(number)
         factors = Hash.new(0)
         primes = Set[]
       
@@ -49,9 +49,9 @@ module Jason
         factors
       end
       
-      def self.factors(number)
-        prime_factors = prime_factors(number)
-        factors = Set[1, number]
+      def self.divisors(number)
+        prime_factors = factors(number)
+        factors = Set[1]
         all_primes = prime_factors.map { |p, n| [p] * n }.flatten
       
         (1..all_primes.count).each do |n|
@@ -62,9 +62,13 @@ module Jason
       
         factors
       end
+
+      def self.proper_divisors(number)
+        divisors(number) - Set[number]
+      end
       
       def self.co_prime?(numbers)
-        factor_sets = numbers.map { |modulus| prime_factors(modulus).keys.to_set }
+        factor_sets = numbers.map { |modulus| factors(modulus).keys.to_set }
         limit = factor_sets.length
         factor_sets.each_with_index do |factors, index|
           return true if index == limit - 1
