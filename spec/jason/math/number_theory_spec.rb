@@ -6,7 +6,7 @@ RSpec.describe Jason::Math::NumberTheory do
 
     context "first 10" do
       let(:count) { 10 }
-      it { is_expected.to eq(Set[2, 3, 5, 7, 11, 13, 17, 19, 23, 29]) }
+      it { is_expected.to eq([2, 3, 5, 7, 11, 13, 17, 19, 23, 29]) }
     end
   end
 
@@ -15,7 +15,7 @@ RSpec.describe Jason::Math::NumberTheory do
 
     context "below 29" do
       let(:limit) { 29 }
-      it { is_expected.to eq(Set[2, 3, 5, 7, 11, 13, 17, 19, 23]) }
+      it { is_expected.to eq([2, 3, 5, 7, 11, 13, 17, 19, 23]) }
     end
   end
 
@@ -25,6 +25,11 @@ RSpec.describe Jason::Math::NumberTheory do
     context "of #{ 2*2*2*3*5*5*7*7*7*11*13*17*17*19 }" do
       let(:n) { 2*2*2*3*5*5*7*7*7*11*13*17*17*19 }
       it { is_expected.to eq({2=>3, 3=>1, 5=>2, 7=>3, 11=>1, 13=>1, 17=>2, 19=>1}) }
+    end
+
+    context "of #{ 5 }" do
+      let(:n) { 5 }
+      it { is_expected.to eq({5=>1}) }
     end
   end
 

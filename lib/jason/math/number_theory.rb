@@ -1,50 +1,33 @@
 require 'openssl'
+require 'prime'
 require 'set'
 
 module Jason
   module Math
     module NumberTheory
       def self.primes(count)
-        primes = Set[]
-        divisor = 2
-        while primes.count < count
-          primes << divisor unless primes.any? { |p| divisor % p == 0 }
-          # puts "#{divisor} (#{primes.count})" if divisor % 10000 == 0
-          divisor += 1
-        end
-        primes
+        Prime::EratosthenesGenerator.new.take(count)
       end
-        
+      
       def self.primes_below(limit)
-        primes = Set[]
-        divisor = 2
-        while divisor < limit
-          primes << divisor unless primes.any? { |p| divisor % p == 0 }
-          # puts "#{divisor} (#{primes.count})" if divisor % 10000 == 0
-          divisor += 1
-        end
-        primes
+        Prime::EratosthenesGenerator.new.take_while { |p| p < limit }
       end
-        
+
+      # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2
+      # are their exponents
       def self.factors(number)
         factors = Hash.new(0)
-        primes = Set[]
-      
-        divisor = 2
-        while number > 1 && divisor < number ** 0.5 + 1
-          prime = primes.none? { |p| divisor % p == 0 }
-          primes << divisor if prime
-      
-          if prime && number % divisor == 0
-            while number % divisor == 0
-              number /= divisor
-              factors[divisor] += 1
-            end
+ 
+        prime_generator = Prime::EratosthenesGenerator.new
+
+        while number > 1
+          prime = prime_generator.take(1).first
+
+          while number % prime == 0
+            number /= prime
+            factors[prime] += 1
           end
-      
-          divisor += 1
         end
-        factors[number] += 1 if number != 1 && primes.none? { |p| number % p == 0 }
       
         factors
       end
