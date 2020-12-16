@@ -63,7 +63,7 @@ module Jason
       end
       
       def self.co_prime?(numbers)
-        factor_sets = numbers.map { |modulus| factors(modulus).keys.to_set }
+        factor_sets = numbers.map { |number| factors(number).keys.to_set }
         limit = factor_sets.length
         factor_sets.each_with_index do |factors, index|
           return true if index == limit - 1
