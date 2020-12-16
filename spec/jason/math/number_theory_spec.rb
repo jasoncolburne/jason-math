@@ -33,6 +33,35 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
+  context "#prime?" do
+    subject { described_class.prime?(n) }
+
+    context "2" do
+      let(:n) { 2 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "4" do
+      let(:n) { 4 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "17" do
+      let(:n) { 17 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "1299709 (100000th prime)" do
+      let(:n) { 1299709 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "1299709 * 1299721 (100000th and 100001st primes)" do
+      let(:n) { 1299709 * 1299721 }
+      it { is_expected.to be_falsey }
+    end
+  end
+
   context "#divisors" do
     subject { described_class.divisors(n) }
 

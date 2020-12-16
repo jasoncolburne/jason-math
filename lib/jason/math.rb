@@ -71,6 +71,10 @@ module Math
     Jason::Math::NumberTheory.reverse(n)
   end
 
+  def self.prime?(n)
+    Jason::Math::NumberTheory.prime?(n)
+  end
+
   def self.co_prime?(numbers)
     Jason::Math::NumberTheory.co_prime?(numbers)
   end
@@ -103,6 +107,10 @@ class Integer
 
   def perfect?
     Math.perfect?(self)
+  end
+
+  def prime?
+    Math.prime?(self)
   end
 
   def deficient?

@@ -13,6 +13,16 @@ module Jason
         Prime::EratosthenesGenerator.new.take_while { |p| p < limit }
       end
 
+      def self.prime?(number)
+        prime_generator = Prime::EratosthenesGenerator.new
+
+        while (prime = prime_generator.take(1).first) < number
+          return false if number % prime == 0
+        end
+
+        prime == number
+      end
+
       # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2
       # are their exponents
       def self.factors(number)
@@ -32,6 +42,7 @@ module Jason
         factors
       end
       
+      # returns a set, do with it what you will
       def self.divisors(number)
         prime_factors = factors(number)
         factors = Set[1]
@@ -46,6 +57,7 @@ module Jason
         factors
       end
 
+      # also returns a set
       def self.proper_divisors(number)
         divisors(number) - Set[number]
       end
