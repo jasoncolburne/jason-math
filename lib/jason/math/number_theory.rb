@@ -16,7 +16,7 @@ module Jason
       end
       
       def self.primes_below(limit)
-        Prime::EratosthenesGenerator.new.take_while { |p| p < limit }
+        Prime::EratosthenesGenerator.new.take_while { |prime| prime < limit }
       end
 
       def self.prime?(number)
