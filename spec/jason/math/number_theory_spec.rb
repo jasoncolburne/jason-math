@@ -33,6 +33,20 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
+  context "#prime" do
+    subject { described_class.prime(offset) }
+
+    context "1st" do
+      let(:offset) { 1 }
+      it { is_expected.to eq(2) }
+    end
+
+    context "100000th" do
+      let(:offset) { 100000 }
+      it { is_expected.to eq(1299709) }
+    end
+  end
+
   context "#prime?" do
     subject { described_class.prime?(n) }
 

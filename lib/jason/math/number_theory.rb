@@ -5,6 +5,12 @@ require 'set'
 module Jason
   module Math
     module NumberTheory
+      def self.prime(offset)
+        prime_generator = Prime::EratosthenesGenerator.new
+        (offset - 1).times { prime_generator.take(1) }
+        prime_generator.take(1).first
+      end
+
       def self.primes(count)
         Prime::EratosthenesGenerator.new.take(count)
       end

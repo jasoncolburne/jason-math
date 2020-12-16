@@ -71,6 +71,10 @@ module Math
     Jason::Math::NumberTheory.reverse(n)
   end
 
+  def self.prime(offset)
+    Jason::Math::NumberTheory.prime(offset)
+  end
+
   def self.prime?(n)
     Jason::Math::NumberTheory.prime?(n)
   end
