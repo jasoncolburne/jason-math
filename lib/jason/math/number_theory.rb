@@ -39,6 +39,11 @@ module Jason
         while number > 1
           prime = prime_generator.take(1).first
 
+          if prime > number ** 0.5
+            factors[number] += 1
+            break
+          end
+
           while number % prime == 0
             number /= prime
             factors[prime] += 1
@@ -93,6 +98,7 @@ module Jason
         number.to_s == number.to_s.reverse
       end
 
+      # i think this should probably be refactored into a loop
       def self.lychrel?(number, depth = 50)
         return true if depth.zero?
         next_number = number + reverse(number)
