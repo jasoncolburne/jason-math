@@ -65,6 +65,11 @@ RSpec.describe Jason::Math::NumberTheory do
       it { is_expected.to be_truthy }
     end
 
+    context "25" do
+      let(:n) { 25 }
+      it { is_expected.to be_falsey }
+    end
+
     context "1299709 (100000th prime)" do
       let(:n) { 1299709 }
       it { is_expected.to be_truthy }

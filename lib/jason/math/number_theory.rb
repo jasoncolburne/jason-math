@@ -22,11 +22,13 @@ module Jason
       def self.prime?(number)
         prime_generator = Prime::EratosthenesGenerator.new
 
-        while (prime = prime_generator.take(1).first) < number
+        root_n = number ** 0.5
+
+        while (prime = prime_generator.take(1).first) <= root_n
           return false if number % prime == 0
         end
 
-        prime == number
+        prime > root_n
       end
 
       # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2
