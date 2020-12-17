@@ -37,11 +37,12 @@ module Jason
         factors = Hash.new(0)
  
         prime_generator = Prime::EratosthenesGenerator.new
+        root_n = number ** 0.5
 
         while number > 1
           prime = prime_generator.take(1).first
 
-          if prime > number ** 0.5
+          if prime > root_n
             factors[number] += 1
             break
           end
