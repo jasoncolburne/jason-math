@@ -100,7 +100,6 @@ module Jason
         number.to_s == number.to_s.reverse
       end
 
-      # i think this should probably be refactored into a loop
       def self.lychrel?(number, depth = 50)
         while depth > 0
           next_number = number + reverse(number)
