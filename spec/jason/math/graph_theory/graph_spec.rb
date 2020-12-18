@@ -1,6 +1,6 @@
 RSpec.describe Jason::Math::GraphTheory::Graph do
-  context "#dijkstra" do
-    subject { graph.dijkstra(origin, destination) }
+  context "#shortest_path" do
+    subject { graph.shortest_path(origin, destination) }
 
     context "stackoverflow example" do
       # example taken from https://stackoverflow.com/questions/30409493/using-bfs-for-weighted-graphs

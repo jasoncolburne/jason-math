@@ -60,6 +60,8 @@ module Jason
           end
         end
 
+        alias_method :shortest_path, :dijkstra
+
         def longest_path(origin, destination)
           negate_edge_weights
           distance = dijkstra(origin, destination)
