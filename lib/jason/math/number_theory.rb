@@ -58,17 +58,16 @@ module Jason
       
       # returns a set, do with it what you will
       def self.divisors(number)
-        prime_factors = factors(number)
-        factors = Set[1]
-        all_primes = prime_factors.map { |p, n| [p] * n }.flatten
+        divisors = Set[1]
+        all_primes = factors(number).map { |p, n| [p] * n }.flatten
       
         (1..all_primes.count).each do |n|
           all_primes.combination(n).each do |combination|
-            factors << combination.inject(&:*)
+            divisors << combination.inject(&:*)
           end
         end
       
-        factors
+        divisors
       end
 
       # also returns a set

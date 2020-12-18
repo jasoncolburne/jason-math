@@ -88,6 +88,11 @@ RSpec.describe Jason::Math::NumberTheory do
       let(:n) { 24 }
       it { is_expected.to eq(Set[1, 2, 3, 4, 6, 8, 12, 24]) }
     end
+
+    context "of 17" do
+      let(:n) { 17 }
+      it { is_expected.to eq(Set[1,17]) }
+    end
   end
 
   context "#co_prime?" do
