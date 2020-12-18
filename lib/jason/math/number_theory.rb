@@ -49,6 +49,8 @@ module Jason
 
           while number % prime == 0
             number /= prime
+            root_n = number ** 0.5
+
             factors[prime] += 1
           end
         end
