@@ -6,11 +6,11 @@ module Jason
         (1..n).inject(&:*)
       end
       
-      def self.n_c_k(n, k)
-        n_p_k(n, k) / factorial(k)
+      def self.nCk(n, k)
+        nPk(n, k) / factorial(k)
       end
 
-      def self.n_p_k(n, k)
+      def self.nPk(n, k)
         factorial(n) / factorial(n - k)
       end
     end
