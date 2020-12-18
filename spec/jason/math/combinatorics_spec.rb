@@ -29,12 +29,12 @@ RSpec.describe Jason::Math::Combinatorics do
   end
 
   context "#nPk" do
-  subject { described_class.nPk(n, k) }
+    subject { described_class.nPk(n, k) }
 
-  context "40P20" do
-    let(:n) { 40 }
-    let(:k) { 20 }
-    it { is_expected.to eq(335367096786357081410764800000) }
+    context "40P20" do
+      let(:n) { 40 }
+      let(:k) { 20 }
+      it { is_expected.to eq(335367096786357081410764800000) }
+    end
   end
-end
 end
