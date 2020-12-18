@@ -6,8 +6,12 @@ module Jason
         (1..n).inject(&:*)
       end
       
-      def self.n_choose_k(n, k)
-        factorial(n) / (factorial(k) * factorial(n - k))
+      def self.n_c_k(n, k)
+        n_p_k(n, k) / factorial(k)
+      end
+
+      def self.n_p_k(n, k)
+        factorial(n) / factorial(n - k)
       end
     end
   end

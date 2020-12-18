@@ -22,8 +22,8 @@ module Math
     Jason::Math::Combinatorics.factorial(n)
   end
 
-  def self.n_choose_k(n, k)
-    Jason::Math::Combinatorics.n_choose_k(n, k)
+  def self.n_c_k(n, k)
+    Jason::Math::Combinatorics.n_c_k(n, k)
   end
 
   # number theory
@@ -94,7 +94,7 @@ end
 
 class Integer
   def choose(k)
-    Math.n_choose_k(self, k)
+    Math.n_c_k(self, k)
   end
 
   def factorial
