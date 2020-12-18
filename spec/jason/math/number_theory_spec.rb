@@ -219,9 +219,9 @@ RSpec.describe Jason::Math::NumberTheory do
       it { is_expected.to be_truthy }
     end
 
-    context "196, depth 100" do
+    context "196, depth 1000" do
       let(:n) { 196 }
-      let(:depth) { 100 }
+      let(:depth) { 1000 }
       it { is_expected.to be_truthy }
     end
   end

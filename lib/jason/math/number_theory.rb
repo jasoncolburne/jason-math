@@ -102,10 +102,14 @@ module Jason
 
       # i think this should probably be refactored into a loop
       def self.lychrel?(number, depth = 50)
-        return true if depth.zero?
-        next_number = number + reverse(number)
-        return false if palindrome?(next_number)
-        lychrel?(next_number, depth - 1)
+        while depth > 0
+          next_number = number + reverse(number)
+          return false if palindrome?(next_number)
+          number = next_number
+          depth -= 1
+        end
+
+        true
       end
 
       def self.reverse(number)
