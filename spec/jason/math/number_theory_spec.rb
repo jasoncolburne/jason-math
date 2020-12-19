@@ -107,6 +107,24 @@ RSpec.describe Jason::Math::NumberTheory do
       let(:numbers) { [2, 3, 5, 7, 9, 11, 13, 17, 19] }
       it { is_expected.to be_falsey }
     end
+
+    context "for [2, 26]" do
+      let(:numbers) { [2, 26] }
+      it { is_expected.to be_falsey }
+    end
+
+    context "for [2, 32193213281156929]" do
+      # this tests that we return early even if prime < root_max_n if we have resolved
+      # all but one number to 1. if this test runs super slowly, you fucked up.
+      let(:numbers) { [2, 32193213281156929] }
+      it { is_expected.to be_truthy }
+    end
+
+    context "for [1, 4]" do
+      # 1 is coprime with everything
+      let(:numbers) { [1, 4] }
+      it { is_expected.to be_truthy }
+    end
   end
 
   context "#chinese_remainder_theorem" do

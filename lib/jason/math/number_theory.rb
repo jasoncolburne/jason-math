@@ -78,12 +78,30 @@ module Jason
       end
       
       def self.co_prime?(numbers)
-        factor_sets = numbers.map { |number| factors(number).keys.to_set }
-        limit = factor_sets.length
-        factor_sets.each_with_index do |factors, index|
-          return true if index == limit - 1
-          return false unless factor_sets[(index + 1)..].all? { |set| factors.intersection(set).empty? }
+        # look for duplicates
+        return false if numbers.to_set.count != numbers.count
+
+        numbers = numbers.dup
+        prime_generator = Prime::EratosthenesGenerator.new
+        root_max_n = numbers.max ** 0.5
+
+        while (prime = prime_generator.take(1).first) < root_max_n && numbers.reject { |n| n == 1 }.count > 1
+          divisible = numbers.select { |number| number % prime == 0 }
+          return false if divisible.count > 1
+
+          divisible.each do |number|
+            new_number = number
+            while new_number % prime == 0
+              new_number = new_number / prime
+            end
+            numbers[numbers.index(number)] = new_number
+            # we'd need to do the numbers.max call twice to check if it changed and i think just doing it once 
+            # taking the root every time will be faster
+            root_max_n = numbers.max ** 0.5
+          end
         end
+
+        true
       end
 
       def self.perfect?(number)
