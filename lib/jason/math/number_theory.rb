@@ -78,7 +78,7 @@ module Jason
       end
       
       def self.co_prime?(numbers)
-        # look for duplicates
+        # look for duplicates, as this allows us to make assumptions later on
         return false if numbers.to_set.count != numbers.count
 
         numbers = numbers.dup
