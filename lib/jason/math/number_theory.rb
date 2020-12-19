@@ -47,11 +47,13 @@ module Jason
             break
           end
 
-          while number % prime == 0
-            number /= prime
-            root_n = number ** 0.5
+          if number % prime == 0
+            while number % prime == 0
+              number /= prime
+              factors[prime] += 1
+            end
 
-            factors[prime] += 1
+            root_n = number ** 0.5
           end
         end
       
