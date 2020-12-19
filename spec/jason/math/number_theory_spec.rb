@@ -122,9 +122,9 @@ RSpec.describe Jason::Math::NumberTheory do
       it { is_expected.to be_truthy }
     end
 
-    context "for [1, 4]" do
+    context "for [1, 4, 5]" do
       # 1 is coprime with everything
-      let(:numbers) { [1, 4] }
+      let(:numbers) { [1, 4, 5] }
       it { is_expected.to be_truthy }
     end
   end
