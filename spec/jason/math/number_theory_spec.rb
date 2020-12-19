@@ -109,6 +109,8 @@ RSpec.describe Jason::Math::NumberTheory do
     end
 
     context "for [2, 26]" do
+      # this is a regression test - i experimented with only going up to the root of the
+      # second maximum number and it broke things.
       let(:numbers) { [2, 26] }
       it { is_expected.to be_falsey }
     end
