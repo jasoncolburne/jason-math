@@ -76,6 +76,38 @@ module Jason
       def self.proper_divisors(number)
         divisors(number) - Set[number]
       end
+
+      def self.gcd(u, v)
+        # gcd(n, n) = n
+        return u if u == v
+
+        # gcd(0, n) = gcd(n, 0) = n
+        return v if u == 0
+        return u if v == 0
+
+        if u.even?
+          if v.odd?
+            gcd(u / 2, v)
+          else
+            2 * gcd(u / 2, v / 2)
+          end
+        else
+          if v.even?
+            gcd(u, v / 2)
+          else
+            if u > v
+              gcd((u - v) / 2, v)
+            else
+              gcd((v - u) / 2, u)
+            end
+          end
+        end
+      end
+
+      def self.lcm(u, v)
+        return 0 if u == 0 && v == 0
+        (u * v) / gcd(u, v)
+      end
       
       def self.co_prime?(numbers)
         # look for duplicates, as this allows us to make assumptions later on

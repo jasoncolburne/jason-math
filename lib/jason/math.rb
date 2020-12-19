@@ -83,6 +83,14 @@ module Math
     Jason::Math::NumberTheory.prime?(n)
   end
 
+  def self.gcd(x, y)
+    Jason::Math::NumberTheory.gcd(x, y)
+  end
+
+  def self.lcm(x, y)
+    Jason::Math::NumberTheory.lcm(x, y)
+  end
+
   def self.co_prime?(numbers)
     Jason::Math::NumberTheory.co_prime?(numbers)
   end

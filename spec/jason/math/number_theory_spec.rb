@@ -129,6 +129,62 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
+  context "#gcd" do
+    subject { described_class.gcd(x, y) }
+
+    context "for 12, 21" do
+      let(:x) { 12 }
+      let(:y) { 21 }
+      it { is_expected.to eq(3) }
+    end
+
+    context "for 12, 35" do
+      let(:x) { 12 }
+      let(:y) { 35 }
+      it { is_expected.to eq(1) }
+    end
+
+    context "for 26, 52" do
+      let(:x) { 26 }
+      let(:y) { 52 }
+      it { is_expected.to eq(26) }
+    end
+
+    context "for 100, 100" do
+      let(:x) { 100 }
+      let(:y) { 100 }
+      it { is_expected.to eq(100) }
+    end
+  end
+
+  context "#lcm" do
+    subject { described_class.lcm(x, y) }
+
+    context "for 12, 21" do
+      let(:x) { 12 }
+      let(:y) { 21 }
+      it { is_expected.to eq(84) }
+    end
+
+    context "for 12, 35" do
+      let(:x) { 12 }
+      let(:y) { 35 }
+      it { is_expected.to eq(420) }
+    end
+
+    context "for 26, 52" do
+      let(:x) { 26 }
+      let(:y) { 52 }
+      it { is_expected.to eq(52) }
+    end
+
+    context "for 100, 100" do
+      let(:x) { 100 }
+      let(:y) { 100 }
+      it { is_expected.to eq(100) }
+    end
+  end
+
   context "#chinese_remainder_theorem" do
     subject { described_class.chinese_remainder_theorem(values_by_moduli) }
 
