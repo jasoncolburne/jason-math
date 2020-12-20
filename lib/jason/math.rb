@@ -117,6 +117,10 @@ module Math
   def self.neighbouring_cells(cell)
     Jason::Math::Utility.neighbouring_cells(cell)
   end
+
+  def self.adjacent_cells(cell)
+    Jason::Math::Utility.adjacent_cells(cell)
+  end
 end
 
 class Integer

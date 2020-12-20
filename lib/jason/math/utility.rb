@@ -21,6 +21,9 @@ module Jason
       end
 
       def self.neighbouring_cells(cell, dimensions = nil)
+        return [] if cell.empty?
+
+        # we'll cache each dimension's method as we derive it
         @neighbouring_cells_methods ||= {}
 
         d = dimensions || cell.count
@@ -41,6 +44,23 @@ module Jason
         end
       
         dimensions.nil? ? eval(@neighbouring_cells_methods[d]) : string
+      end
+
+      def self.adjacent_cells(cell)
+        adjacent_cells = []
+
+        cell.each_with_index do |value, index|
+          cell_negative = cell.dup
+          cell_positive = cell.dup
+
+          cell_negative[index] -= 1
+          cell_positive[index] += 1
+
+          adjacent_cells << cell_negative
+          adjacent_cells << cell_positive
+        end
+
+        adjacent_cells
       end
     end
   end

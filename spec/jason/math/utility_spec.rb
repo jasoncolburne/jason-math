@@ -39,5 +39,40 @@ RSpec.describe Jason::Math::Utility do
       let(:cell) { [1, 2, 3, 4, 5, 6] }
       it { is_expected.to eq(728) }
     end
+
+    context "for []" do
+      let(:cell) { [] }
+      it { is_expected.to eq([]) }
+    end
+  end
+
+  context "#adjacent_cells" do
+    subject { described_class.adjacent_cells(cell) }
+
+    context "for [0]" do
+      let(:cell) { [0] }
+      it { is_expected.to eq([[-1], [1]]) }
+    end
+
+    context "for [1, 1]" do
+      let(:cell) { [1, 1] }
+      it { is_expected.to eq([[0, 1], [2, 1], [1, 0], [1, 2]]) }
+    end
+
+    context "for [1, 1, -1]" do
+      let(:cell) { [1, 1, -1] }
+      it { is_expected.to eq([[0, 1, -1], [2, 1, -1], [1, 0, -1], [1, 2, -1], [1, 1, -2], [1, 1, 0]]) }
+    end
+
+    context "for [1, 2, 3, 4, 5, 6], count" do
+      subject { described_class.adjacent_cells(cell).count }
+      let(:cell) { [1, 2, 3, 4, 5, 6] }
+      it { is_expected.to eq(12) }
+    end
+
+    context "for []" do
+      let(:cell) { [] }
+      it { is_expected.to eq([]) }
+    end
   end
 end
