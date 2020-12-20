@@ -3,6 +3,7 @@ require "jason/math/analysis"
 require "jason/math/combinatorics"
 require "jason/math/graph_theory"
 require "jason/math/number_theory"
+require "jason/math/utility"
 
 module Jason
   module Math
@@ -105,6 +106,16 @@ module Math
 
   def self.triangular_number(offset)
     Jason::Math::NumberTheory.triangular_number(offset)
+  end
+
+  # utility
+
+  def self.binary_search(array, value)
+    Jason::Math::Utility.binary_search(array, value)
+  end
+
+  def self.neighbouring_cells(cell)
+    Jason::Math::Utility.neighbouring_cells(cell)
   end
 end
 
