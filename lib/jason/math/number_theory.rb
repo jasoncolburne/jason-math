@@ -21,12 +21,13 @@ module Jason
 
       def self.prime?(number)
         prime_generator = Prime::EratosthenesGenerator.new
+        root_n = number ** 0.5
 
-        while (prime = prime_generator.take(1).first) * prime <= number
+        while (prime = prime_generator.take(1).first) <= root_n
           return false if number % prime == 0
         end
 
-        prime * prime > number
+        prime > root_n
       end
 
       # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2
@@ -34,11 +35,12 @@ module Jason
       def self.factors(number)
         factors = Hash.new(0)
         prime_generator = Prime::EratosthenesGenerator.new
+        root_n = number ** 0.5
 
         while number > 1
           prime = prime_generator.take(1).first
 
-          if prime * prime > number
+          if prime > root_n
             factors[number] += 1
             break
           end
@@ -48,6 +50,8 @@ module Jason
               number /= prime
               factors[prime] += 1
             end
+
+            root_n = number ** 0.5
           end
         end
       
@@ -127,9 +131,9 @@ module Jason
 
         numbers = numbers.dup
         prime_generator = Prime::EratosthenesGenerator.new
-        max_n = numbers.max ** 0.5
+        root_max_n = numbers.max ** 0.5
 
-        while (prime = prime_generator.take(1).first) * prime < max_n && numbers.reject { |n| n == 1 }.count > 1
+        while (prime = prime_generator.take(1).first) < root_max_n && numbers.reject { |n| n == 1 }.count > 1
           divisible = numbers.select { |number| number % prime == 0 }
           return false if divisible.count > 1
 
@@ -141,7 +145,7 @@ module Jason
             numbers[numbers.index(number)] = new_number
             # we'd need to do the numbers.max call twice to check if it changed and i think just doing it once 
             # taking the root every time will be faster
-            max_n = numbers.max
+            root_max_n = numbers.max ** 0.5
           end
         end
 
