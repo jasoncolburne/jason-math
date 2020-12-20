@@ -95,6 +95,20 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
+  context "#proper_divisors" do
+    subject { described_class.proper_divisors(n) }
+
+    context "of 24" do
+      let(:n) { 24 }
+      it { is_expected.to eq(Set[1, 2, 3, 4, 6, 8, 12]) }
+    end
+
+    context "of 17" do
+      let(:n) { 17 }
+      it { is_expected.to eq(Set[1]) }
+    end
+  end
+
   context "#totient" do
     subject { described_class.totient(n) }
 
