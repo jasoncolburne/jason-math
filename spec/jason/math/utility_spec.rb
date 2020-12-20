@@ -19,6 +19,12 @@ RSpec.describe Jason::Math::Utility do
       let(:value) { 4 }
       it { is_expected.to eq(0) }
     end
+
+    context "for 3 in [4, 5, 17, 21, 22, 24, 32, 36, 43, 57, 67, 71, 73, 76, 77, 88, 89, 90, 94]" do
+      let(:array) { [4, 5, 17, 21, 22, 24, 32, 36, 43, 57, 67, 71, 73, 76, 77, 88, 89, 90, 94] }
+      let(:value) { 3 }
+      it { is_expected.to eq(nil) }
+    end
   end
 
   context "#neighbouring_cells" do
