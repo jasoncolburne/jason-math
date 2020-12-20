@@ -95,6 +95,20 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
+  context "#totient" do
+    subject { described_class.totient(n) }
+
+    context "of 1299709" do
+      let(:n) { 1299709 }
+      it { is_expected.to eq(1299708) }
+    end
+
+    context "of 10" do
+      let(:n) { 10 }
+      it { is_expected.to eq(4) }
+    end
+  end
+
   context "#co_prime?" do
     subject { described_class.co_prime?(numbers) }
 

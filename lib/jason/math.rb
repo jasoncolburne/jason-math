@@ -91,6 +91,10 @@ module Math
     Jason::Math::NumberTheory.lcm(x, y)
   end
 
+  def self.totient(n)
+    Jason::Math::NumberTheory.totient(n)
+  end
+
   def self.co_prime?(numbers)
     Jason::Math::NumberTheory.co_prime?(numbers)
   end

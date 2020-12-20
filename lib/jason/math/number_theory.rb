@@ -110,6 +110,22 @@ module Jason
         return 0 if u == 0 && v == 0
         (u * v) / gcd(u, v)
       end
+
+      def self.totient(number)
+        result = number;
+        root_n = (number ** 0.5).to_i
+
+        (2..root_n).each do |i|
+          if number % i == 0
+            while number % i == 0
+              number /= i
+            end
+            result -= result / i
+          end
+        end
+
+        number > 1 ? result - result / number : result
+      end
       
       def self.co_prime?(numbers)
         # look for duplicates, as this allows us to make assumptions later on
