@@ -91,7 +91,7 @@ RSpec.describe Jason::Math::NumberTheory do
 
     context "of 17" do
       let(:n) { 17 }
-      it { is_expected.to eq(Set[1,17]) }
+      it { is_expected.to eq(Set[1, 17]) }
     end
   end
 
