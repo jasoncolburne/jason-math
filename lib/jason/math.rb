@@ -1,4 +1,6 @@
 require "jason/math/version"
+
+require "jason/math/algebra"
 require "jason/math/analysis"
 require "jason/math/combinatorics"
 require "jason/math/graph_theory"
@@ -13,6 +15,11 @@ module Jason
 end
 
 module Math
+  # algebra
+  def self.solve_quadratic(a, b, c)
+    Jason::Math::Algebra.solve_quadratic(a, b, c)
+  end
+
   # analysis
   def self.collatz_sequence(n)
     Jason::Math::Analysis.collatz_sequence(n)
