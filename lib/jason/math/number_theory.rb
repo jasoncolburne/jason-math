@@ -111,9 +111,9 @@ module Jason
 
       def self.totient(number)
         result = number;
-        root_n = (number ** 0.5).to_i
+        max = (number ** 0.5).to_i
 
-        (2..root_n).each do |i|
+        (2..max).each do |i|
           if number % i == 0
             while number % i == 0
               number /= i
