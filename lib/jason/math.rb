@@ -184,6 +184,18 @@ class Array
   def co_prime?
     Math.co_prime?(self)
   end
+
+  def binary_search(value)
+    Math.binary_search(self, value)
+  end
+
+  def neighbouring_cells
+    Math.neighbouring_cells(self)
+  end
+
+  def adjacent_cells
+    Math.adjacent_cells(self)
+  end
 end
 
 class Set
