@@ -27,7 +27,7 @@ module Jason
           return false if number % prime == 0
         end
 
-        prime > root_n
+        true
       end
 
       # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2
