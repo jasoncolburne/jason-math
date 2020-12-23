@@ -53,7 +53,7 @@ module Jason
         end
 
         def negate_edge_weights
-          @graph.each do |vertex, edges|
+          @graph.values.each do |edges|
             edges.each do |edge|
               edge[:weight] = -edge[:weight]
             end
