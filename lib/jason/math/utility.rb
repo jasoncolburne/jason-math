@@ -1,3 +1,5 @@
+require 'jason/math/utility/disjoint_set'
+
 module Jason
   module Math
     module Utility

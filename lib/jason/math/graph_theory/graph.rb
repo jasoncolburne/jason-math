@@ -6,30 +6,12 @@ module Jason
       class Graph
         def initialize(vertices)
           @vertices = vertices
-          @graph = {}
+          @graph = Hash.new { |h, k| h[k] = [] }
         end
       
         def add_edge(origin, destination, weight = 1)
           raise "unexpected vertices (#{origin}, #{destination})!" unless [origin, destination].all? { |vertex| @vertices.include?(vertex) }
-      
-          @graph[origin] ||= []
-          if old_data = edge_from(origin, destination)
-            if old_data[:weight] > weight
-              # update to the shorter path
-              @graph[origin].delete(old_data)
-              @graph[origin] << { vertex: destination, weight: weight }
-            end
-          else    
-            @graph[origin] << { vertex: destination, weight: weight }
-          end
-        end
-      
-        def edges_for(vertex)
-          @graph[vertex] ||= []
-        end
-      
-        def edge_from(origin, destination)
-          @graph[origin].find { |edge| edge[:vertex] == destination }
+          @graph[origin] << { vertex: destination, weight: weight }
         end
       
         def dijkstra(origin, destination)
@@ -41,7 +23,7 @@ module Jason
       
           until heap.empty? do
             vertex = heap.pop
-            edges_for(vertex).each do |edge|
+            @graph[vertex].each do |edge|
               if distances[edge[:vertex]] > distances[vertex] + edge[:weight]
                 distances[edge[:vertex]] = distances[vertex] + edge[:weight]
                 heap << edge[:vertex]
@@ -52,14 +34,6 @@ module Jason
           distances[destination]
         end
 
-        def negate_edge_weights
-          @graph.values.each do |edges|
-            edges.each do |edge|
-              edge[:weight] = -edge[:weight]
-            end
-          end
-        end
-
         alias_method :shortest_path, :dijkstra
 
         def longest_path(origin, destination)
@@ -67,6 +41,51 @@ module Jason
           distance = dijkstra(origin, destination)
           negate_edge_weights
           -distance
+        end
+
+        def kruskal
+          minimum_spanning_tree = []
+
+          edges = []
+          @graph.each do |origin, aggregates|
+            aggregates.each do |aggregate|
+              edges << { origin: origin, destination: aggregate[:vertex], weight: aggregate[:weight] }
+            end
+          end
+          edges.sort_by! { |aggregate| aggregate[:weight] }
+
+          disjoint_set = Jason::Math::Utility::DisjointSet.new(@vertices)
+
+          tree_size = @vertices.count - 1
+          max_index = edges.count - 1
+
+          index = 0
+          while minimum_spanning_tree.count < tree_size && index < max_index
+            aggregate = edges[index]
+            index += 1
+
+            a = disjoint_set.find(aggregate[:origin])
+            b = disjoint_set.find(aggregate[:destination])
+
+            if a != b
+              minimum_spanning_tree << aggregate
+              disjoint_set.union(a, b)
+            end
+          end
+
+          minimum_spanning_tree.count == tree_size ? minimum_spanning_tree : nil
+        end
+
+        alias_method :minimum_spanning_tree, :kruskal
+
+        private
+
+        def negate_edge_weights
+          @graph.values.each do |edges|
+            edges.each do |edge|
+              edge[:weight] = -edge[:weight]
+            end
+          end
         end
       end      
     end
