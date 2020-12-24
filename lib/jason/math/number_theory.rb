@@ -19,15 +19,63 @@ module Jason
         Prime::EratosthenesGenerator.new.take_while { |prime| prime < limit }
       end
 
-      def self.prime?(number)
+      def self.prime?(number, below = nil)
         prime_generator = Prime::EratosthenesGenerator.new
         root_n = number ** 0.5
 
-        while (prime = prime_generator.take(1).first) <= root_n
+        while (prime = prime_generator.take(1).first) <= root_n && (below.nil? || prime < below)
           return false if number % prime == 0
         end
 
         true
+      end
+
+      def self.prime_by_weak_fermat?(number, iterations = 10000)
+        iterations.times do
+          # TODO use a better RNG
+          a = rand(number - 4) + 2
+          return false unless a.to_bn.mod_exp((number - 1), number) == 1
+        end
+
+        true
+      end
+
+      def self.prime_by_miller_rabin?(number, iterations = 10000)
+        r = 0
+        d = number - 1
+        while d % 2 == 0
+          d /= 2
+          r += 1
+        end
+
+        iterations.times do
+          # TODO use a better RNG
+          a = rand(number - 4) + 2
+          x = a.to_bn.mod_exp(d, number)
+          next if x == 1 or x == number - 1
+          probably_prime = false
+          (r - 1).times do
+            x = x.mod_exp(2, number)
+            if x == number - 1
+              probably_prime = true
+              break
+            end
+          end
+
+          return false unless probably_prime
+        end
+
+        true
+      end
+
+      def self.probably_prime?(number, sieve_below = 1299709, iterations_of_fermat = 10000, iterations_of_miller_rabin = 10000)
+        return false unless prime?(number, sieve_below)
+
+        if number < sieve_below * sieve_below
+          true
+        else
+          prime_by_weak_fermat?(number, iterations_of_fermat) && prime_by_miller_rabin?(number, iterations_of_miller_rabin)
+        end
       end
 
       # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2
