@@ -32,6 +32,7 @@ module Jason
 
       def self.prime_by_weak_fermat?(number, iterations = nil)
         iterations ||= number.to_s(2).length / 2 + 1
+        puts iterations
         iterations.times do
           # TODO use a better RNG
           a = rand(number - 4) + 2
