@@ -91,15 +91,15 @@ module Math
     Jason::Math::NumberTheory.prime?(n)
   end
 
-  def self.prime_by_weak_fermat?(n, iterations = 10000)
+  def self.prime_by_weak_fermat?(n, iterations = nil)
     Jason::Math::NumberTheory.prime_by_weak_fermat?(n, iterations)
   end
 
-  def self.prime_by_miller_rabin?(n, iterations = 10000)
+  def self.prime_by_miller_rabin?(n, iterations = nil)
     Jason::Math::NumberTheory.prime_by_miller_rabin?(n, iterations)
   end
 
-  def self.probably_prime?(n, sieve_below = 1299709, iterations_of_fermat = 10000, iterations_of_miller_rabin = 10000)
+  def self.probably_prime?(n, sieve_below = 1299709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
     Jason::Math::NumberTheory.probably_prime?(n, sieve_below, iterations_of_fermat, iterations_of_miller_rabin)
   end
 
@@ -163,15 +163,15 @@ class Integer
     Math.prime?(self)
   end
 
-  def prime_by_weak_fermat?(iterations = 10000)
+  def prime_by_weak_fermat?(iterations = nil)
     Math.prime_by_weak_fermat?(self, iterations)
   end
 
-  def prime_by_miller_rabin?(iterations = 10000)
+  def prime_by_miller_rabin?(iterations = nil)
     Math.prime_by_miller_rabin?(self, iterations)
   end
 
-  def probably_prime?(sieve_below = 1299709, iterations_of_fermat = 10000, iterations_of_miller_rabin = 10000)
+  def probably_prime?(sieve_below = 1299709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
     Math.probably_prime?(self, sieve_below, iterations_of_fermat, iterations_of_miller_rabin)
   end
 

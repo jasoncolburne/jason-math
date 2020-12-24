@@ -30,7 +30,8 @@ module Jason
         true
       end
 
-      def self.prime_by_weak_fermat?(number, iterations = 10000)
+      def self.prime_by_weak_fermat?(number, iterations = nil)
+        iterations ||= number.to_s(2).length / 2 + 1
         iterations.times do
           # TODO use a better RNG
           a = rand(number - 4) + 2
@@ -40,7 +41,7 @@ module Jason
         true
       end
 
-      def self.prime_by_miller_rabin?(number, iterations = 10000)
+      def self.prime_by_miller_rabin?(number, iterations = nil)
         r = 0
         d = number - 1
         while d % 2 == 0
@@ -48,6 +49,7 @@ module Jason
           r += 1
         end
 
+        iterations ||= number.to_s(2).length / 2 + 1
         iterations.times do
           # TODO use a better RNG
           a = rand(number - 4) + 2
@@ -68,7 +70,7 @@ module Jason
         true
       end
 
-      def self.probably_prime?(number, sieve_below = 1299709, iterations_of_fermat = 10000, iterations_of_miller_rabin = 10000)
+      def self.probably_prime?(number, sieve_below = 1299709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
         return false unless prime?(number, sieve_below)
 
         if number < sieve_below * sieve_below
