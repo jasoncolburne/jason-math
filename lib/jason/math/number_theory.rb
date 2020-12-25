@@ -214,8 +214,9 @@ module Jason
         proper_divisors(number).sum > number
       end
 
-      def self.palindrome?(number)
-        number.to_s == number.to_s.reverse
+      def self.palindrome?(number, base = 10)
+        string = number.to_s(base)
+        string == string.reverse
       end
 
       def self.lychrel?(number, depth = 50)

@@ -356,6 +356,13 @@ RSpec.describe Jason::Math::NumberTheory do
       let(:n) { 24566 }
       it { is_expected.to be_falsey }
     end
+
+    context "585, base 2" do
+      subject { described_class.palindrome?(n, base) }
+      let(:n) { 585 }
+      let(:base) { 2 }
+      it { is_expected.to be_truthy }
+    end
   end
 
   context "#lychrel?" do

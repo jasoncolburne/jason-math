@@ -75,8 +75,8 @@ module Math
     Jason::Math::NumberTheory.lychrel?(n, depth)
   end
 
-  def self.palindrome?(n)
-    Jason::Math::NumberTheory.palindrome?(n)
+  def self.palindrome?(n, base = 10)
+    Jason::Math::NumberTheory.palindrome?(n, base)
   end
 
   def self.reverse(n)
@@ -187,8 +187,8 @@ class Integer
     Math.lychrel?(self, depth)
   end
 
-  def palindrome?
-    Math.palindrome?(self)
+  def palindrome?(base = 10)
+    Math.palindrome?(self, base)
   end
 
   def reverse
