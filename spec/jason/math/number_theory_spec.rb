@@ -431,6 +431,20 @@ RSpec.describe Jason::Math::NumberTheory do
       let(:argument) { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
       it { is_expected.to be_falsey }
     end
+
+    context "2013, initial = 0" do
+      subject { described_class.pandigital?(argument, initial) }
+      let(:argument) { 2013 }
+      let(:initial) { 0 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "2534, initial = 2" do
+      subject { described_class.pandigital?(argument, initial) }
+      let(:argument) { 2534 }
+      let(:initial) { 2 }
+      it { is_expected.to be_truthy }
+    end
   end
 
   context "#reverse" do

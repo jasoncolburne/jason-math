@@ -230,9 +230,10 @@ module Jason
         true
       end
 
-      def self.pandigital?(numbers)
+      def self.pandigital?(numbers, initial = 1)
         digits = numbers.is_a?(Integer) ? numbers.digits : numbers.map(&:digits).flatten
-        return false unless (1..digits.count).to_set == digits.to_set
+        max = digits.count - (1 - initial)
+        return false unless (initial..max).to_set == digits.to_set
         true
       end
 
