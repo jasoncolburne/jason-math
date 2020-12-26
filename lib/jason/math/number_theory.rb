@@ -254,6 +254,10 @@ module Jason
       def self.reverse(number)
         number.to_s.reverse.to_i
       end
+
+      def self.concatenate(numbers)
+        numbers.map(&:to_s).join.to_i
+      end
       
       def self.chinese_remainder_theorem(mapping)
         raise "moduli not co-prime" unless co_prime?(mapping.keys)

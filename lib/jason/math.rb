@@ -91,6 +91,10 @@ module Math
     Jason::Math::NumberTheory.reverse(n)
   end
 
+  def self.concatenate(numbers)
+    Jason::Math::NumberTheory.concatenate(numbers)
+  end
+
   def self.prime(offset)
     Jason::Math::NumberTheory.prime(offset)
   end
@@ -229,6 +233,10 @@ class Integer
 end
 
 class Array
+  def concatenate
+    Math.concatenate(self)
+  end
+
   def co_prime?
     Math.co_prime?(self)
   end
