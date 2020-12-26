@@ -139,6 +139,10 @@ module Math
     Jason::Math::NumberTheory.pentagonal_number(offset)
   end
 
+  def self.hexagonal_number(offset)
+    Jason::Math::NumberTheory.hexagonal_number(offset)
+  end
+
   # utility
 
   def self.binary_search(array, value)

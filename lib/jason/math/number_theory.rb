@@ -270,6 +270,10 @@ module Jason
       def self.pentagonal_number(offset)
         (offset * (3 * offset - 1)) / 2
       end
+
+      def self.hexagonal_number(offset)
+        offset * (2 * offset - 1)
+      end
     end
   end
 end
