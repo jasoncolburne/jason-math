@@ -79,6 +79,14 @@ module Math
     Jason::Math::NumberTheory.palindrome?(n, base)
   end
 
+  def self.pandigital?(numbers)
+    Jason::Math::NumberTheory.pandigital?(numbers)
+  end
+
+  def self.digits(n)
+    Jason::Math::NumberTheory.digits(n)
+  end
+
   def self.reverse(n)
     Jason::Math::NumberTheory.reverse(n)
   end
@@ -155,6 +163,10 @@ class Integer
     Math.divisors(self)
   end
 
+  def digits
+    Math.digits(self)
+  end
+
   def perfect?
     Math.perfect?(self)
   end
@@ -220,11 +232,19 @@ class Array
   def adjacent_cells
     Math.adjacent_cells(self)
   end
+
+  def pandigital?
+    Math.pandigital?(self)
+  end
 end
 
 class Set
   def co_prime?
     Math.co_prime?(self)
+  end
+
+  def pandigital?
+    Math.pandigital?(self)
   end
 end
 

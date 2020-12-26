@@ -230,6 +230,25 @@ module Jason
         true
       end
 
+      def self.pandigital?(numbers)
+        digits = numbers.map { |number| number.to_s.split('') }.flatten
+        digits.count == 9 && digits.uniq.count == 9 && !digits.include?('0')
+      end
+
+      # note: negative numbers will lose their sign in this method
+      def self.digits(number)
+        return [0] if number.zero?
+
+        number = number.abs if number < 0
+        
+        digits = []
+        while number > 0
+          digits.unshift(number % 10)
+          number /= 10
+        end
+        digits
+      end
+
       def self.reverse(number)
         number.to_s.reverse.to_i
       end
