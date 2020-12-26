@@ -135,6 +135,10 @@ module Math
     Jason::Math::NumberTheory.triangular_number(offset)
   end
 
+  def self.pentagonal_number(offset)
+    Jason::Math::NumberTheory.pentagonal_number(offset)
+  end
+
   # utility
 
   def self.binary_search(array, value)

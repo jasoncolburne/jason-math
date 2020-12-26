@@ -266,6 +266,10 @@ module Jason
       def self.triangular_number(offset)
         (offset * (offset + 1)) / 2
       end
+
+      def self.pentagonal_number(offset)
+        (offset * (3 * offset - 1)) / 2
+      end
     end
   end
 end
