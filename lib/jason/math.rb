@@ -167,6 +167,10 @@ class Integer
     Math.digits(self)
   end
 
+  def pandigital?
+    [self].pandigital?
+  end
+
   def perfect?
     Math.perfect?(self)
   end

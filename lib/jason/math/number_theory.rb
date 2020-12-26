@@ -231,8 +231,9 @@ module Jason
       end
 
       def self.pandigital?(numbers)
-        digits = numbers.map { |number| number.to_s.split('') }.flatten
-        digits.count == 9 && digits.uniq.count == 9 && !digits.include?('0')
+        digits = numbers.map(&:digits).flatten
+        return false unless (1..digits.count).to_set == digits.to_set
+        true
       end
 
       # note: negative numbers will lose their sign in this method
@@ -240,7 +241,7 @@ module Jason
         return [0] if number.zero?
 
         number = number.abs if number < 0
-        
+
         digits = []
         while number > 0
           digits.unshift(number % 10)
