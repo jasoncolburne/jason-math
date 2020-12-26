@@ -168,7 +168,7 @@ class Integer
   end
 
   def pandigital?
-    [self].pandigital?
+    Math.pandigital?(self)
   end
 
   def perfect?

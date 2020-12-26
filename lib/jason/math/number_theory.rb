@@ -231,7 +231,7 @@ module Jason
       end
 
       def self.pandigital?(numbers)
-        digits = numbers.map(&:digits).flatten
+        digits = numbers.is_a?(Integer) ? numbers.digits : numbers.map(&:digits).flatten
         return false unless (1..digits.count).to_set == digits.to_set
         true
       end

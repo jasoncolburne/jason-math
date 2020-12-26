@@ -393,6 +393,46 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
+  context "#pandigital?" do
+    subject { described_class.pandigital?(argument) }
+
+    context "42531" do
+      let(:argument) { 42531 }
+      it { is_expected.to be_truthy }
+    end
+
+    context "425314" do
+      let(:argument) { 425314 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "42631" do
+      let(:argument) { 42631 }
+      it { is_expected.to be_falsey }
+    end
+
+    context "[14, 52, 3687]" do
+      let(:argument) { [14, 52, 3687] }
+      it { is_expected.to be_truthy }
+    end
+
+    context "[14, 52, 3687, 0]" do
+      let(:argument) { [14, 52, 3687, 0] }
+      it { is_expected.to be_falsey }
+    end
+
+    context "[1]" do
+      let(:argument) { [1] }
+      it { is_expected.to be_truthy }
+    end
+
+    # important test
+    context "[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]" do
+      let(:argument) { [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+      it { is_expected.to be_falsey }
+    end
+  end
+
   context "#reverse" do
     subject { described_class.reverse(n) }
 
