@@ -8,7 +8,7 @@ module Jason
       def self.prime(offset)
         prime_generator = Prime::EratosthenesGenerator.new
         (offset - 1).times { prime_generator.take(1) }
-        prime_generator.take(1).first
+        prime_generator.next
       end
 
       def self.primes(count)
@@ -23,7 +23,7 @@ module Jason
         prime_generator = Prime::EratosthenesGenerator.new
         root_n = number ** 0.5
 
-        while (prime = prime_generator.take(1).first) <= root_n && (below.nil? || prime < below)
+        while (prime = prime_generator.next) <= root_n && (below.nil? || prime < below)
           return false if number % prime == 0
         end
 
@@ -88,7 +88,7 @@ module Jason
         root_n = number ** 0.5
 
         while number > 1
-          prime = prime_generator.take(1).first
+          prime = prime_generator.next
 
           if prime > root_n
             factors[number] += 1
@@ -183,7 +183,7 @@ module Jason
         prime_generator = Prime::EratosthenesGenerator.new
         root_max_n = numbers.max ** 0.5
 
-        while (prime = prime_generator.take(1).first) < root_max_n && numbers.reject { |n| n == 1 }.count > 1
+        while (prime = prime_generator.next) < root_max_n && numbers.reject { |n| n == 1 }.count > 1
           divisible = numbers.select { |number| number % prime == 0 }
           return false if divisible.count > 1
 
