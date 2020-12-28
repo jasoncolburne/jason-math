@@ -25,6 +25,10 @@ module Math
     Jason::Math::Analysis.collatz_sequence(n)
   end
 
+  def self.root_as_continued_fraction(n)
+    Jason::Math::Analysis.root_as_continued_fraction(n)
+  end
+
   # combinatorics
   def self.factorial(n)
     Jason::Math::Combinatorics.factorial(n)
@@ -229,6 +233,10 @@ class Integer
 
   def primes
     Math.primes(self)
+  end
+
+  def root_as_continued_fraction
+    Math.root_as_continued_fraction(self)
   end
 end
 
