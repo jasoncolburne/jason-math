@@ -64,6 +64,17 @@ module Jason
 
         adjacent_cells
       end
+
+      def self.circular_array_enumerator(array)
+        array = array.dup
+
+        Enumerator.new do |yielder|
+          while true
+            yielder.yield array.first
+            array.rotate!(1)
+          end
+        end
+      end
     end
   end
 end

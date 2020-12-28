@@ -40,20 +40,21 @@ module Jason
       end
 
       def self.evaluate_continued_fraction(fraction, depth = 32)
-        return fraction[0] if fraction[1].empty?
+        return fraction[0] if fraction[1].is_a?(Array) && fraction[1].empty?
 
-        fraction[0] + 1.to_f / recursively_evaluate_continued_fraction(fraction[1].dup, depth)
+        enumerator = fraction[1].is_a?(Array) ? Utility.circular_array_enumerator(fraction[1]) : fraction[1]
+
+        fraction[0] + 1.to_f / recursively_evaluate_continued_fraction(enumerator, depth)
       end
 
       private
 
-      def self.recursively_evaluate_continued_fraction(sequence, depth, iterations = 0)
+      def self.recursively_evaluate_continued_fraction(enumerator, depth, iterations = 0)
         if iterations > depth
           0
         else
-          value = sequence.first
-          sequence.rotate!(1)
-          value + 1.to_f / recursively_evaluate_continued_fraction(sequence, depth, iterations + 1)
+          value = enumerator.next
+          value + 1.to_f / recursively_evaluate_continued_fraction(enumerator, depth, iterations + 1)
         end
       end
     end
