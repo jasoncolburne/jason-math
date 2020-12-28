@@ -30,6 +30,12 @@ RSpec.describe Jason::Math::Analysis do
   context "#evaluate_continued_fraction" do
     subject { described_class.evaluate_continued_fraction(fraction) }
 
+    context "for phi ([1, [1]])" do
+      let(:fraction) { [1, [1]] }
+      let(:result) { (5 ** 0.5 + 1) / 2 }
+      it { is_expected.to eq(result) }
+    end
+
     context "for [1, [2]]" do
       let(:fraction) { [1, [2]] }
       let(:result) { 2 ** 0.5 }

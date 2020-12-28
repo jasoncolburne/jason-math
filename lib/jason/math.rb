@@ -29,8 +29,12 @@ module Math
     Jason::Math::Analysis.root_as_continued_fraction(n)
   end
 
-  def self.evaluate_continued_fraction(fraction, depth = 32)
+  def self.evaluate_continued_fraction(fraction, depth = 40)
     Jason::Math::Analysis.evaluate_continued_fraction(fraction, depth)
+  end
+
+  def self.continued_fraction_for(constant)
+    Jason::Math::Analysis.continued_fraction_for(constant)
   end
 
   # combinatorics
@@ -269,7 +273,7 @@ class Array
     Math.pandigital?(self, initial)
   end
 
-  def evaluate_continued_fraction(depth = 32)
+  def evaluate_continued_fraction(depth = 40)
     Math.evaluate_continued_fraction(self, depth)
   end
 end

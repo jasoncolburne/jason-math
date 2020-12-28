@@ -39,12 +39,33 @@ module Jason
         result
       end
 
-      def self.evaluate_continued_fraction(fraction, depth = 32)
+      def self.evaluate_continued_fraction(fraction, depth = 40)
         return fraction[0] if fraction[1].is_a?(Array) && fraction[1].empty?
 
         generator = fraction[1].is_a?(Array) ? Utility.circular_array_generator(fraction[1]) : fraction[1]
 
         fraction[0] + 1.to_f / recursively_evaluate_continued_fraction(generator, depth)
+      end
+
+      def self.continued_fraction_for(constant)
+        case constant
+        when :e
+          e_continued_fraction_generator = Enumerator.new do |yielder|
+            i = 1
+            while true
+              yielder.yield 1
+              yielder.yield 2 * i
+              yielder.yield 1
+              i += 1
+            end
+          end
+
+          [2, e_continued_fraction_generator]
+        when :phi # golden ratio
+          [1, [1]]
+        else
+          raise "unsupported constant"
+        end
       end
 
       private

@@ -69,9 +69,19 @@ module Jason
         array = array.dup
 
         Enumerator.new do |yielder|
-          while true
-            yielder.yield array.first
-            array.rotate!(1)
+          unless array.empty?
+            if array.count == 1
+              to_yield = array.first
+              yielder.yield to_yield while true
+            else
+              i = 0
+              count = array.count
+              while true
+                yielder.yield array[i]
+                i += 1
+                i = 0 if i == count
+              end
+            end
           end
         end
       end
