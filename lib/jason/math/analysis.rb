@@ -24,17 +24,37 @@ module Jason
         a = limit
         result << a
 
-        seen = Set[]
-        until seen.include?([m, d, a])
-          subresult << a unless seen.empty?
-          seen << [m, d, a]
-          m = d * a - m
-          d = (n - m * m) / d
-          a = (limit + m) / d
+        unless limit == n ** 0.5
+          seen = Set[]
+          until seen.include?([m, d, a])
+            subresult << a unless seen.empty?
+            seen << [m, d, a]
+            m = d * a - m
+            d = (n - m * m) / d
+            a = (limit + m) / d
+          end
         end
 
         result << subresult
         result
+      end
+
+      def self.evaluate_continued_fraction(fraction, depth = 32)
+        return fraction[0] if fraction[1].empty?
+
+        fraction[0] + 1.to_f / recursively_evaluate_continued_fraction(fraction[1].dup, depth)
+      end
+
+      private
+
+      def self.recursively_evaluate_continued_fraction(sequence, depth, iterations = 0)
+        if iterations > depth
+          0
+        else
+          value = sequence.first
+          sequence.rotate!(1)
+          value + 1.to_f / recursively_evaluate_continued_fraction(sequence, depth, iterations + 1)
+        end
       end
     end
   end
