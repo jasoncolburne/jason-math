@@ -54,7 +54,7 @@ module Jason
           end
           edges.sort_by! { |aggregate| aggregate[:weight] }
 
-          disjoint_set = Jason::Math::Utility::DisjointSet.new(@vertices)
+          disjoint_set = Utility::DisjointSet.new(@vertices)
 
           tree_size = @vertices.count - 1
           max_index = edges.count - 1
