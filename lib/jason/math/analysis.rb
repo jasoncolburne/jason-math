@@ -44,7 +44,7 @@ module Jason
 
         generator = fraction[1].is_a?(Array) ? Utility.circular_array_generator(fraction[1]) : fraction[1]
 
-        return fraction[0] if depth.zero?
+        return Rational(fraction[0], 1) if depth.zero?
 
         fraction[0] + Rational(1, recursively_evaluate_continued_fraction(generator, depth))
       end
