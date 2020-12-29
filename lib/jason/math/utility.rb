@@ -1,4 +1,5 @@
 require 'jason/math/utility/disjoint_set'
+require 'jason/math/utility/completion_estimator'
 
 module Jason
   module Math
