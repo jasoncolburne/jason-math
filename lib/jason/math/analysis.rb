@@ -44,6 +44,8 @@ module Jason
 
         generator = fraction[1].is_a?(Array) ? Utility.circular_array_generator(fraction[1]) : fraction[1]
 
+        return fraction[0] if depth.zero?
+
         fraction[0] + Rational(1, recursively_evaluate_continued_fraction(generator, depth))
       end
 
@@ -70,9 +72,9 @@ module Jason
 
       private
 
-      def self.recursively_evaluate_continued_fraction(generator, depth, iterations = 0)
-        if iterations > depth
-          1
+      def self.recursively_evaluate_continued_fraction(generator, depth, iterations = 1)
+        if iterations == depth
+          generator.next
         else
           value = generator.next
           value + Rational(1, recursively_evaluate_continued_fraction(generator, depth, iterations + 1))

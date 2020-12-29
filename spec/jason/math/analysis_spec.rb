@@ -28,7 +28,8 @@ RSpec.describe Jason::Math::Analysis do
   end
 
   context "#evaluate_continued_fraction" do
-    subject { described_class.evaluate_continued_fraction(fraction) }
+    subject { described_class.evaluate_continued_fraction(fraction, depth) }
+    let(:depth) { 42 }
 
     context "for phi ([1, [1]])" do
       let(:fraction) { [1, [1]] }
@@ -36,9 +37,30 @@ RSpec.describe Jason::Math::Analysis do
       it { is_expected.to eq(result) }
     end
 
-    context "for [1, [2]]" do
+    context "for root 2 ([1, [2]])" do
       let(:fraction) { [1, [2]] }
-      let(:result) { Rational(8434586304032980, 5964153172084899) }
+      let(:result) { Rational(14398739476117879, 10181446324101389) }
+      it { is_expected.to eq(result) }
+    end
+
+    context "for root 2 ([1, [2]]), depth = 0" do
+      let(:fraction) { [1, [2]] }
+      let(:depth) { 0 }
+      let(:result) { 1 }
+      it { is_expected.to eq(result) }
+    end
+
+    context "for root 2 ([1, [2]]), depth = 1" do
+      let(:fraction) { [1, [2]] }
+      let(:depth) { 1 }
+      let(:result) { Rational(3, 2) }
+      it { is_expected.to eq(result) }
+    end
+
+    context "for root 2 ([1, [2]]), depth = 8" do
+      let(:fraction) { [1, [2]] }
+      let(:depth) { 8 }
+      let(:result) { Rational(1393, 985) }
       it { is_expected.to eq(result) }
     end
 
@@ -50,7 +72,7 @@ RSpec.describe Jason::Math::Analysis do
 
     context "for [9, [1, 2, 3, 1, 1, 5, 1, 8, 1, 5, 1, 1, 3, 2, 1, 18]]" do
       let(:fraction) { [9, [1, 2, 3, 1, 1, 5, 1, 8, 1, 5, 1, 1, 3, 2, 1, 18]] }
-      let(:result) { Rational(502919753638818250, 51872211906631527) }
+      let(:result) { Rational(1562560820373993102, 161165842870530659) }
       it { is_expected.to eq(result) }
     end
   end
