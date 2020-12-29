@@ -32,25 +32,25 @@ RSpec.describe Jason::Math::Analysis do
 
     context "for phi ([1, [1]])" do
       let(:fraction) { [1, [1]] }
-      let(:result) { (5 ** 0.5 + 1) / 2 }
+      let(:result) { Rational(701408733, 433494437) }
       it { is_expected.to eq(result) }
     end
 
     context "for [1, [2]]" do
       let(:fraction) { [1, [2]] }
-      let(:result) { 2 ** 0.5 }
+      let(:result) { Rational(8434586304032980, 5964153172084899) }
       it { is_expected.to eq(result) }
     end
 
     context "for [3, [1, 1, 1, 1, 6]]" do
       let(:fraction) { [3, [1, 1, 1, 1, 6]] }
-      let(:result) { 13 ** 0.5 }
+      let(:result) { Rational(20169517848487, 5594017754162) }
       it { is_expected.to eq(result) }
     end
 
     context "for [9, [1, 2, 3, 1, 1, 5, 1, 8, 1, 5, 1, 1, 3, 2, 1, 18]]" do
       let(:fraction) { [9, [1, 2, 3, 1, 1, 5, 1, 8, 1, 5, 1, 1, 3, 2, 1, 18]] }
-      let(:result) { 94 ** 0.5 }
+      let(:result) { Rational(502919753638818250, 51872211906631527) }
       it { is_expected.to eq(result) }
     end
   end
