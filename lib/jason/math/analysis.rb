@@ -39,7 +39,7 @@ module Jason
         result
       end
 
-      def self.evaluate_continued_fraction(fraction, depth = 40)
+      def self.evaluate_continued_fraction(fraction, depth = 42)
         return fraction[0] if fraction[1].is_a?(Array) && fraction[1].empty?
 
         generator = fraction[1].is_a?(Array) ? Utility.circular_array_generator(fraction[1]) : fraction[1]

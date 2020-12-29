@@ -29,7 +29,7 @@ module Math
     Jason::Math::Analysis.root_as_continued_fraction(n)
   end
 
-  def self.evaluate_continued_fraction(fraction, depth = 40)
+  def self.evaluate_continued_fraction(fraction, depth = 42)
     Jason::Math::Analysis.evaluate_continued_fraction(fraction, depth)
   end
 
@@ -273,7 +273,7 @@ class Array
     Math.pandigital?(self, initial)
   end
 
-  def evaluate_continued_fraction(depth = 40)
+  def evaluate_continued_fraction(depth = 42)
     Math.evaluate_continued_fraction(self, depth)
   end
 end
