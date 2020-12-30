@@ -278,8 +278,10 @@ module Jason
         result
       end
       
-      def self.chinese_remainder_theorem(mapping)
-        raise "moduli not co-prime" unless co_prime?(mapping.keys)
+      def self.chinese_remainder_theorem(mapping, enforce_co_primality = true)
+        if enforce_co_primality
+          raise "moduli not co-prime" unless co_prime?(mapping.keys)
+        end
       
         max = mapping.keys.inject(&:*)
         series = mapping.map { |m, r| (r * max * (max/m).to_bn.mod_inverse(m) / m) }

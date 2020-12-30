@@ -143,8 +143,8 @@ module Math
     Jason::Math::NumberTheory.co_prime?(numbers)
   end
 
-  def self.chinese_remainder_theorem(values_by_moduli)
-    Jason::Math::NumberTheory.chinese_remainder_theorem(values_by_moduli)
+  def self.chinese_remainder_theorem(values_by_moduli, enforce_co_primality = true)
+    Jason::Math::NumberTheory.chinese_remainder_theorem(values_by_moduli, enforce_co_primality)
   end
 
   def self.triangular_number(offset)
@@ -289,7 +289,7 @@ class Set
 end
 
 class Hash
-  def chinese_remainder_theorem
-    Math.chinese_remainder_theorem(self)
+  def chinese_remainder_theorem(enforce_co_primality = true)
+    Math.chinese_remainder_theorem(self, enforce_co_primality)
   end
 end
