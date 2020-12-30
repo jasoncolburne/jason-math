@@ -255,8 +255,27 @@ module Jason
         number.to_s.reverse.to_i
       end
 
-      def self.concatenate(numbers)
+      def self.concatenate_with_strings(numbers)
         numbers.map(&:to_s).join.to_i
+      end
+
+      def self.concatenate(numbers)
+        result = 0
+        digits = 0
+
+        i = numbers.count - 1
+        while i >= 0
+          n = numbers[i]
+          result += n * 10 ** digits
+          if n.zero?
+            digits += 1
+          else
+            digits += ::Math.log10(n).to_i + 1
+          end
+          i-= 1
+        end
+
+        result
       end
       
       def self.chinese_remainder_theorem(mapping)
