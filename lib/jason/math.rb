@@ -258,6 +258,10 @@ class Integer
   def root_as_continued_fraction
     Math.root_as_continued_fraction(self)
   end
+
+  def totient
+    Math.totient(self)
+  end
 end
 
 class Array
