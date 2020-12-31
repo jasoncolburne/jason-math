@@ -305,11 +305,11 @@ module Jason
       end
 
       def self.product(numbers)
-        numbers.empty? ? nil : numbers.inject(&:*)
+        numbers.inject(1, :*)
       end
 
       def self.modular_product(numbers, modulus)
-        numbers.empty? ? nil : numbers.inject(1) { |product, n| product * n % modulus }
+        numbers.inject(1) { |product, n| product * n % modulus }
       end
     end
   end
