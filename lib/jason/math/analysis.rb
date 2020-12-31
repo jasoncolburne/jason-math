@@ -13,6 +13,26 @@ module Jason
         sequence
       end
 
+      def self.fibonacci_enumerator
+        Enumerator.new do |yielder|
+          nk = 0
+          nk1 = 1
+          yielder.yield nk
+          yielder.yield nk1
+
+          while true
+            nk2 = nk1 + nk
+            yielder.yield nk2
+            nk = nk1
+            nk1 = nk2
+          end
+        end
+      end
+
+      def self.fibonacci_term(n)
+        fibonacci_enumerator.take(n + 1).last
+      end
+
       def self.root_as_continued_fraction(n)
         result = []
         subresult = []

@@ -8,6 +8,23 @@ RSpec.describe Jason::Math::Analysis do
     end
   end
 
+  context "#fibonacci_enumerator" do
+    context "first 10" do
+      subject { described_class.fibonacci_enumerator.first(n) }
+      let(:n) { 10 }
+      it { is_expected.to eq([0, 1, 1, 2, 3, 5, 8, 13, 21, 34]) }
+    end
+  end
+
+  context "#fibonacci_term" do
+    subject { described_class.fibonacci_term(n) }
+
+    context "10th" do
+      let(:n) { 10 }
+      it { is_expected.to eq(55) }
+    end
+  end
+
   context "#root_as_continued_fraction" do
     subject { described_class.root_as_continued_fraction(n) }
 

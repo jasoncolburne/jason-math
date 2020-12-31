@@ -25,6 +25,14 @@ module Math
     Jason::Math::Analysis.collatz_sequence(n)
   end
 
+  def self.fibonacci_enumerator
+    Jason::Math::Analysis.fibonacci_enumerator
+  end
+
+  def self.fibonacci_term(n)
+    Jason::Math::Analysis.fibonacci_term(n)
+  end
+
   def self.root_as_continued_fraction(n)
     Jason::Math::Analysis.root_as_continued_fraction(n)
   end
@@ -175,6 +183,10 @@ module Math
 end
 
 class Integer
+  def fibonacci_terms
+    Math.fibonacci_enumerator.take(self)
+  end
+
   def factorial
     Math.factorial(self)
   end
