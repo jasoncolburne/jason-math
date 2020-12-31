@@ -288,6 +288,10 @@ class Array
   def evaluate_continued_fraction(depth = 42)
     Math.evaluate_continued_fraction(self, depth)
   end
+
+  def sum_mod(modulus)
+    self.inject(0) { |sum, n| (sum + n) % modulus }
+  end
 end
 
 class Set
