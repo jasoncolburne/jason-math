@@ -293,8 +293,16 @@ class Array
     Math.evaluate_continued_fraction(self, depth)
   end
 
-  def sum_mod(modulus)
-    self.inject(0) { |sum, n| (sum + n) % modulus }
+  def modular_sum(modulus)
+    inject(0) { |sum, n| (sum + n) % modulus }
+  end
+
+  def product
+    empty? ? nil : inject(&:*)
+  end
+
+  def modular_product(modulus)
+    empty? ? nil : inject(1) { |product, n| product * n % modulus }
   end
 end
 
