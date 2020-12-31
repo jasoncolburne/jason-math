@@ -96,8 +96,7 @@ module Jason
         if iterations == depth
           generator.next
         else
-          value = generator.next
-          value + Rational(1, recursively_evaluate_continued_fraction(generator, depth, iterations + 1))
+          generator.next + Rational(1, recursively_evaluate_continued_fraction(generator, depth, iterations + 1))
         end
       end
     end
