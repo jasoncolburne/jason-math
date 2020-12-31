@@ -167,6 +167,18 @@ module Math
     Jason::Math::NumberTheory.hexagonal_number(offset)
   end
 
+  def self.modular_sum(numbers, modulus)
+    Jason::Math::NumberTheory.modular_sum(numbers, modulus)
+  end
+
+  def self.product(numbers)
+    Jason::Math::NumberTheory.product(numbers)
+  end
+
+  def self.modular_product(numbers, modulus)
+    Jason::Math::NumberTheory.modular_product(numbers, modulus)
+  end
+
   # utility
 
   def self.binary_search(array, value)
@@ -294,15 +306,15 @@ class Array
   end
 
   def modular_sum(modulus)
-    inject(0) { |sum, n| (sum + n) % modulus }
+    Math.modular_sum(self, modulus)
   end
 
   def product
-    empty? ? nil : inject(&:*)
+    Math.product(self)
   end
 
   def modular_product(modulus)
-    empty? ? nil : inject(1) { |product, n| product * n % modulus }
+    Math.modular_product(self, modulus)
   end
 end
 
@@ -313,6 +325,18 @@ class Set
 
   def pandigital?(initial = 1)
     Math.pandigital?(self, initial)
+  end
+
+  def modular_sum(modulus)
+    Math.modular_sum(self, modulus)
+  end
+
+  def product
+    Math.product(self)
+  end
+
+  def modular_product(modulus)
+    Math.modular_product(self, modulus)
   end
 end
 

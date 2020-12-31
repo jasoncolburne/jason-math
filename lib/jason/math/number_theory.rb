@@ -299,6 +299,18 @@ module Jason
       def self.hexagonal_number(offset)
         offset * (2 * offset - 1)
       end
+
+      def self.modular_sum(numbers, modulus)
+        numbers.inject(0) { |sum, n| (sum + n) % modulus }
+      end
+
+      def self.product(numbers)
+        numbers.empty? ? nil : numbers.inject(&:*)
+      end
+
+      def self.modular_product(numbers, modulus)
+        numbers.empty? ? nil : numbers.inject(1) { |product, n| product * n % modulus }
+      end
     end
   end
 end
