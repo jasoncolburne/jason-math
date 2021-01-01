@@ -268,6 +268,12 @@ class Integer
   end
 end
 
+class Rational
+  def inverse
+    Rational(denominator, numerator)
+  end
+end
+
 class Array
   def concatenate
     Math.concatenate(self)
