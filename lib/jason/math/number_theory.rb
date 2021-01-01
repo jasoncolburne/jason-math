@@ -294,7 +294,7 @@ module Jason
         elsif n == 3
           (offset * offset + offset) / 2
         else
-          ((n - 2) * offset * offset - (n - 4) * offset) / 2
+          ((n - 2) * offset - (n - 4)) * offset / 2
         end
       end
 
