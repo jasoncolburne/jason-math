@@ -288,16 +288,14 @@ module Jason
         series.inject(&:+) % max     
       end
       
-      def self.triangular_number(offset)
-        (offset * (offset + 1)) / 2
-      end
-
-      def self.pentagonal_number(offset)
-        (offset * (3 * offset - 1)) / 2
-      end
-
-      def self.hexagonal_number(offset)
-        offset * (2 * offset - 1)
+      def self.polygonal_number(n, offset)
+        if n < 3
+          raise "no polygon with #{n} sides"
+        elsif n == 3
+          (offset * offset + offset) / 2
+        else
+          ((n - 2) * offset * offset - (n - 4) * offset) / 2
+        end
       end
 
       def self.modular_sum(numbers, modulus)

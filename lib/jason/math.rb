@@ -155,16 +155,8 @@ module Math
     Jason::Math::NumberTheory.chinese_remainder_theorem(values_by_moduli, enforce_co_primality)
   end
 
-  def self.triangular_number(offset)
-    Jason::Math::NumberTheory.triangular_number(offset)
-  end
-
-  def self.pentagonal_number(offset)
-    Jason::Math::NumberTheory.pentagonal_number(offset)
-  end
-
-  def self.hexagonal_number(offset)
-    Jason::Math::NumberTheory.hexagonal_number(offset)
+  def self.polygonal_number(n, offset)
+    Jason::Math::NumberTheory.polygonal_number(n, offset)
   end
 
   def self.modular_sum(numbers, modulus)

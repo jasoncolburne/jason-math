@@ -278,11 +278,12 @@ RSpec.describe Jason::Math::NumberTheory do
     end
   end
 
-  context "#triangular_number" do
-    subject { described_class.triangular_number(n) }
+  context "#polygonal_number" do
+    subject { described_class.polygonal_number(n, offset) }
 
     context "10th triangular number" do
-      let(:n) { 10 }
+      let(:n) { 3 }
+      let(:offset) { 10 }
       it { is_expected.to eq(55) }
     end
   end
