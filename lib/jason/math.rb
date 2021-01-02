@@ -184,6 +184,10 @@ module Math
   def self.adjacent_cells(cell)
     Jason::Math::Utility.adjacent_cells(cell)
   end
+
+  def self.groupings(array)
+    Jason::Math::Utility.groupings(array)
+  end
 end
 
 class Integer
@@ -275,6 +279,10 @@ class Rational
 end
 
 class Array
+  def groupings
+    Math.groupings(self)
+  end
+
   def concatenate
     Math.concatenate(self)
   end

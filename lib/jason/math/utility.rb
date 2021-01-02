@@ -66,6 +66,29 @@ module Jason
         adjacent_cells
       end
 
+      def self.groupings(array)
+        Enumerator.new do |yielder|
+          yielder.yield [array]
+
+          (1..(2**(array.count - 1) - 1)).each do |n|
+            _array = array.dup
+            current_group = [_array.shift]
+            groups = [current_group]
+            until _array.empty?
+              if n.odd?
+                current_group = [_array.shift]
+                groups << current_group
+              else
+                current_group << _array.shift
+              end
+              n >>= 1
+            end
+
+            yielder.yield groups
+          end
+        end
+      end
+
       def self.circular_array_generator(array)
         array = array.dup
 
