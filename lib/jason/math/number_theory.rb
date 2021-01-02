@@ -107,6 +107,16 @@ module Jason
       
         factors
       end
+
+      def self.factor_array(number)
+        result = []
+
+        factors(number).each do |factor, power|
+          result += [factor] * power
+        end
+
+        result
+      end
       
       # returns a set, do with it what you will
       def self.divisors(number)

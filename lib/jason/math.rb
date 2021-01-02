@@ -71,6 +71,10 @@ module Math
     Jason::Math::NumberTheory.factors(n)
   end
 
+  def self.factor_array(n)
+    Jason::Math::NumberTheory.factor_array(n)
+  end
+
   def self.divisors(n)
     Jason::Math::NumberTheory.divisors(n)
   end
@@ -201,6 +205,10 @@ class Integer
 
   def factors
     Math.factors(self)
+  end
+
+  def factor_array
+    Math.factor_array(self)
   end
 
   def divisors
