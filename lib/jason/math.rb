@@ -58,6 +58,10 @@ module Math
     Jason::Math::Combinatorics.nCk(n, k)
   end
 
+  def self.enumerate_partitions(array)
+    Jason::Math::Combinatorics.enumerate_partitions(array)
+  end
+
   # number theory
   def self.primes(count)
     Jason::Math::NumberTheory.primes(count)
@@ -187,10 +191,6 @@ module Math
 
   def self.adjacent_cells(cell)
     Jason::Math::Utility.adjacent_cells(cell)
-  end
-
-  def self.enumerate_partitions(array)
-    Jason::Math::Utility.enumerate_partitions(array)
   end
 end
 

@@ -37,4 +37,13 @@ RSpec.describe Jason::Math::Combinatorics do
       it { is_expected.to eq(335367096786357081410764800000) }
     end
   end
+
+  context "#enumerate_partitions" do
+    subject { described_class.enumerate_partitions(array).to_a }
+
+    context "for [1, 2, 3]" do
+      let(:array) { [1, 2, 3] }
+      it { is_expected.to eq([[[1, 2, 3]], [[1, 2], [3]], [[1, 3], [2]], [[1], [2, 3]], [[1], [2], [3]]]) }
+    end
+  end
 end
