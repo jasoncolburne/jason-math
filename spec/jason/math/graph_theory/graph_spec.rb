@@ -75,8 +75,8 @@ RSpec.describe Jason::Math::GraphTheory::Graph do
 
       it do
         is_expected.to eq([
-          { origin: 2, destination: 4, weight: 5 },
           { origin: 0, destination: 3, weight: 5 },
+          { origin: 2, destination: 4, weight: 5 },
           { origin: 3, destination: 5, weight: 6 },
           { origin: 0, destination: 1, weight: 7 },
           { origin: 1, destination: 4, weight: 7 },
