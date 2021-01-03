@@ -189,8 +189,8 @@ module Math
     Jason::Math::Utility.adjacent_cells(cell)
   end
 
-  def self.partitions(array)
-    Jason::Math::Utility.partitions(array)
+  def self.enumerate_partitions(array)
+    Jason::Math::Utility.enumerate_partitions(array)
   end
 end
 
@@ -287,8 +287,8 @@ class Rational
 end
 
 class Array
-  def partitions
-    Math.partitions(self)
+  def enumerate_partitions
+    Math.enumerate_partitions(self)
   end
 
   def concatenate

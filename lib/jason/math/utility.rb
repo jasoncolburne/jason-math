@@ -87,7 +87,7 @@ module Jason
         end
       end
 
-      def self.partitions(array)
+      def self.enumerate_partitions(array)
         partition = [array.dup]        
         number_of_elements = array.count
         indexes = Array.new(number_of_elements, 0)

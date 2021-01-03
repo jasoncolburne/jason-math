@@ -82,8 +82,8 @@ RSpec.describe Jason::Math::Utility do
     end
   end
 
-  context "#partitions" do
-    subject { described_class.partitions(array).to_a }
+  context "#enumerate_partitions" do
+    subject { described_class.enumerate_partitions(array).to_a }
 
     context "for [1, 2, 3]" do
       let(:array) { [1, 2, 3] }
