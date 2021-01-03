@@ -198,11 +198,10 @@ module Jason
           return false if divisible.count > 1
 
           divisible.each do |number|
-            new_number = number
-            while new_number % prime == 0
-              new_number = new_number / prime
-            end
-            numbers[numbers.index(number)] = new_number
+            index = numbers.index(number)
+            number /= prime while number % prime == 0
+            numbers[index] = number
+
             # we'd need to do the numbers.max call twice to check if it changed and i think just doing it once 
             # taking the root every time will be faster
             root_max_n = numbers.max ** 0.5
