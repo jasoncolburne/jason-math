@@ -73,8 +73,8 @@ RSpec.describe Jason::Math::GraphTheory::Graph do
         graph.add_edge(5, 6, 11)
       end
 
-      it do
-        is_expected.to eq([
+      it "should be sane" do
+        expect(subject.sort_by { |aggregate| [aggregate[:weight], aggregate[:origin], aggregate[:destination]] }).to eq([
           { origin: 0, destination: 3, weight: 5 },
           { origin: 2, destination: 4, weight: 5 },
           { origin: 3, destination: 5, weight: 6 },
