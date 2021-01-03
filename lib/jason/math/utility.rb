@@ -96,11 +96,43 @@ module Jason
       private
 
       def self._partitions(array, yielder = nil)
+        partition = [array.dup]        
+        number_of_elements = array.count
+        indexes = Array.new(number_of_elements, 0)
+
+        while true
+          yielder.yield partition.inject([]) { |collector, part| collector << part.dup }
+
+          i = number_of_elements - 1
+          index = nil
+
+          while true
+            return if i <= 0
+            index = indexes[i]
+            partition[index].pop
+            break unless partition[index].empty?
+            partition.delete_at(index)
+            i -= 1
+          end
+
+          index += 1
+          partition << [] if index >= partition.count
+
+          while i < number_of_elements
+            indexes[i] = index
+            partition[index] << array[i]
+            index = 0
+            i += 1
+          end
+        end  
+      end
+      
+      def self._partitions_recursive(array, yielder = nil)
         if array.empty?
           return [[]]
         else
           a = array.pop
-          sub_response = _partitions(array)
+          sub_response = _partitions_recursive(array)
           response = []
           sub_response.each do |partition|
             response << [[a]] + partition

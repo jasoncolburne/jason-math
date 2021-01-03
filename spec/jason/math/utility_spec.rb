@@ -81,4 +81,13 @@ RSpec.describe Jason::Math::Utility do
       it { is_expected.to eq([]) }
     end
   end
+
+  context "#partitions" do
+    subject { described_class.partitions(array).to_a }
+
+    context "for [1, 2, 3]" do
+      let(:array) { [1, 2, 3] }
+      it { is_expected.to eq([[[1, 2, 3]], [[1, 2], [3]], [[1, 3], [2]], [[1], [2, 3]], [[1], [2], [3]]]) }
+    end
+  end
 end
