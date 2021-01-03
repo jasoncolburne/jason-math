@@ -73,12 +73,12 @@ module Jason
           unless array.empty?
             if array.count == 1
               to_yield = array.first
-              yielder.yield to_yield while true
+              yielder << to_yield while true
             else
               i = 0
               count = array.count
               while true
-                yielder.yield array[i]
+                yielder << array[i]
                 i += 1
                 i = 0 if i == count
               end
@@ -88,69 +88,43 @@ module Jason
       end
 
       def self.partitions(array)
-        Enumerator.new do |yielder|
-          _partitions(array, yielder)
-        end
-      end
-
-      private
-
-      def self._partitions(array, yielder = nil)
         partition = [array.dup]        
         number_of_elements = array.count
         indexes = Array.new(number_of_elements, 0)
 
-        while true
-          yielder.yield partition.inject([]) { |collector, part| collector << part.dup }
-
-          i = number_of_elements - 1
-          index = nil
-
+        Enumerator.new do |yielder|
           while true
-            return if i <= 0
-            index = indexes[i]
-            partition[index].pop
-            break unless partition[index].empty?
-            partition.delete_at(index)
-            i -= 1
-          end
+            yielder << partition.inject([]) { |collector, part| collector << part.dup }
 
-          index += 1
-          partition << [] if index >= partition.count
+            i = number_of_elements - 1
+            index = nil
+            done = false
 
-          while i < number_of_elements
-            indexes[i] = index
-            partition[index] << array[i]
-            index = 0
-            i += 1
-          end
-        end  
-      end
-      
-      def self._partitions_recursive(array, yielder = nil)
-        if array.empty?
-          return [[]]
-        else
-          a = array.pop
-          sub_response = _partitions_recursive(array)
-          response = []
-          sub_response.each do |partition|
-            response << [[a]] + partition
-            yielder.yield [[a]] + partition if yielder
-            partition.each do |set|
-              _partition = partition.dup
-              _partition.delete_at(_partition.index(set))
+            while true
+              if i <= 0
+                done = true
+                break
+              end
+              index = indexes[i]
+              partition[index].pop
+              break unless partition[index].empty?
+              partition.delete_at(index)
+              i -= 1
+            end
 
-              response << [set + [a]] + _partition
-              yielder.yield [set + [a]] + _partition if yielder
+            break if done
+
+            index += 1
+            partition << [] if index >= partition.count
+
+            while i < number_of_elements
+              indexes[i] = index
+              partition[index] << array[i]
+              index = 0
+              i += 1
             end
           end
-          response
         end
-      end
-
-      def self.copy_2d_array(array)
-        array.inject([]) { |array, element| array << element }
       end
     end
   end
