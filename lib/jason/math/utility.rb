@@ -66,29 +66,6 @@ module Jason
         adjacent_cells
       end
 
-      def self.groupings(array)
-        Enumerator.new do |yielder|
-          yielder.yield [array]
-
-          (1..(2**(array.count - 1) - 1)).each do |n|
-            _array = array.dup
-            current_group = [_array.shift]
-            groups = [current_group]
-            until _array.empty?
-              if n.odd?
-                current_group = [_array.shift]
-                groups << current_group
-              else
-                current_group << _array.shift
-              end
-              n >>= 1
-            end
-
-            yielder.yield groups
-          end
-        end
-      end
-
       def self.circular_array_generator(array)
         array = array.dup
 
@@ -108,6 +85,40 @@ module Jason
             end
           end
         end
+      end
+
+      def self.partitions(array)
+        Enumerator.new do |yielder|
+          _partitions(array, yielder)
+        end
+      end
+
+      private
+
+      def self._partitions(array, yielder = nil)
+        if array.empty?
+          return [[]]
+        else
+          a = array.pop
+          sub_response = _partitions(array)
+          response = []
+          sub_response.each do |partition|
+            response << [[a]] + partition
+            yielder.yield [[a]] + partition if yielder
+            partition.each do |set|
+              _partition = partition.dup
+              _partition.delete_at(_partition.index(set))
+
+              response << [set + [a]] + _partition
+              yielder.yield [set + [a]] + _partition if yielder
+            end
+          end
+          response
+        end
+      end
+
+      def self.copy_2d_array(array)
+        array.inject([]) { |array, element| array << element }
       end
     end
   end
