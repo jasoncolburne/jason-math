@@ -20,6 +20,8 @@ module Jason
       end
 
       def self.prime?(number, below = nil)
+        return false if number < 2
+
         prime_generator = Prime::EratosthenesGenerator.new
         root_n = number ** 0.5
 
@@ -31,6 +33,8 @@ module Jason
       end
 
       def self.prime_by_weak_fermat?(number, iterations = nil)
+        return false if number < 2
+
         iterations ||= number.to_s(2).length / 2 + 1
         iterations.times do
           # TODO use a better RNG
@@ -42,6 +46,8 @@ module Jason
       end
 
       def self.prime_by_miller_rabin?(number, iterations = nil)
+        return false if number < 2
+
         r = 0
         d = number - 1
         while d % 2 == 0
@@ -109,19 +115,13 @@ module Jason
       end
 
       def self.factor_array(number)
-        result = []
-
-        factors(number).each do |factor, power|
-          result += [factor] * power
-        end
-
-        result
+        factors(number).map { |p, n| [p] * n }.flatten
       end
       
       # returns a set, do with it what you will
       def self.divisors(number)
         divisors = Set[1]
-        all_primes = factors(number).map { |p, n| [p] * n }.flatten
+        all_primes = factor_array(number)
       
         (1..all_primes.count).each do |n|
           all_primes.combination(n).each do |combination|
@@ -237,6 +237,29 @@ module Jason
         end
 
         true
+      end
+
+      def self.harshad?(number)
+        number % number.digits.sum == 0
+      end
+
+      def self.right_truncatable_harshad?(number)
+        while number > 10
+          return false unless number.harshad?
+          number /= 10
+        end
+
+        true
+      end
+
+      def self.strong_harshad?(number)
+        number.harshad? && (number / number.digits.sum).probably_prime?
+      end
+
+      def self.strong_right_truncatable_harshad_prime?(number)
+        return false unless number.probably_prime? && number > 9
+
+        (number / 10).strong_harshad? && (number / 10).right_truncatable_harshad?
       end
 
       def self.pandigital?(numbers, initial = 1)

@@ -103,6 +103,22 @@ module Math
     Jason::Math::NumberTheory.lychrel?(n, depth)
   end
 
+  def self.harshad?(n)
+    Jason::Math::NumberTheory.harshad?(n)
+  end
+
+  def self.right_truncatable_harshad?(n)
+    Jason::Math::NumberTheory.right_truncatable_harshad?(n)
+  end
+
+  def self.strong_harshad?(n)
+    Jason::Math::NumberTheory.strong_harshad?(n)
+  end
+
+  def self.strong_right_truncatable_harshad_prime?(n)
+    Jason::Math::NumberTheory.strong_right_truncatable_harshad_prime?(n)
+  end
+
   def self.palindrome?(n, base = 10)
     Jason::Math::NumberTheory.palindrome?(n, base)
   end
@@ -253,6 +269,22 @@ class Integer
 
   def lychrel?(depth = 50)
     Math.lychrel?(self, depth)
+  end
+
+  def harshad?
+    Math.harshad?(self)
+  end
+
+  def right_truncatable_harshad?
+    Math.right_truncatable_harshad?(self)
+  end
+
+  def strong_harshad?
+    Math.strong_harshad?(self)
+  end
+
+  def strong_right_truncatable_harshad_prime?
+    Math.strong_right_truncatable_harshad_prime?(self)
   end
 
   def palindrome?(base = 10)
