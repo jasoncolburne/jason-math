@@ -142,12 +142,18 @@ RSpec.describe Jason::Math::NumberTheory do
 
     context "of 24" do
       let(:n) { 24 }
-      it { is_expected.to eq(Set[1, 2, 3, 4, 6, 8, 12, 24]) }
+      it { is_expected.to eq([1, 2, 4, 8, 3, 6, 12, 24]) }
+    end
+
+    # this is a performance test, old implementation would take seconds
+    context "of 2**24" do
+      let(:n) { 2**24 }
+      it { is_expected.to eq([1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608, 16777216]) }
     end
 
     context "of 17" do
       let(:n) { 17 }
-      it { is_expected.to eq(Set[1, 17]) }
+      it { is_expected.to eq([1, 17]) }
     end
   end
 
@@ -156,12 +162,12 @@ RSpec.describe Jason::Math::NumberTheory do
 
     context "of 24" do
       let(:n) { 24 }
-      it { is_expected.to eq(Set[1, 2, 3, 4, 6, 8, 12]) }
+      it { is_expected.to eq([1, 2, 4, 8, 3, 6, 12]) }
     end
 
     context "of 17" do
       let(:n) { 17 }
-      it { is_expected.to eq(Set[1]) }
+      it { is_expected.to eq([1]) }
     end
   end
 

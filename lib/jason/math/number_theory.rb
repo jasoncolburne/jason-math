@@ -114,27 +114,40 @@ module Jason
         factors
       end
 
+      # returns a flat array with duplicated factors
       def self.factor_array(number)
         factors(number).map { |p, n| [p] * n }.flatten
       end
       
-      # returns a set, do with it what you will
       def self.divisors(number)
-        divisors = Set[1]
-        all_primes = factor_array(number)
-      
-        (1..all_primes.count).each do |n|
-          all_primes.combination(n).each do |combination|
-            divisors << combination.inject(&:*)
-          end
-        end
-      
-        divisors
+        enumerate_divisors(number).to_a
       end
 
-      # also returns a set
       def self.proper_divisors(number)
-        divisors(number) - Set[number]
+        enumerate_divisors(number, true).to_a
+      end
+
+      def self.enumerate_divisors(number, proper = false)
+        factors_array = number.factors.to_a
+        factor_count = factors_array.count
+        exponents = [0] * factor_count
+
+        Enumerator.new do |yielder|
+          catch :done do
+            while true
+              result = (0..(factor_count - 1)).map { |x| factors_array[x][0] ** exponents[x] }.inject(1, :*)
+              yielder.yield result unless proper && result == number
+              i = 0
+              while true
+                exponents[i] += 1
+                break if exponents[i] <= factors_array[i][1]
+                exponents[i] = 0
+                i += 1
+                throw :done if i >= factor_count
+              end
+            end
+          end
+        end
       end
 
       def self.gcd(u, v)
