@@ -87,6 +87,10 @@ module Math
     Jason::Math::NumberTheory.proper_divisors(n)
   end
 
+  def self.enumerate_divisors(n, proper = false)
+    Jason::Math::NumberTheory.enumerate_divisors(n, proper)
+  end
+
   def self.perfect?(n)
     Jason::Math::NumberTheory.perfect?(n)
   end
@@ -229,6 +233,10 @@ class Integer
 
   def divisors
     Math.divisors(self)
+  end
+
+  def enumerate_divisors(proper = false)
+    Math.enumerate_divisors(self, proper)
   end
 
   def digits
