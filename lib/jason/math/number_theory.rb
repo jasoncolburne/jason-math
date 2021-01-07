@@ -133,17 +133,21 @@ module Jason
         exponents = [0] * factor_count
 
         Enumerator.new do |yielder|
-          catch :done do
-            while true
-              result = (0..(factor_count - 1)).map { |x| factors_array[x][0] ** exponents[x] }.inject(1, :*)
-              yielder.yield result unless proper && result == number
-              i = 0
+          if number < 2
+            yielder.yield 1 if number == 1 && !proper
+          else
+            catch :done do
               while true
-                exponents[i] += 1
-                break if exponents[i] <= factors_array[i][1]
-                exponents[i] = 0
-                i += 1
-                throw :done if i >= factor_count
+                result = (0..(factor_count - 1)).map { |x| factors_array[x][0] ** exponents[x] }.inject(1, :*)
+                yielder.yield result unless proper && result == number
+                i = 0
+                while true
+                  exponents[i] += 1
+                  break if exponents[i] <= factors_array[i][1]
+                  exponents[i] = 0
+                  i += 1
+                  throw :done if i >= factor_count
+                end
               end
             end
           end
