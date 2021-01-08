@@ -287,15 +287,15 @@ module Jason
       end
 
       # note: negative numbers will lose their sign in this method
-      def self.digits(number)
+      def self.digits(number, base = 10)
         return [0] if number.zero?
 
         number = number.abs if number < 0
 
         digits = []
         while number > 0
-          digits.unshift(number % 10)
-          number /= 10
+          digits.unshift(number % base)
+          number /= base
         end
         digits
       end

@@ -131,8 +131,8 @@ module Math
     Jason::Math::NumberTheory.pandigital?(numbers, initial)
   end
 
-  def self.digits(n)
-    Jason::Math::NumberTheory.digits(n)
+  def self.digits(n, base = 10)
+    Jason::Math::NumberTheory.digits(n, base)
   end
 
   def self.reverse(n)
@@ -239,8 +239,8 @@ class Integer
     Math.enumerate_divisors(self, proper)
   end
 
-  def digits
-    Math.digits(self)
+  def digits(base = 10)
+    Math.digits(self, base)
   end
 
   def pandigital?(initial = 1)
