@@ -33,6 +33,10 @@ module Jason
         fibonacci_enumerator.take(n + 1).last
       end
 
+      def self.fibonacci_terms_below(limit)
+        fibonacci_enumerator.take_while { |n| n < limit }
+      end
+
       def self.root_as_continued_fraction(n)
         result = []
         subresult = []

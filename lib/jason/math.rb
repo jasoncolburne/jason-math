@@ -33,6 +33,10 @@ module Math
     Jason::Math::Analysis.fibonacci_term(n)
   end
 
+  def self.fibonacci_terms_below(limit)
+    Jason::Math::Analysis.fibonacci_terms_below(limit)
+  end
+
   def self.root_as_continued_fraction(n)
     Jason::Math::Analysis.root_as_continued_fraction(n)
   end
