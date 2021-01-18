@@ -14,6 +14,7 @@ module Jason
         factorial(n) / factorial(n - k)
       end
 
+      # https://jeromekelleher.net/generating-integer-partitions.html
       def self.enumerate_integer_partitions(n)
         a = [0] * n
         k = 1
@@ -43,6 +44,7 @@ module Jason
         end
       end
 
+      # https://stackoverflow.com/questions/14053885/integer-partition-algorithm-and-recursion
       def self.count_integer_partitions(n, max = n)
         return 1 + count_integer_partitions(n, max - 1) if n == max
         return 0 if max == 0 || n < 0
