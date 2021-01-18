@@ -46,4 +46,22 @@ RSpec.describe Jason::Math::Combinatorics do
       it { is_expected.to eq([[[1, 2, 3]], [[1, 2], [3]], [[1, 3], [2]], [[1], [2, 3]], [[1], [2], [3]]]) }
     end
   end
+
+  context "#enumerate_integer_partitions" do
+    subject { described_class.enumerate_integer_partitions(n).to_a }
+
+    context "for 4" do
+      let(:n) { 4 }
+      it { is_expected.to eq([[1, 1, 1, 1], [1, 1, 2], [1, 3], [2, 2], [4]]) }
+    end
+  end
+
+  context "#count_integer_partitions" do
+    subject { described_class.count_integer_partitions(n) }
+
+    context "for 42" do
+      let(:n) { 42 }
+      it { is_expected.to eq(53174) }
+    end
+  end
 end

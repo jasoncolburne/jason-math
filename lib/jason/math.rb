@@ -62,6 +62,14 @@ module Math
     Jason::Math::Combinatorics.nCk(n, k)
   end
 
+  def self.enumerate_integer_partitions(n)
+    Jason::Math::Combinatorics.enumerate_integer_partitions(n)
+  end
+
+  def self.count_integer_partitions(n, max = n)
+    Jason::Math::Combinatorics.count_integer_partitions(n, max)
+  end
+
   def self.enumerate_partitions(array)
     Jason::Math::Combinatorics.enumerate_partitions(array)
   end
@@ -241,6 +249,14 @@ class Integer
 
   def enumerate_divisors(proper = false)
     Math.enumerate_divisors(self, proper)
+  end
+
+  def enumerate_partitions
+    Math.enumerate_integer_partitions(self)
+  end
+
+  def count_partitions(max = self)
+    Math.count_integer_partitions(self, max)
   end
 
   def digits(base = 10)
