@@ -20,6 +20,39 @@ To update in the future, use:
 
 ## Usage
 
+Here is an example of a solution for https://projecteuler.net/problem=12
+
+```ruby
+require 'rubygems'
+require 'bundler/setup'
+require 'jason/math'
+
+n = 1
+while true do
+  t = Math.polygonal_number(3, n)
+  break if t.divisors.count > 500
+  n += 1
+end
+
+puts Math.polygonal_number(3, n)
+```
+
+This gem monkeypatches several core classes. If this is not desirable to you, try something like this (the same code without the convenience methods):
+
+```ruby
+require 'rubygems'
+require 'bundler/setup'
+require 'jason/math/number_theory'
+
+n = 1
+while true do
+  t = Jason::Math::NumberTheory.polygonal_number(3, n)
+  break if Jason::Math::NumberTheory.divisors(t).count > 500
+  n += 1
+end
+
+puts Jason::Math::NumberTheory.polygonal_number(3, n)
+```
 
 ## Development
 
