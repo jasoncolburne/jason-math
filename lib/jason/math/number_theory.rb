@@ -128,7 +128,7 @@ module Jason
       end
 
       def self.enumerate_divisors(number, proper = false)
-        factors_array = number.factors.to_a
+        factors_array = factors(number).to_a
         factor_count = factors_array.count
         exponents = [0] * factor_count
 
