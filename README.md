@@ -54,6 +54,8 @@ end
 puts Jason::Math::NumberTheory.polygonal_number(3, n)
 ```
 
+The only caveat here is that I may have used some of the convenience methods within the library code itself, meaning the gem may require a bit of refactoring to work correctly. If you notice a `NoMethodError` on `Math`, `Integer`, `Array`, `Set` or `Hash` please send me steps to reproduce.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
