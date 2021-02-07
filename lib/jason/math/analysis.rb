@@ -17,12 +17,12 @@ module Jason
         Enumerator.new do |yielder|
           nk = 0
           nk1 = 1
-          yielder.yield nk
-          yielder.yield nk1
+          yielder << nk
+          yielder << nk1
 
           while true
             nk2 = nk1 + nk
-            yielder.yield nk2
+            yielder << nk2
             nk = nk1
             nk1 = nk2
           end
@@ -79,9 +79,9 @@ module Jason
           e_continued_fraction_generator = Enumerator.new do |yielder|
             i = 1
             while true
-              yielder.yield 1
-              yielder.yield 2 * i
-              yielder.yield 1
+              yielder << 1
+              yielder << 2 * i
+              yielder << 1
               i += 1
             end
           end

@@ -134,12 +134,12 @@ module Jason
 
         Enumerator.new do |yielder|
           if number < 2
-            yielder.yield 1 if number == 1 && !proper
+            yielder << 1 if number == 1 && !proper
           else
             catch :done do
               while true
                 result = (0..(factor_count - 1)).map { |x| factors_array[x][0] ** exponents[x] }.inject(1, :*)
-                yielder.yield result unless proper && result == number
+                yielder << result unless proper && result == number
                 i = 0
                 while true
                   exponents[i] += 1
