@@ -23,31 +23,33 @@ module Jason
         nil
       end
 
-      # do not set dimensions when calling - used recursively
-      def self.neighbouring_cells(cell, dimensions = nil)
+      # do not set dimension when calling - used recursively
+      def self.neighbouring_cells(cell, dimension = nil)
         return [] if cell.empty?
 
         # we'll cache each dimension's method as we derive it
         @neighbouring_cells_methods ||= {}
 
-        d = dimensions || cell.count
+        dimensions = cell.count
+        d = dimension || dimensions
+        padding = " " * (dimensions - d) * 2
       
-        if @neighbouring_cells_methods[d].nil? || dimensions
+        if @neighbouring_cells_methods[d].nil? || dimension
           string = ""
           if d.zero?
-            coordinates = (0..(cell.count - 1)).map { |n| "x#{n}" }.join(", ")
-            string += "neighbour = [#{coordinates}]\n"
-            string += "neighbour == cell ? nil : neighbour\n"
+            coordinates = (0..(dimensions - 1)).map { |n| "x#{n}" }.join(", ")
+            string += padding + "neighbour = [#{coordinates}]\n"
+            string += padding + "neighbour == cell ? nil : neighbour\n"
           else
-            string += "((cell[#{d - 1}] - 1)..(cell[#{d - 1}] + 1)).map do |x#{d - 1}|\n"
+            string += padding + "((cell[#{d - 1}] - 1)..(cell[#{d - 1}] + 1)).map do |x#{d - 1}|\n"
             string += neighbouring_cells(cell, d - 1)
-            string += "end\n"
+            string += padding + "end\n"
           end
       
-          @neighbouring_cells_methods[d] = string.chomp + ".flatten(#{d - 1}).compact\n" if dimensions.nil?
+          @neighbouring_cells_methods[d] = string.chomp + ".flatten(#{d - 1}).compact\n" if dimension.nil?
         end
       
-        dimensions.nil? ? eval(@neighbouring_cells_methods[d]) : string
+        dimension.nil? ? eval(@neighbouring_cells_methods[d]) : string
       end
 
       def self.adjacent_cells(cell)
