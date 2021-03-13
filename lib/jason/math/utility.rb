@@ -23,6 +23,7 @@ module Jason
         nil
       end
 
+      # do not set dimensions when calling - used recursively
       def self.neighbouring_cells(cell, dimensions = nil)
         return [] if cell.empty?
 
