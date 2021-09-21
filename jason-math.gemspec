@@ -43,4 +43,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "benchmark-ips"
 
   spec.add_dependency "rb_heap"
+  spec.add_dependency "securerandom"
 end

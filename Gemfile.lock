@@ -3,6 +3,7 @@ PATH
   specs:
     jason-math (0.1.0)
       rb_heap
+      securerandom
 
 GEM
   remote: https://rubygems.org/
@@ -29,6 +30,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.10.0)
     rspec-support (3.10.2)
+    securerandom (0.1.0)
 
 PLATFORMS
   ruby
