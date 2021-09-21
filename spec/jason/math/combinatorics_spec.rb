@@ -18,6 +18,25 @@ RSpec.describe Jason::Math::Combinatorics do
     end
   end
 
+  context "#double_factorial" do
+    subject { described_class.double_factorial(n) }
+
+    context "for 13" do
+      let(:n) { 13 }
+      it { is_expected.to eq(135135) }
+    end
+
+    context "for 0" do
+      let(:n) { 0 }
+      it { is_expected.to eq(1) }
+    end
+
+    context "for 1" do
+      let(:n) { 1 }
+      it { is_expected.to eq(1) }
+    end
+  end
+
   context "#nCk" do
     subject { described_class.nCk(n, k) }
 

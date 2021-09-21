@@ -54,6 +54,10 @@ module Math
     Jason::Math::Combinatorics.factorial(n)
   end
 
+  def self.double_factorial(n)
+    Jason::Math::Combinatorics.double_factorial(n)
+  end
+
   def self.nPk(n, k)
     Jason::Math::Combinatorics.nPk(n, k)
   end
@@ -233,6 +237,10 @@ class Integer
 
   def factorial
     Math.factorial(self)
+  end
+
+  def double_factorial
+    Math.double_factorial(self)
   end
 
   def factors

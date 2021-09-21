@@ -5,6 +5,20 @@ module Jason
         return 1 if n.zero?
         (1..n).inject(&:*)
       end
+
+      def self.double_factorial(n)
+        second_last = 1
+        last = 1
+        current = 1
+
+        (1..n).each do |k|
+          current = k * second_last
+          second_last = last
+          last = current
+        end
+
+        return current
+      end
       
       def self.nCk(n, k)
         nPk(n, k) / factorial(k)
