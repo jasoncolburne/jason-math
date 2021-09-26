@@ -139,12 +139,12 @@ module Jason
         end
 
         class AlgorithmBase
-          def initialize(curve, p)
+          def initialize(curve, p, order = nil)
             raise "Invalid point specified" unless curve.valid?(p)
 
             @curve = curve
             @p = p
-            @n = curve.order(p)
+            @n = order || curve.order(p)
           end
 
           def generate_public_key(private_key)
