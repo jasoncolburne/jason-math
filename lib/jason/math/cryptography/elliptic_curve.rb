@@ -164,7 +164,7 @@ module Jason
             [m.x, inverse(entropy, @n) * (digest + m.x * private_key) % @n]
           end
 
-          def validate(digest, signature, public_key)
+          def verify(digest, signature, public_key)
             raise "Invalid public key" unless @curve.valid?(public_key)
             raise "Invalid public key" unless @curve.multiply(public_key, @n) == @curve.zero
 

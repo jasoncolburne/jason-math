@@ -22,7 +22,7 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorit
   end
 
   context "#validate" do
-    subject { dsa.validate(digest, signature, public_key) }
+    subject { dsa.verify(digest, signature, public_key) }
 
     let(:public_key) { Jason::Math::Cryptography::EllipticCurve::Point.new(1, 1) }
 
