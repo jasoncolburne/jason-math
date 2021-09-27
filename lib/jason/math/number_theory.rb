@@ -347,6 +347,83 @@ module Jason
         end
       end
 
+      def self.legendre_symbol(a, p)
+        ls = modular_exponentiation(a, (p - 1) / 2, p)
+        ls == p - 1 ? -1 : ls
+      end
+
+      def self.modular_exponentiation(base, exponent, modulus)
+        bits = exponent.to_s(2)
+        x = 1
+        bits.each_char do |bit|
+          x = x * x % modulus
+          x = x * base % modulus if bit == '1'
+        end
+        x
+      end
+
+      # p must be prime
+      def self.modular_square_roots(a, p)
+        return 0 if legendre_symbol(a, p) != 1
+        return 0 if a == 0
+        return 0 if p == 2
+        
+        return modular_exponentiation(a, (p + 1) / 4, p) if p % 4 == 3
+    
+        # Partition p-1 to s * 2^e for an odd s (i.e.
+        # reduce all the powers of 2 from p-1)
+        #
+        s = p - 1
+        e = 0
+        while s % 2 == 0 do
+          s /= 2
+          e += 1
+        end
+    
+        # Find some 'n' with a legendre symbol n|p = -1.
+        # Shouldn't take long.
+        #
+        n = 2
+        n += 1 while legendre_symbol(n, p) != -1
+    
+        # Here be dragons!
+        # Read the paper "Square roots from 1; 24, 51,
+        # 10 to Dan Shanks" by Ezra Brown for more
+        # information
+        #
+    
+        # x is a guess of the square root that gets better
+        # with each iteration.
+        # b is the "fudge factor" - by how much we're off
+        # with the guess. The invariant x^2 = ab (mod p)
+        # is maintained throughout the loop.
+        # g is used for successive powers of n to update
+        # both a and b
+        # r is the exponent - decreases with each update
+        #
+        x = modular_exponentiation(a, (s + 1) / 2, p)
+        b = modular_exponentiation(a, s, p)
+        g = modular_exponentiation(n, s, p)
+        r = e
+    
+        while true do
+          t = b
+          m = 0
+          (0..(r - 1)).each do |m|
+            break if t == 1
+            t = modular_exponentiation(t, 2, p)
+          end
+    
+          return [x, p - x] if m == 0
+    
+          gs = modular_exponentiation(g, 2 ** (r - m - 1), p)
+          g = (gs * gs) % p
+          x = (x * gs) % p
+          b = (b * g) % p
+          r = m
+        end
+      end
+      
       def self.modular_sum(numbers, modulus)
         numbers.inject(0) { |sum, n| (sum + n) % modulus }
       end
