@@ -32,7 +32,8 @@ module Jason
             end
 
             raise "No root found"
-          end                
+          end
+          
         end
 
         class Point
@@ -57,6 +58,10 @@ module Jason
 
           def to_a
             [@x, @y]
+          end
+
+          def to_hex(width)
+            @x.to_s(16).rjust(width, "0") + @y.to_s(16).rjust(width, "0") 
           end
         end
 

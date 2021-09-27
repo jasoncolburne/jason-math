@@ -204,6 +204,19 @@ module Math
     Jason::Math::NumberTheory.polygonal_number(n, offset)
   end
 
+  def self.legendre_symbol(a, p)
+    Jason::Math::NumberTheory.legendre_symbol(a, p)
+  end
+
+  def self.modular_exponentiation(base, exponent, modulus)
+    Jason::Math::NumberTheory.modular_exponentiation(base, exponent, modulus)
+  end
+
+  # p must be prime
+  def self.modular_square_roots(a, p)
+    Jason::Math::NumberTheory.modular_square_roots(a, p)
+  end
+
   def self.modular_sum(numbers, modulus)
     Jason::Math::NumberTheory.modular_sum(numbers, modulus)
   end
@@ -338,6 +351,18 @@ class Integer
 
   def primes
     Math.primes(self)
+  end
+
+  def legendre_symbol(prime)
+    Math.legendre_symbol(self, prime)
+  end
+
+  def modular_exponentiation(exponent, modulus)
+    Math.modular_exponentiation(self, exponent, modulus)
+  end
+
+  def modular_square_roots(prime)
+    Math.modular_square_roots(self, prime)
   end
 
   def root_as_continued_fraction
