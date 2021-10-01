@@ -258,12 +258,12 @@ module Jason
       end
 
       def self.harshad?(number)
-        number % number.digits.sum == 0
+        number % digits(number).sum == 0
       end
 
       def self.right_truncatable_harshad?(number)
         while number > 10
-          return false unless number.harshad?
+          return false unless harshad?(number)
           number /= 10
         end
 
@@ -271,19 +271,19 @@ module Jason
       end
 
       def self.strong_harshad?(number)
-        number.harshad? && (number / number.digits.sum).probably_prime?
+        harshad?(number) && probably_prime?(number / digits(number).sum)
       end
 
       def self.strong_right_truncatable_harshad_prime?(number)
-        return false unless number.probably_prime? && number > 9
+        return false unless probably_prime?(number) && number > 9
 
-        (number / 10).strong_harshad? && (number / 10).right_truncatable_harshad?
+        strong_harshad?(number / 10) && right_truncatable_harshad?(number / 10)
       end
 
       def self.pandigital?(numbers, initial = 1)
-        digits = numbers.is_a?(Integer) ? numbers.digits : numbers.map(&:digits).flatten
-        max = digits.count - (1 - initial)
-        return false unless (initial..max).to_set == digits.to_set
+        _digits = numbers.is_a?(Integer) ? digits(numbers) : numbers.map { |n| digits(n) }.flatten
+        max = _digits.count - (1 - initial)
+        return false unless (initial..max).to_set == _digits.to_set
         true
       end
 
@@ -293,12 +293,12 @@ module Jason
 
         number = number.abs if number < 0
 
-        digits = []
+        result = []
         while number > 0
-          digits.unshift(number % base)
+          result.unshift(number % base)
           number /= base
         end
-        digits
+        result
       end
 
       def self.reverse(number)
@@ -311,16 +311,16 @@ module Jason
 
       def self.concatenate(numbers)
         result = 0
-        digits = 0
+        _digits = 0
 
         i = numbers.count - 1
         while i >= 0
           n = numbers[i]
-          result += n * 10 ** digits
+          result += n * 10 ** _digits
           if n.zero?
-            digits += 1
+            _digits += 1
           else
-            digits += ::Math.log10(n).to_i + 1
+            _digits += ::Math.log10(n).to_i + 1
           end
           i-= 1
         end
@@ -353,22 +353,43 @@ module Jason
         ls == p - 1 ? -1 : ls
       end
 
-      def self.modular_exponentiation(base, exponent, modulus)
-        bits = exponent.to_s(2)
-        x = 1
-        bits.each_char do |bit|
-          x = x * x % modulus
-          x = x * base % modulus if bit == '1'
+      def self.extended_gcd(a, b)
+        s0, s1, t0, t1 = 1, 0, 0, 1
+
+        while b > 0
+          q = a / b
+          r = a % b
+          a, b = b, r
+          s0, s1, t0, t1 = s1, s0 - q * s1, t1, t0 - q * t1
         end
-        x
+
+        [s0, t0, a]
+      end
+
+      def self.modular_exponentiation(base, exponent, modulus, optimize = true)
+        if optimize
+          base.to_bn.mod_exp(exponent, modulus).to_i
+        else
+          bits = exponent.to_s(2)
+          x = 1
+          bits.each_char do |bit|
+            x = x * x % modulus
+            x = x * base % modulus if bit == '1'
+          end
+          x
+        end
+      end
+
+      def self.modular_inverse(n, modulus)
+        extended_gcd(n, modulus)[0] % modulus
       end
 
       # https://eli.thegreenplace.net/2009/03/07/computing-modular-square-roots-in-python
       # p must be prime
       def self.modular_square_roots(a, p)
-        return 0 if legendre_symbol(a, p) != 1
-        return 0 if a == 0
-        return 0 if p == 2
+        raise "No roots found" if legendre_symbol(a, p) != 1
+        raise "No roots found" if a == 0
+        raise "No roots found" if p == 2
         
         return modular_exponentiation(a, (p + 1) / 4, p) if p % 4 == 3
     

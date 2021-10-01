@@ -7,23 +7,13 @@ module Jason
         # port of https://gist.github.com/bellbind/1414867/04ccbaa3fe97304d3d9d91c36520a662f2e28a45
 
         module Math
-          def extended_gcd(a, b)
-            s0, s1, t0, t1 = 1, 0, 0, 1
-
-            while b > 0
-              q = a / b
-              r = a % b
-              a, b = b, r
-              s0, s1, t0, t1 = s1, s0 - q * s1, t1, t0 - q * t1
-            end
-
-            [s0, t0, a]
-          end
-
           def inverse(x, n)
-            return extended_gcd(x, n)[0] % n
+            NumberTheory.modular_inverse(x, n)
           end
 
+          # want to replace with an optimized version for prime n
+          # but it breaks the naive tests (where n is 19).
+          # should likely test with NIST params
           def sqrt(x, n)
             raise "x must be < n" unless x < n
             
@@ -33,7 +23,6 @@ module Jason
 
             raise "No root found"
           end
-          
         end
 
         class Point
@@ -144,18 +133,18 @@ module Jason
         end
 
         class AlgorithmBase
-          def initialize(curve, p, order = nil)
-            raise "Invalid point specified" unless curve.valid?(p)
+          def initialize(curve, generator, order = nil)
+            raise "Invalid generator specified" unless curve.valid?(generator)
 
             @curve = curve
-            @p = p
-            @n = order || curve.order(p)
+            @generator = generator
+            @order = order || curve.order(generator)
           end
 
           def generate_public_key(private_key)
-            raise "Private key out of range" unless 0 < private_key && private_key < @n
+            raise "Private key out of range" unless 0 < private_key && private_key < @order
             
-            @curve.multiply(@p, private_key)
+            @curve.multiply(@generator, private_key)
           end
         end
 
@@ -163,21 +152,21 @@ module Jason
           include Math
 
           def sign(digest, private_key, entropy)
-            raise "Entropy out of range" unless 0 < entropy && entropy < @n
+            raise "Entropy out of range" unless 0 < entropy && entropy < @order
 
-            m = @curve.multiply(@p, entropy)
-            [m.x, inverse(entropy, @n) * (digest + m.x * private_key) % @n]
+            m = @curve.multiply(@generator, entropy)
+            [m.x, inverse(entropy, @order) * (digest + m.x * private_key) % @order]
           end
 
           def verify(digest, signature, public_key)
             raise "Invalid public key" unless @curve.valid?(public_key)
-            raise "Invalid public key" unless @curve.multiply(public_key, @n) == @curve.zero
+            raise "Invalid public key" unless @curve.multiply(public_key, @order) == @curve.zero
 
-            w = inverse(signature[1], @n)
-            u1, u2 = digest * w % @n, signature[0] * w % @n
-            p = @curve.add(@curve.multiply(@p, u1), @curve.multiply(public_key, u2))
+            w = inverse(signature[1], @order)
+            u1, u2 = digest * w % @order, signature[0] * w % @order
+            p = @curve.add(@curve.multiply(@generator, u1), @curve.multiply(public_key, u2))
 
-            p.x % @n == signature[0]
+            p.x % @order == signature[0]
           end
         end
 
@@ -186,7 +175,7 @@ module Jason
           # partner public_key
           def compute_secret(private_key, public_key)
             raise "Invalid public key" unless @curve.valid?(public_key)
-            raise "Invalid public key" unless @curve.multiply(public_key, @n) == @curve.zero
+            raise "Invalid public key" unless @curve.multiply(public_key, @order) == @curve.zero
 
             @curve.multiply(public_key, private_key)
           end
@@ -198,7 +187,7 @@ module Jason
             raise "Invalid plaintext value" unless @curve.valid?(plaintext)
             raise "Invalid public key" unless @curve.valid?(public_key)
 
-            [@curve.multiply(@p, entropy), @curve.add(plaintext, @curve.multiply(public_key, entropy))]
+            [@curve.multiply(@generator, entropy), @curve.add(plaintext, @curve.multiply(public_key, entropy))]
           end
 
           # ciphertext is an array of two points on the curve
