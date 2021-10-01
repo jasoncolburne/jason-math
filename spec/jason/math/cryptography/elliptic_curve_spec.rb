@@ -1,13 +1,13 @@
 RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorithm do
-  let(:dsa) { described_class.new(curve, point) }
+  let(:dsa) { described_class.new(curve, generator) }
 
   let(:a) { 1 }
   let(:b) { 18 }
   let(:n) { 19 }
   let(:curve) { Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n) }
 
-  let(:point_x_value) { 7 }
-  let(:point) { curve.at(point_x_value)[0] }
+  let(:x_value) { 7 }
+  let(:generator) { curve.at(x_value).first }
 
   let(:digest) { 128 }
 
@@ -42,15 +42,15 @@ end
 
 RSpec.describe Jason::Math::Cryptography::EllipticCurve::DiffieHellman do
   context "#compute_secret" do
-    let(:dh) { described_class.new(curve, point) }
+    let(:dh) { described_class.new(curve, generator) }
 
     let(:a) { 1 }
     let(:b) { 18 }
     let(:n) { 19 }
     let(:curve) { Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n) }
 
-    let(:point_x_value) { 7 }
-    let(:point) { curve.at(point_x_value)[0] }
+    let(:x_value) { 7 }
+    let(:generator) { curve.at(x_value).first }
 
     let(:private_key_a) { 11 }
     let(:private_key_b) { 3 }
@@ -75,15 +75,15 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DiffieHellman do
 end
 
 RSpec.describe Jason::Math::Cryptography::EllipticCurve::ElGamal do
-  let(:eg) { described_class.new(curve, point) }
+  let(:eg) { described_class.new(curve, generator) }
 
   let(:a) { 1 }
   let(:b) { 18 }
   let(:n) { 19 }
   let(:curve) { Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n) }
 
-  let(:point_x_value) { 7 }
-  let(:point) { curve.at(point_x_value)[0] }
+  let(:x_value) { 7 }
+  let(:generator) { curve.at(x_value).first }
 
   let(:plaintext) { Jason::Math::Cryptography::EllipticCurve::Point.new(15, 11) }
   let(:ciphertext) { [
