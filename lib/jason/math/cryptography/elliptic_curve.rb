@@ -11,16 +11,17 @@ module Jason
             NumberTheory.modular_inverse(x, n)
           end
 
+          # want to replace with an optimized version for prime n
+          # but it breaks the naive tests (where n is 19).
+          # should likely test with NIST params
           def sqrt(x, n)
-            NumberTheory.modular_square_roots(x, n)
-
-            # raise "x must be < n" unless x < n
+            raise "x must be < n" unless x < n
             
-            # (1..n).each do |i|
-            #   return [i, n - i] if i * i % n == x
-            # end
+            (1..n).each do |i|
+              return [i, n - i] if i * i % n == x
+            end
 
-            # raise "No root found"
+            raise "No root found"
           end
         end
 
