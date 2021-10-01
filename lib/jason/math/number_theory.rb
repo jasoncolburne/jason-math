@@ -35,10 +35,11 @@ module Jason
       def self.prime_by_weak_fermat?(number, iterations = nil)
         return false if number < 2
 
-        iterations ||= number.to_s(2).length / 2 + 1
+        bits = number.to_s(2)
+        iterations ||= bits.length / 2 + 1
         iterations.times do
-          # TODO use a better RNG
-          a = rand(number - 4) + 2
+          # a = rand(number - 4) + 2
+          a = SecureRandom.hex((bits.length / 4.0).ceil).to_i(16) % (number - 4) + 2
           return false unless a.to_bn.mod_exp((number - 1), number) == 1
         end
 
@@ -362,6 +363,7 @@ module Jason
         x
       end
 
+      # https://eli.thegreenplace.net/2009/03/07/computing-modular-square-roots-in-python
       # p must be prime
       def self.modular_square_roots(a, p)
         return 0 if legendre_symbol(a, p) != 1
