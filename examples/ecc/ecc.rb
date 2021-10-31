@@ -11,19 +11,19 @@ class CurveService
 
     raise 'Unknown Curve Specified' unless params
 
+    hex_characters_required = params['hex_characters_required']
+    @hex_characters_required = hex_characters_required
+
     n = params['n'].to_i(16)
     a = params['a'].to_i(16)
     b = params['b'].to_i(16)
-    hex_characters_required = params['hex_characters_required']
-    px = params['generator'][0..(hex_characters_required - 1)].to_i(16)
-    py = params['generator'][(hex_characters_required)..(2 * hex_characters_required - 1)].to_i(16)
+    px = hex_to_i(params['generator'], 0)
+    py = hex_to_i(params['generator'], 1)
     order = params['order'].to_i(16)
 
     @curve = Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n)
     @p = Jason::Math::Cryptography::EllipticCurve::Point.new(px, py)
     @order = order
-
-    @hex_characters_required = hex_characters_required
   end
 
   def generate_keypair()
