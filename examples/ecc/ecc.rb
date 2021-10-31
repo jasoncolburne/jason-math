@@ -17,12 +17,12 @@ class CurveService
     n = params['n'].to_i(16)
     a = params['a'].to_i(16)
     b = params['b'].to_i(16)
-    px = hex_to_i(params['generator'], 0)
-    py = hex_to_i(params['generator'], 1)
+    x = hex_to_i(params['generator'], 0)
+    y = hex_to_i(params['generator'], 1)
     order = params['order'].to_i(16)
 
     @curve = Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n)
-    @p = Jason::Math::Cryptography::EllipticCurve::Point.new(px, py)
+    @p = Jason::Math::Cryptography::EllipticCurve::Point.new(x, y)
     @order = order
   end
 
