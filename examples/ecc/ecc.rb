@@ -87,7 +87,7 @@ class CurveService
       end
     end
 
-    raise "Not encodable"
+    raise "Couldn't find a point on curve, try again"
   end
 
   def decrypt(ciphertext, private_key)
