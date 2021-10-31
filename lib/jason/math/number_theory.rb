@@ -1,4 +1,5 @@
 require 'openssl'
+require 'securerandom'
 require 'prime'
 require 'set'
 

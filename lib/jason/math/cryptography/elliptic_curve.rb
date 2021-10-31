@@ -1,5 +1,3 @@
-require 'securerandom'
-
 module Jason
   module Math
     module Cryptography

@@ -105,6 +105,8 @@ class CurveService
     [plaintext[2..]].pack('H*')[0..(length - 1)]
   end
 
+  private
+
   def hex_to_i(input, part)
     input[(part * @hex_characters_required)..((part + 1) * @hex_characters_required - 1)].to_i(16)
   end
