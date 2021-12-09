@@ -1,3 +1,5 @@
+require 'base64'
+
 require 'jason/math/utility/disjoint_set'
 require 'jason/math/utility/completion_estimator'
 
@@ -88,6 +90,10 @@ module Jason
             end
           end
         end
+      end
+
+      def self.hex_to_base64(hex_string)
+        Base64.strict_encode64([hex_string].pack('H*'))
       end
     end
   end

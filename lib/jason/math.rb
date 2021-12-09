@@ -453,3 +453,9 @@ class Hash
     Math.chinese_remainder_theorem(self, enforce_co_primality)
   end
 end
+
+class String
+  def hex_to_base64
+    Jason::Math::Utility.hex_to_base64(self)
+  end
+end
