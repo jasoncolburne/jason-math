@@ -458,4 +458,16 @@ class String
   def hex_to_base64
     Jason::Math::Utility.hex_to_base64(self)
   end
+
+  def hex_to_byte_string
+    Jason::Math::Utility.hex_to_byte_string(self)
+  end
+
+  def hex_to_byte_array
+    Jason::Math::Utility.hex_to_byte_array(self)
+  end
+
+  def ^(other)
+    Jason::Math::Utility.xor(self, other)
+  end
 end

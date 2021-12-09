@@ -93,7 +93,20 @@ module Jason
       end
 
       def self.hex_to_base64(hex_string)
-        Base64.strict_encode64([hex_string].pack('H*'))
+        Base64.strict_encode64(hex_to_byte_string(hex_string))
+      end
+
+      def self.hex_to_byte_string(hex_string)
+        [hex_string].pack('H*')
+      end
+
+      def self.hex_to_byte_array(hex_string)
+        hex_to_byte_string(hex_string).bytes
+      end
+
+      def self.xor(a, b)
+        raise "Inputs must have equal length" unless a.length == b.length
+        a.bytes.zip(b.bytes).map { |x, y| (x^y).chr }.join
       end
     end
   end
