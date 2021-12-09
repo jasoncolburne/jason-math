@@ -81,4 +81,13 @@ RSpec.describe Jason::Math::Utility do
       it { is_expected.to eq([]) }
     end
   end
+
+  context "#hex_to_base64" do
+    subject { described_class.hex_to_base64(hex_string) }
+
+    context "cryptopals example" do
+      let(:hex_string) { '49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d' }
+      it { is_expected.to eq('SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t') }
+    end
+  end
 end
