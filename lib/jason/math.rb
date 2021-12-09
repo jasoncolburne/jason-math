@@ -455,6 +455,10 @@ class Hash
 end
 
 class String
+  def byte_string_to_hex
+    Jason::Math::Utility.byte_string_to_hex(self)
+  end
+
   def hex_to_base64
     Jason::Math::Utility.hex_to_base64(self)
   end

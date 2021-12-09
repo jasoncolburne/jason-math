@@ -109,6 +109,15 @@ RSpec.describe Jason::Math::Utility do
     end
   end
 
+  context "#byte_string_to_hex" do
+    subject { described_class.byte_string_to_hex(byte_string) }
+
+    context "simple example" do
+      let(:byte_string) { "\xff\x00".b }
+      it { is_expected.to eq('ff00') }
+    end
+  end
+
   context "#xor" do
     subject { described_class.xor(a, b) }
 

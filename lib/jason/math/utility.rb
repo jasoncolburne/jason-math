@@ -100,6 +100,10 @@ module Jason
         [hex_string].pack('H*')
       end
 
+      def self.byte_string_to_hex(byte_string)
+        byte_string.unpack('H*').first
+      end
+
       def self.hex_to_byte_array(hex_string)
         hex_to_byte_string(hex_string).bytes
       end
