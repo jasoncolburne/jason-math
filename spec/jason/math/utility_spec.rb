@@ -90,4 +90,33 @@ RSpec.describe Jason::Math::Utility do
       it { is_expected.to eq('SSdtIGtpbGxpbmcgeW91ciBicmFpbiBsaWtlIGEgcG9pc29ub3VzIG11c2hyb29t') }
     end
   end
+
+  context "#hex_to_byte_array" do
+    subject { described_class.hex_to_byte_array(hex_string) }
+
+    context "simple example" do
+      let(:hex_string) { "ff00" }
+      it { is_expected.to eq([255, 0]) }
+    end
+  end
+
+  context "#hex_to_byte_string" do
+    subject { described_class.hex_to_byte_string(hex_string) }
+
+    context "simple example" do
+      let(:hex_string) { "ff00" }
+      it { is_expected.to eq("\xff\x00".b) }
+    end
+  end
+
+  context "#xor" do
+    subject { described_class.xor(a, b) }
+
+    context "cryptopals example" do
+      let(:a) { '1c0111001f010100061a024b53535009181c'.hex_to_byte_string }
+      let(:b) { '686974207468652062756c6c277320657965'.hex_to_byte_string }
+
+      it { is_expected.to eq('746865206b696420646f6e277420706c6179'.hex_to_byte_string) }
+    end
+  end
 end
