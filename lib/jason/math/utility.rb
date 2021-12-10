@@ -2,6 +2,7 @@ require 'base64'
 
 require 'jason/math/utility/disjoint_set'
 require 'jason/math/utility/completion_estimator'
+require 'jason/math/utility/language_detector'
 
 module Jason
   module Math
