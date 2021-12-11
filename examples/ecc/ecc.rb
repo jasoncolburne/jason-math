@@ -61,7 +61,7 @@ class CurveService
   end
 
   def encrypt(plaintext, public_key)
-    raise "Plaintext value too long" unless plaintext.length * 2 <= @hex_characters_required - 12
+    raise "Plaintext value too long" unless plaintext.b.length * 2 <= @hex_characters_required - 10
 
     @elgamal ||= Jason::Math::Cryptography::EllipticCurve::ElGamal.new(@curve, @p, @order)
 
@@ -69,11 +69,14 @@ class CurveService
     public_key = Jason::Math::Cryptography::EllipticCurve::Point.new(hex_to_i(public_key, 0), hex_to_i(public_key, 1))
 
     # we have 32 bits to play with in an attempt to find a point on the curve
-    padding = 0
-    while padding < 2 ** 32
+    filler = 0
+    while filler < 2 ** 31
       # convert plaintext to a point
-      x = ("00" + plaintext.length.to_s(16).rjust(2, "0") + plaintext.unpack("H*")[0].ljust(@hex_characters_required - 12, "0") + padding.to_s(16).rjust(8, "0")).to_i(16)
-      padding += 1
+      padding = @hex_characters_required / 2 - plaintext.b.length - 4
+      x_string = filler.to_s(16).rjust(8, "0") + plaintext.b.unpack("H*").first + [padding].pack("C").unpack("H*").first * padding
+      x = x_string.to_i(16)
+
+      filler += 1
 
       # check if we have found a quadratic residue
       x_prime = (x * x * x + @curve.a * x + @curve.b) % @curve.n
@@ -100,9 +103,9 @@ class CurveService
     private_key = private_key.to_i(16)
 
     plaintext_point = @elgamal.decrypt(ciphertext, private_key)
-    plaintext = i_to_hex(plaintext_point.x)[2..(@hex_characters_required - 9)]
-    length = plaintext[0..1].to_i(16)
-    [plaintext[2..]].pack('H*')[0..(length - 1)]
+    plaintext = i_to_hex(plaintext_point.x)[8..-1]
+    padding = plaintext[-2..-1].to_i(16)
+    [plaintext].pack('H*')[0..(-padding - 1)]
   end
 
   private
