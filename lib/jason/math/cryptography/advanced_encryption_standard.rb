@@ -237,8 +237,8 @@ module Jason
           length = clear_text.length
           iterations = length / 16 + 1
           cipher_text = "".b
-
           last_block = initialization_vector
+
           iterations.times do |i|
             to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
             padding = 16 - to_cipher.length
@@ -258,8 +258,8 @@ module Jason
 
           iterations = length / 16
           clear_text = "".b
-
           last_block = initialization_vector
+
           iterations.times do |i|
             current_block = cipher_text[(i * 16)..((i + 1) * 16 - 1)]
             clear_text << Jason::Math::Utility.xor(decipher(current_block), last_block)
@@ -278,8 +278,8 @@ module Jason
           length = clear_text.length
           iterations = (length.to_f / 16).ceil
           cipher_text = "".b
-
           last_block = initialization_vector
+
           iterations.times do |i|
             ciphered_block = cipher(last_block)
             to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
@@ -292,11 +292,10 @@ module Jason
 
         def decrypt_cfb(cipher_text, initialization_vector)
           length = cipher_text.length
-
           iterations = (length.to_f / 16).ceil
           clear_text = "".b
-
           last_block = initialization_vector
+
           iterations.times do |i|
             ciphered_block = cipher(last_block)
             last_block = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
@@ -312,8 +311,8 @@ module Jason
           length = clear_text.length
           iterations = (length.to_f / 16).ceil
           cipher_text = "".b
-
           last_block = initialization_vector
+
           iterations.times do |i|
             last_block = cipher(last_block)
             to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
@@ -325,11 +324,10 @@ module Jason
 
         def decrypt_ofb(cipher_text, initialization_vector)
           length = cipher_text.length
-
           iterations = (length.to_f / 16).ceil
           clear_text = "".b
-
           last_block = initialization_vector
+
           iterations.times do |i|
             last_block = cipher(last_block)
             to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
