@@ -261,10 +261,8 @@ module Jason
           last_block = initialization_vector
           iterations.times do |i|
             ciphered_block = cipher(last_block)
-            to_xor = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
-            padding = 16 - to_xor.length
-            to_xor << ([padding] * padding).pack('C*') unless padding.zero?
-            last_block = Jason::Math::Utility.xor(ciphered_block, to_xor)
+            to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            last_block = Jason::Math::Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
             cipher_text << last_block
           end
 
@@ -274,16 +272,14 @@ module Jason
         def decrypt_cfb(cipher_text, initialization_vector)
           length = cipher_text.length
 
-          raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
-
-          iterations = length / 16
+          iterations = (length.to_f / 16).ceil
           clear_text = "".b
 
           last_block = initialization_vector
           iterations.times do |i|
             ciphered_block = cipher(last_block)
-            last_block = cipher_text[(i * 16)..((i + 1) * 16 - 1)]
-            clear_text << Jason::Math::Utility.xor(ciphered_block, last_block)
+            last_block = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            clear_text << Jason::Math::Utility.xor(ciphered_block[0..(last_block.length - 1)], last_block)
           end
 
           clear_text
@@ -326,6 +322,7 @@ module Jason
         end
 
         def add_round_key(block, key_schedule_subset)
+          puts "add round key"
           Jason::Math::Utility.xor(block, key_schedule_subset)
         end
 

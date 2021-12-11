@@ -12,6 +12,30 @@ module Jason
 
       class Cipher
         ALGORITHMS = {
+          aes_128_cbc: {
+            class: AdvancedEncryptionStandard,
+            mode: :cbc_128,
+          }.freeze,
+          aes_192_cbc: {
+            class: AdvancedEncryptionStandard,
+            mode: :cbc_192,
+          }.freeze,
+          aes_256_cbc: {
+            class: AdvancedEncryptionStandard,
+            mode: :cbc_256,
+          }.freeze,
+          aes_128_cfb: {
+            class: AdvancedEncryptionStandard,
+            mode: :cfb_128,
+          }.freeze,
+          aes_192_cfb: {
+            class: AdvancedEncryptionStandard,
+            mode: :cfb_192,
+          }.freeze,
+          aes_256_cfb: {
+            class: AdvancedEncryptionStandard,
+            mode: :cfb_256,
+          }.freeze,
           aes_128_ecb: {
             class: AdvancedEncryptionStandard,
             mode: :ecb_128,
@@ -26,19 +50,19 @@ module Jason
           }.freeze,
         }.freeze
 
-        def initialize(algorithm, key, initialization_vector = nil)
+        def initialize(algorithm, key, use_openssl = false)
           raise "Unsupported algorithm" unless ALGORITHMS.keys.include?(algorithm)
 
           details = ALGORITHMS[algorithm]
-          @cipher = details[:class].new(details[:mode], key, initialization_vector)
+          @cipher = details[:class].new(details[:mode], key, use_openssl)
         end
 
-        def encrypt(clear_text)
-          @cipher.encrypt(clear_text)
+        def encrypt(clear_text, initialization_vector)
+          @cipher.encrypt(clear_text, initialization_vector)
         end
 
-        def decrypt(cipher_text)
-          @cipher.decrypt(cipher_text)
+        def decrypt(cipher_text, initialization_vector)
+          @cipher.decrypt(cipher_text, initialization_vector)
         end
       end
     end
