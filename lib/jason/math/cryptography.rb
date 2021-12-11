@@ -36,11 +36,11 @@ module Jason
           @cipher = details[:class].new(details[:mode], key, use_openssl)
         end
 
-        def encrypt(clear_text, initialization_vector)
+        def encrypt(clear_text, initialization_vector = nil)
           @cipher.encrypt(clear_text, initialization_vector)
         end
 
-        def decrypt(cipher_text, initialization_vector)
+        def decrypt(cipher_text, initialization_vector = nil)
           @cipher.decrypt(cipher_text, initialization_vector)
         end
 
