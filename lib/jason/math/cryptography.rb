@@ -54,6 +54,13 @@ module Jason
           details = ALGORITHMS[algorithm]
           details[:class].generate_key(details[:mode])
         end
+
+        def self.detect_ecb?(cipher_text, block_size = 16)
+          indicies = (0..cipher_text.length).step(block_size).to_a
+          indicies[0..-2].zip(indicies[1..]).combination(2).any? do |(i1, i2), (j1, j2)|
+            cipher_text[i1..(i2 - 1)] == cipher_text[j1..(j2 - 1)]
+          end
+        end
       end
     end
   end
