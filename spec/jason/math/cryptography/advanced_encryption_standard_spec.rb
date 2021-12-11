@@ -50,14 +50,31 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
       let(:initialization_vector) { 'abcdefghijklmnop' }
       let(:cipher_text) { "Q\x86\xEF{\xB6\xD2\xD5\x88\xFF\xED\"-_\x8E\x04\xB9\xD7\x86\xFD\x94:GC63\xEF\xFFU\xADD\xE2/".b }
 
+      let(:smaller_clear_text) { '123456789' }
+      let(:smaller_cipher_text) { "P\x85\xEE|\xB7\xD1\xD4\x87\xFE".b }
+
       context "#decrypt" do
-        subject { aes.decrypt(cipher_text, initialization_vector) }
-        it { is_expected.to eq(clear_text) }
+        context "payload a multiple of block size" do
+          subject { aes.decrypt(cipher_text, initialization_vector) }
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.decrypt(smaller_cipher_text, initialization_vector) }
+          it { is_expected.to eq(smaller_clear_text) }
+        end
       end
 
       context "#encrypt" do
-        subject { aes.encrypt(clear_text, initialization_vector) }
-        it { is_expected.to eq(cipher_text) }
+        context "payload a multiple of block size" do
+          subject { aes.encrypt(clear_text, initialization_vector) }
+          it { is_expected.to eq(cipher_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.encrypt(smaller_clear_text, initialization_vector) }
+          it { is_expected.to eq(smaller_cipher_text) }
+        end
       end
     end
   end
@@ -109,14 +126,31 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
       let(:initialization_vector) { 'abcdefghijklmnop' }
       let(:cipher_text) { "\x88\xB0\xDFS\x97\xC3\xEF\xEBbD\x02&4}SkwK@1\xE9\x823\x1E'\xC2riW\xA5|\xCD".b }
 
+      let(:smaller_clear_text) { '123456789' }
+      let(:smaller_cipher_text) { "\x89\xB3\xDET\x96\xC0\xEE\xE4c".b }
+
       context "#decrypt" do
-        subject { aes.decrypt(cipher_text, initialization_vector) }
-        it { is_expected.to eq(clear_text) }
+        context "payload a multiple of block size" do
+          subject { aes.decrypt(cipher_text, initialization_vector) }
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.decrypt(smaller_cipher_text, initialization_vector) }
+          it { is_expected.to eq(smaller_clear_text) }
+        end
       end
 
       context "#encrypt" do
-        subject { aes.encrypt(clear_text, initialization_vector) }
-        it { is_expected.to eq(cipher_text) }
+        context "payload a multiple of block size" do
+          subject { aes.encrypt(clear_text, initialization_vector) }
+          it { is_expected.to eq(cipher_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.encrypt(smaller_clear_text, initialization_vector) }
+          it { is_expected.to eq(smaller_cipher_text) }
+        end
       end
     end
   end
@@ -168,14 +202,31 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
       let(:initialization_vector) { 'abcdefghijklmnop' }
       let(:cipher_text) { "\\\xD65\xB0\x9F\xF8\v\xDE\xE0\x00\xA0\xEDh\xD8uj\\\x88_9\xC3\x196\xABT\xCD\xF8:\xFB?\xA7\x13".b }
 
+      let(:smaller_clear_text) { '123456789' }
+      let(:smaller_cipher_text) { "]\xD54\xB7\x9E\xFB\n\xD1\xE1".b }
+
       context "#decrypt" do
-        subject { aes.decrypt(cipher_text, initialization_vector) }
-        it { is_expected.to eq(clear_text) }
+        context "payload a multiple of block size" do
+          subject { aes.decrypt(cipher_text, initialization_vector) }
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.decrypt(smaller_cipher_text, initialization_vector) }
+          it { is_expected.to eq(smaller_clear_text) }
+        end
       end
 
       context "#encrypt" do
-        subject { aes.encrypt(clear_text, initialization_vector) }
-        it { is_expected.to eq(cipher_text) }
+        context "payload a multiple of block size" do
+          subject { aes.encrypt(clear_text, initialization_vector) }
+          it { is_expected.to eq(cipher_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.encrypt(smaller_clear_text, initialization_vector) }
+          it { is_expected.to eq(smaller_cipher_text) }
+        end
       end
     end
   end
