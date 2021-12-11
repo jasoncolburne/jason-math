@@ -100,6 +100,15 @@ module Jason
         end
 
         def encrypt(clear_text)
+          case @mode
+          when :ecb
+            encrypt_ecb(clear_text)
+          else
+            raise "Unsupported mode"
+          end
+        end
+
+        private def encrypt_ecb(clear_text)
           length = clear_text.length
           iterations = length / 16 + 1
 
@@ -117,8 +126,7 @@ module Jason
         private def cipher(clear_text)
           raise "Block ciphers cipher blocks with strict sizes (16 bytes for AES)" if clear_text.length != 16
 
-          state = clear_text.dup
-          state = add_round_key(state, @key_schedule[0..15])
+          state = add_round_key(clear_text, @key_schedule[0..15])
 
           1.upto(@rounds - 1) do |round|
             state = sub_bytes(state)
