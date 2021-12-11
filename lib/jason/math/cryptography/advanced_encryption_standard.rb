@@ -5,27 +5,6 @@ module Jason
     module Cryptography
       class AdvancedEncryptionStandard
         MODE_DETAILS = {
-          ecb_128: {
-            mode: :ecb,
-            bits: 128,
-            rounds: 10,
-            key_size: 4, # in 4-byte words
-            openssl_algorithm: 'aes-128-ecb',
-          }.freeze,
-          ecb_192: {
-            mode: :ecb,
-            bits: 192,
-            rounds: 12,
-            key_size: 6, # in 4-byte words
-            openssl_algorithm: 'aes-192-ecb',
-          }.freeze,
-          ecb_256: {
-            mode: :ecb,
-            bits: 256,
-            rounds: 14,
-            key_size: 8, # in 4-byte words
-            openssl_algorithm: 'aes-256-ecb',
-          }.freeze,
           cbc_128: {
             mode: :cbc,
             bits: 128,
@@ -46,6 +25,48 @@ module Jason
             rounds: 14,
             key_size: 8, # in 4-byte words
             openssl_algorithm: 'aes-256-cbc',
+          }.freeze,
+          cfb_128: {
+            mode: :cfb,
+            bits: 128,
+            rounds: 10,
+            key_size: 4, # in 4-byte words
+            openssl_algorithm: 'aes-128-cfb',
+          }.freeze,
+          cfb_192: {
+            mode: :cfb,
+            bits: 192,
+            rounds: 12,
+            key_size: 6, # in 4-byte words
+            openssl_algorithm: 'aes-192-cfb',
+          }.freeze,
+          cfb_256: {
+            mode: :cfb,
+            bits: 256,
+            rounds: 14,
+            key_size: 8, # in 4-byte words
+            openssl_algorithm: 'aes-256-cfb',
+          }.freeze,
+          ecb_128: {
+            mode: :ecb,
+            bits: 128,
+            rounds: 10,
+            key_size: 4, # in 4-byte words
+            openssl_algorithm: 'aes-128-ecb',
+          }.freeze,
+          ecb_192: {
+            mode: :ecb,
+            bits: 192,
+            rounds: 12,
+            key_size: 6, # in 4-byte words
+            openssl_algorithm: 'aes-192-ecb',
+          }.freeze,
+          ecb_256: {
+            mode: :ecb,
+            bits: 256,
+            rounds: 14,
+            key_size: 8, # in 4-byte words
+            openssl_algorithm: 'aes-256-ecb',
           }.freeze,
         }.freeze
 
@@ -101,45 +122,32 @@ module Jason
           0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d,
         ].freeze
 
-        def initialize(mode, key, initialization_vector = nil)
+        def initialize(mode, key, use_openssl = false)
           mode_details = MODE_DETAILS[mode]
-          @mode = mode_details[:mode]
-          @bits = mode_details[:bits]
-          @rounds = mode_details[:rounds]
-          @key_size = mode_details[:key_size]
 
-          @initialization_vector = initialization_vector
-          @key_schedule = expand_key(key)
-
-          # for openssl
-          @openssl_algorithm = mode_details[:openssl_algorithm]
-          @key = key
-        end
-
-        def encrypt(clear_text, use_openssl = false)
-          return encrypt_openssl(clear_text) if use_openssl
-
-          case @mode
-          when :ecb
-            encrypt_ecb(clear_text)
-          when :cbc
-            encrypt_cbc(clear_text)
+          @use_openssl = use_openssl
+          if use_openssl
+            @openssl_algorithm = mode_details[:openssl_algorithm]
+            @key = key
           else
-            raise "Unsupported mode"
+            @mode = mode_details[:mode]
+            @bits = mode_details[:bits]
+            @rounds = mode_details[:rounds]
+            @key_size = mode_details[:key_size]
+            @key_schedule = expand_key(key)
           end
         end
 
-        def decrypt(cipher_text, use_openssl = false)
-          return decrypt_openssl(cipher_text) if use_openssl
+        def encrypt(clear_text, initialization_vector = nil)
+          return encrypt_openssl(clear_text, initialization_vector) if @use_openssl
 
-          case @mode
-          when :ecb
-            decrypt_ecb(cipher_text)
-          when :cbc
-            decrypt_cbc(cipher_text)
-          else
-            raise "Unsupported mode"
-          end
+          send("encrypt_#{@mode}".to_sym, clear_text, initialization_vector)
+        end
+
+        def decrypt(cipher_text, initialization_vector = nil)
+          return decrypt_openssl(cipher_text, initialization_vector) if @use_openssl
+
+          send("decrypt_#{@mode}".to_sym, cipher_text, initialization_vector)
         end
 
         private
@@ -168,7 +176,8 @@ module Jason
         end
 
         # Electronic CodeBook (ECB)
-        def encrypt_ecb(clear_text)
+
+        def encrypt_ecb(clear_text, initialization_vector = nil)
           length = clear_text.length
           iterations = length / 16 + 1
           cipher_text = "".b
@@ -183,7 +192,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_ecb(cipher_text)
+        def decrypt_ecb(cipher_text, initialization_vector = nil)
           length = cipher_text.length
 
           raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
@@ -202,12 +211,13 @@ module Jason
         end
 
         # Cipher Block Chaining (CBC)
-        def encrypt_cbc(clear_text)
+
+        def encrypt_cbc(clear_text, initialization_vector)
           length = clear_text.length
           iterations = length / 16 + 1
           cipher_text = "".b
 
-          last_block = @initialization_vector
+          last_block = initialization_vector
           iterations.times do |i|
             to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
             padding = 16 - to_cipher.length
@@ -220,7 +230,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_cbc(cipher_text)
+        def decrypt_cbc(cipher_text, initialization_vector)
           length = cipher_text.length
 
           raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
@@ -228,7 +238,7 @@ module Jason
           iterations = length / 16
           clear_text = "".b
 
-          last_block = @initialization_vector
+          last_block = initialization_vector
           iterations.times do |i|
             current_block = cipher_text[(i * 16)..((i + 1) * 16 - 1)]
             clear_text << Jason::Math::Utility.xor(decipher(current_block), last_block)
@@ -240,6 +250,46 @@ module Jason
 
           clear_text[0..(length - padding - 1)]
         end
+
+        # Cipher Feedback (CFB)
+
+        def encrypt_cfb(clear_text, initialization_vector)
+          length = clear_text.length
+          iterations = (length.to_f / 16).ceil
+          cipher_text = "".b
+
+          last_block = initialization_vector
+          iterations.times do |i|
+            ciphered_block = cipher(last_block)
+            to_xor = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
+            padding = 16 - to_xor.length
+            to_xor << ([padding] * padding).pack('C*') unless padding.zero?
+            last_block = Jason::Math::Utility.xor(ciphered_block, to_xor)
+            cipher_text << last_block
+          end
+
+          cipher_text
+        end
+
+        def decrypt_cfb(cipher_text, initialization_vector)
+          length = cipher_text.length
+
+          raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
+
+          iterations = length / 16
+          clear_text = "".b
+
+          last_block = initialization_vector
+          iterations.times do |i|
+            ciphered_block = cipher(last_block)
+            last_block = cipher_text[(i * 16)..((i + 1) * 16 - 1)]
+            clear_text << Jason::Math::Utility.xor(ciphered_block, last_block)
+          end
+
+          clear_text
+        end
+
+        # Core Routines
 
         def cipher(clear_text)
           raise "Block ciphers cipher blocks with strict sizes (16 bytes for AES)" if clear_text.length != 16
@@ -369,20 +419,20 @@ module Jason
           sub_bytes_core(bytes, INVERSE_S_BOX)
         end
 
-        def decrypt_openssl(cipher_text)
+        def decrypt_openssl(cipher_text, initialization_vector)
           cipher = OpenSSL::Cipher.new(@openssl_algorithm)
           cipher.decrypt
           cipher.key = @key
-          cipher.iv = @initialization_vector unless @initialization_vector.nil?
+          cipher.iv = initialization_vector unless initialization_vector.nil?
           clear_text = cipher.update(cipher_text)
           clear_text + cipher.final
         end
 
-        def encrypt_openssl(clear_text)
+        def encrypt_openssl(clear_text, initialization_vector)
           cipher = OpenSSL::Cipher.new(@openssl_algorithm)
           cipher.encrypt
           cipher.key = @key
-          cipher.iv = @initialization_vector unless @initialization_vector.nil?
+          cipher.iv = initialization_vector unless initialization_vector.nil?
           clear_text = cipher.update(clear_text)
           clear_text + cipher.final
         end
