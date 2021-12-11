@@ -29,6 +29,22 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
         it { is_expected.to eq(cipher_text) }
       end
     end
+
+    context "cipher block chaining (cbc)" do
+      let(:mode) { 'cbc' }
+      let(:initialization_vector) { 'abcdefghijklmnop' }
+      let(:cipher_text) { "\x85\xD5\xD1\xC0S!\x92Q\x18Q?\a1z\xA6~J\xEB\xD1C\xFC\"\x14\xD8N\x81\xB9\x1F\x82q\xD1\x1E\v\xB4\xCB\f0+\x88\x80\xEBV\x87<\xD9\xCC\xEB\x02".b }
+
+      context "#decrypt" do
+        subject { aes.decrypt(cipher_text) }
+        it { is_expected.to eq(clear_text) }
+      end
+
+      context "#encrypt" do
+        subject { aes.encrypt(clear_text) }
+        it { is_expected.to eq(cipher_text) }
+      end
+    end
   end
 
   context "192-bit" do
@@ -58,6 +74,22 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
         it { is_expected.to eq(cipher_text) }
       end
     end
+
+    context "cipher block chaining (cbc)" do
+      let(:mode) { 'cbc' }
+      let(:initialization_vector) { 'abcdefghijklmnop' }
+      let(:cipher_text) { "\xA1\x0E\xE2\xBC\xC0\x9D\x82fr\xC4}j\xFF\xC0\xA1\xAD\xBAak\xA1a\x81\xED\xC7\x9C\xC8(P\xD6\x19\x1D\xE3[\x8E\x8F\x05\x16\xCD\x16\x9Ez3\xF4B)\xF3\xEB&".b }
+
+      context "#decrypt" do
+        subject { aes.decrypt(cipher_text) }
+        it { is_expected.to eq(clear_text) }
+      end
+
+      context "#encrypt" do
+        subject { aes.encrypt(clear_text) }
+        it { is_expected.to eq(cipher_text) }
+      end
+    end
   end
 
   context "256-bit" do
@@ -76,6 +108,22 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
       let(:mode) { 'ecb' }
       let(:initialization_vector) { nil }
       let(:cipher_text) { "\xC6\xD9\xB4W\xEB\xCF?\vZ\xEFg\xD2\x93\bX\x04{7\x91U\xA9\x8BB\xE7\xE5v\xD3\xEA\xDE\x8F\x1E\x1FLE\xDF\xB3\xB3\xB4\x84\xEC5\xB0Q-\xC8\xC1\xC4\xD6".b }
+
+      context "#decrypt" do
+        subject { aes.decrypt(cipher_text) }
+        it { is_expected.to eq(clear_text) }
+      end
+
+      context "#encrypt" do
+        subject { aes.encrypt(clear_text) }
+        it { is_expected.to eq(cipher_text) }
+      end
+    end
+
+    context "cipher block chaining (cbc)" do
+      let(:mode) { 'cbc' }
+      let(:initialization_vector) { 'abcdefghijklmnop' }
+      let(:cipher_text) { "^\xED\x80Cu3\xE7\xEF\xA00+\xE8k\xB6\"\xF5\xE9(\xDE\x043\x8C\x06\x10\x9E\xE9\vcX!\x01\xB2\xB0/3T\x8D\xF9\xA4S\xA1Bw\x05\x14\xFE!\xFC".b }
 
       context "#decrypt" do
         subject { aes.decrypt(cipher_text) }

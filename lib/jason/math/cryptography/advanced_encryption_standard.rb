@@ -14,17 +14,38 @@ module Jason
           }.freeze,
           ecb_192: {
             mode: :ecb,
-            bits: 128,
+            bits: 192,
             rounds: 12,
             key_size: 6, # in 4-byte words
             openssl_algorithm: 'aes-192-ecb',
           }.freeze,
           ecb_256: {
             mode: :ecb,
-            bits: 128,
+            bits: 256,
             rounds: 14,
             key_size: 8, # in 4-byte words
             openssl_algorithm: 'aes-256-ecb',
+          }.freeze,
+          cbc_128: {
+            mode: :cbc,
+            bits: 128,
+            rounds: 10,
+            key_size: 4, # in 4-byte words
+            openssl_algorithm: 'aes-128-cbc',
+          }.freeze,
+          cbc_192: {
+            mode: :cbc,
+            bits: 192,
+            rounds: 12,
+            key_size: 6, # in 4-byte words
+            openssl_algorithm: 'aes-192-cbc',
+          }.freeze,
+          cbc_256: {
+            mode: :cbc,
+            bits: 256,
+            rounds: 14,
+            key_size: 8, # in 4-byte words
+            openssl_algorithm: 'aes-256-cbc',
           }.freeze,
         }.freeze
 
@@ -86,18 +107,47 @@ module Jason
           @bits = mode_details[:bits]
           @rounds = mode_details[:rounds]
           @key_size = mode_details[:key_size]
-          @openssl_algorithm = mode_details[:openssl_algorithm]
 
-          @key = key
           @initialization_vector = initialization_vector
+          @key_schedule = expand_key(key)
 
-          expand_key
+          # for openssl
+          @openssl_algorithm = mode_details[:openssl_algorithm]
+          @key = key
         end
 
-        private def expand_key
-          raise "Invalid key length" unless @key.length == @key_size * 4
+        def encrypt(clear_text, use_openssl = false)
+          return encrypt_openssl(clear_text) if use_openssl
 
-          key_schedule = @key.unpack('N*')
+          case @mode
+          when :ecb
+            encrypt_ecb(clear_text)
+          when :cbc
+            encrypt_cbc(clear_text)
+          else
+            raise "Unsupported mode"
+          end
+        end
+
+        def decrypt(cipher_text, use_openssl = false)
+          return decrypt_openssl(cipher_text) if use_openssl
+
+          case @mode
+          when :ecb
+            decrypt_ecb(cipher_text)
+          when :cbc
+            decrypt_cbc(cipher_text)
+          else
+            raise "Unsupported mode"
+          end
+        end
+
+        private
+
+        def expand_key(key)
+          raise "Invalid key length" unless key.length == @key_size * 4
+
+          key_schedule = key.unpack('N*')
 
           i = @key_size
           while i < 4 * (@rounds + 1)
@@ -114,28 +164,11 @@ module Jason
             i += 1
           end
 
-          @key_schedule = key_schedule.pack('N*')
+          key_schedule.pack('N*')
         end
 
-        def encrypt(clear_text)
-          case @mode
-          when :ecb
-            encrypt_ecb(clear_text)
-          else
-            raise "Unsupported mode"
-          end
-        end
-
-        def decrypt(cipher_text)
-          case @mode
-          when :ecb
-            decrypt_ecb(cipher_text)
-          else
-            raise "Unsupported mode"
-          end
-        end
-
-        private def encrypt_ecb(clear_text)
+        # Electronic CodeBook (ECB)
+        def encrypt_ecb(clear_text)
           length = clear_text.length
           iterations = length / 16 + 1
           cipher_text = "".b
@@ -150,7 +183,7 @@ module Jason
           cipher_text
         end
 
-        private def decrypt_ecb(cipher_text)
+        def decrypt_ecb(cipher_text)
           length = cipher_text.length
 
           raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
@@ -168,7 +201,47 @@ module Jason
           clear_text[0..(length - padding - 1)]
         end
 
-        private def cipher(clear_text)
+        # Cipher Block Chaining (CBC)
+        def encrypt_cbc(clear_text)
+          length = clear_text.length
+          iterations = length / 16 + 1
+          cipher_text = "".b
+
+          last_block = @initialization_vector
+          iterations.times do |i|
+            to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
+            padding = 16 - to_cipher.length
+            to_cipher << ([padding] * padding).pack('C*') unless padding.zero?
+            to_cipher = Jason::Math::Utility.xor(to_cipher, last_block)
+            last_block = cipher(to_cipher)
+            cipher_text << last_block
+          end
+
+          cipher_text
+        end
+
+        def decrypt_cbc(cipher_text)
+          length = cipher_text.length
+
+          raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
+
+          iterations = length / 16
+          clear_text = "".b
+
+          last_block = @initialization_vector
+          iterations.times do |i|
+            current_block = cipher_text[(i * 16)..((i + 1) * 16 - 1)]
+            clear_text << Jason::Math::Utility.xor(decipher(current_block), last_block)
+            last_block = current_block
+          end
+
+          padding = clear_text.chars.last.ord
+          raise "Invalid padding, cannot decrypt" if padding > 16 || padding.zero?
+
+          clear_text[0..(length - padding - 1)]
+        end
+
+        def cipher(clear_text)
           raise "Block ciphers cipher blocks with strict sizes (16 bytes for AES)" if clear_text.length != 16
 
           state = add_round_key(clear_text, @key_schedule[0..15])
@@ -185,7 +258,7 @@ module Jason
           add_round_key(state, @key_schedule[(@rounds * 16)..((@rounds + 1) * 16 - 1)])
         end
 
-        private def decipher(cipher_text)
+        def decipher(cipher_text)
           raise "Block ciphers cipher blocks with strict sizes (16 bytes for AES)" if cipher_text.length != 16
 
           state = add_round_key(cipher_text, @key_schedule[(@rounds * 16)..((@rounds + 1) * 16 - 1)])
@@ -202,11 +275,11 @@ module Jason
           add_round_key(state, @key_schedule[0..15])
         end
 
-        private def add_round_key(block, key_schedule_subset)
+        def add_round_key(block, key_schedule_subset)
           Jason::Math::Utility.xor(block, key_schedule_subset)
         end
 
-        private def shift_rows(block)
+        def shift_rows(block)
           i = 0
           result = "".b
 
@@ -218,7 +291,7 @@ module Jason
           result
         end
 
-        private def inverse_shift_rows(block)
+        def inverse_shift_rows(block)
           i = 0
           result = "".b
 
@@ -230,17 +303,17 @@ module Jason
           result
         end
 
-        private def mix_columns(block)
+        def mix_columns(block)
           ranges = [0..3, 4..7, 8..11, 12..15]
           ranges.map { |range| mix_column(block[range]) }.join
         end
 
-        private def inverse_mix_columns(block)
+        def inverse_mix_columns(block)
           ranges = [0..3, 4..7, 8..11, 12..15]
           ranges.map { |range| inverse_mix_column(block[range]) }.join
         end
 
-        private def mix_column(column)
+        def mix_column(column)
           bytes = column.bytes
           [
             galois_multiply(bytes[0], 2) ^ galois_multiply(bytes[1], 3) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 1),
@@ -250,7 +323,7 @@ module Jason
           ].pack('C*')
         end
 
-        private def inverse_mix_column(column)
+        def inverse_mix_column(column)
           bytes = column.bytes
           [
             galois_multiply(bytes[0], 0xe) ^ galois_multiply(bytes[1], 0xb) ^ galois_multiply(bytes[2], 0xd) ^ galois_multiply(bytes[3], 0x9),
@@ -261,7 +334,7 @@ module Jason
         end
 
         # in GF(2^8)
-        private def galois_multiply(a, b)
+        def galois_multiply(a, b)
           p = 0
           hi_bit = 0
           8.times do
@@ -274,25 +347,25 @@ module Jason
           p % 256
         end
 
-        private def rot_word(word)
+        def rot_word(word)
           ((word << 8) & 0xffffffff) | (word >> 24) 
         end
 
-        private def sub_word(word)
+        def sub_word(word)
           sub_bytes([word].pack('N*')).unpack('N*').first
         end
 
-        private def sub_bytes_core(bytes, box)
+        def sub_bytes_core(bytes, box)
           result = "".b
           bytes.bytes.each { |byte| result << box[byte].chr }
           result
         end
 
-        private def sub_bytes(bytes)
+        def sub_bytes(bytes)
           sub_bytes_core(bytes, S_BOX)
         end
 
-        private def inverse_sub_bytes(bytes)
+        def inverse_sub_bytes(bytes)
           sub_bytes_core(bytes, INVERSE_S_BOX)
         end
 
