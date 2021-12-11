@@ -474,4 +474,12 @@ class String
   def ^(other)
     Jason::Math::Utility.xor(self, other)
   end
+
+  def &(other)
+    Jason::Math::Utility.and(self, other)
+  end
+
+  def |(other)
+    Jason::Math::Utility.or(self, other)
+  end
 end
