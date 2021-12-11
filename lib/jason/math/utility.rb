@@ -111,7 +111,36 @@ module Jason
 
       def self.xor(a, b)
         raise "Inputs must have equal length" unless a.length == b.length
-        a.bytes.zip(b.bytes).map { |x, y| (x^y).chr }.join
+        a.bytes.zip(b.bytes).map { |x, y| (x ^ y).chr }.join
+      end
+
+      def self.and(a, b)
+        raise "Inputs must have equal length" unless a.length == b.length
+        a.bytes.zip(b.bytes).map { |x, y| (x & y).chr }.join
+      end
+
+      def self.or(a, b)
+        raise "Inputs must have equal length" unless a.length == b.length
+        a.bytes.zip(b.bytes).map { |x, y| (x | y).chr }.join
+      end
+
+      def self.integer_to_byte_string(n)
+        result = []
+
+        until n.zero?
+          result.unshift(n & 0xffffffff)
+          n >>= 32
+        end
+
+        result.pack('N*')
+      end
+
+      INT32_MAX = 2 ** 32
+
+      def self.byte_string_to_integer(byte_string)
+        byte_string.unpack("N*").reverse.each_with_index.inject(0) do |sum, (byte, index)|
+          sum + byte * (INT32_MAX ** index)
+        end
       end
     end
   end

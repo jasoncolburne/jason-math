@@ -47,6 +47,27 @@ module Jason
             key_size: 8, # in 4-byte words
             openssl_algorithm: 'aes-256-cfb',
           }.freeze,
+          ctr_128: {
+            mode: :ctr,
+            bits: 128,
+            rounds: 10,
+            key_size: 4, # in 4-byte words
+            openssl_algorithm: 'aes-128-ctr',
+          }.freeze,
+          ctr_192: {
+            mode: :ctr,
+            bits: 192,
+            rounds: 12,
+            key_size: 6, # in 4-byte words
+            openssl_algorithm: 'aes-192-ctr',
+          }.freeze,
+          ctr_256: {
+            mode: :ctr,
+            bits: 256,
+            rounds: 14,
+            key_size: 8, # in 4-byte words
+            openssl_algorithm: 'aes-256-ctr',
+          }.freeze,
           ecb_128: {
             mode: :ecb,
             bits: 128,
@@ -169,6 +190,14 @@ module Jason
           return decrypt_openssl(cipher_text, initialization_vector) if @use_openssl
 
           send("decrypt_#{@mode}".to_sym, cipher_text, initialization_vector)
+        end
+
+        def generate_nonce
+          Jason::Math::Utility.and("\x7f" + "\xff" * 15, SecureRandom.bytes(16))
+        end
+
+        def self.generate_key(mode)
+          SecureRandom.bytes(4 * MODE_DETAILS[mode][:key_size])
         end
 
         private
@@ -332,6 +361,46 @@ module Jason
             last_block = cipher(last_block)
             to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
             clear_text << Jason::Math::Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
+          end
+
+          clear_text
+        end
+
+        # Counter (CTR)
+
+        def encrypt_ctr(clear_text, nonce)
+          length = clear_text.length
+          iterations = (length.to_f / 16).ceil
+          cipher_text = "".b
+          counter = Jason::Math::Utility.byte_string_to_integer(nonce)
+
+          iterations.times do |i|
+            to_cipher = Jason::Math::Utility.integer_to_byte_string(counter)
+            ciphered_block = cipher(to_cipher)
+            to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            cipher_text << Jason::Math::Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+            counter += 1
+          end
+
+          cipher_text
+        end
+
+        def decrypt_ctr(cipher_text, nonce)
+          decrypt_ctr_with_offset(cipher_text, nonce)
+        end
+
+        def decrypt_ctr_with_offset(cipher_text, nonce, offset = 0)
+          length = cipher_text.length
+          iterations = (length.to_f / 16).ceil
+          clear_text = "".b
+          counter = Jason::Math::Utility.byte_string_to_integer(nonce) + offset
+
+          iterations.times do |i|
+            to_cipher = Jason::Math::Utility.integer_to_byte_string(counter)
+            ciphered_block = cipher(to_cipher)
+            to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            clear_text << Jason::Math::Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+            counter += 1
           end
 
           clear_text
