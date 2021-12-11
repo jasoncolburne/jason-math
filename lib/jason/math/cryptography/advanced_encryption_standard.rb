@@ -68,6 +68,27 @@ module Jason
             key_size: 8, # in 4-byte words
             openssl_algorithm: 'aes-256-ecb',
           }.freeze,
+          ofb_128: {
+            mode: :ofb,
+            bits: 128,
+            rounds: 10,
+            key_size: 4, # in 4-byte words
+            openssl_algorithm: 'aes-128-ofb',
+          }.freeze,
+          ofb_192: {
+            mode: :ofb,
+            bits: 192,
+            rounds: 12,
+            key_size: 6, # in 4-byte words
+            openssl_algorithm: 'aes-192-ofb',
+          }.freeze,
+          ofb_256: {
+            mode: :ofb,
+            bits: 256,
+            rounds: 14,
+            key_size: 8, # in 4-byte words
+            openssl_algorithm: 'aes-256-ofb',
+          }.freeze,
         }.freeze
 
         R_CON = [
@@ -285,6 +306,39 @@ module Jason
           clear_text
         end
 
+        # Output Feedback (OFB)
+
+        def encrypt_ofb(clear_text, initialization_vector)
+          length = clear_text.length
+          iterations = (length.to_f / 16).ceil
+          cipher_text = "".b
+
+          last_block = initialization_vector
+          iterations.times do |i|
+            last_block = cipher(last_block)
+            to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            cipher_text << Jason::Math::Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
+          end
+
+          cipher_text
+        end
+
+        def decrypt_ofb(cipher_text, initialization_vector)
+          length = cipher_text.length
+
+          iterations = (length.to_f / 16).ceil
+          clear_text = "".b
+
+          last_block = initialization_vector
+          iterations.times do |i|
+            last_block = cipher(last_block)
+            to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            clear_text << Jason::Math::Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
+          end
+
+          clear_text
+        end
+
         # Core Routines
 
         def cipher(clear_text)
@@ -322,7 +376,6 @@ module Jason
         end
 
         def add_round_key(block, key_schedule_subset)
-          puts "add round key"
           Jason::Math::Utility.xor(block, key_schedule_subset)
         end
 

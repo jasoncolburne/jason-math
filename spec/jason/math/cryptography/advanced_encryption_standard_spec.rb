@@ -77,6 +77,39 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
         end
       end
     end
+
+    context "output feedback (ofb)" do
+      let(:mode) { 'ofb' }
+      let(:initialization_vector) { 'abcdefghijklmnop' }
+      let(:cipher_text) { "Q\x86\xEF{\xB6\xD2\xD5\x88\xFF\xED\"-_\x8E\x04\xB9$Au}\xD4#\x9Ee\xB4\xB2\x01\xC5\x1D\x9C\x1A\x1D".b }
+
+      let(:smaller_clear_text) { '123456789' }
+      let(:smaller_cipher_text) { "P\x85\xEE|\xB7\xD1\xD4\x87\xFE".b }
+
+      context "#decrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.decrypt(cipher_text, initialization_vector) }
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.decrypt(smaller_cipher_text, initialization_vector) }
+          it { is_expected.to eq(smaller_clear_text) }
+        end
+      end
+
+      context "#encrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.encrypt(clear_text, initialization_vector) }
+          it { is_expected.to eq(cipher_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.encrypt(smaller_clear_text, initialization_vector) }
+          it { is_expected.to eq(smaller_cipher_text) }
+        end
+      end
+    end
   end
 
   context "192-bit" do
@@ -153,6 +186,39 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
         end
       end
     end
+
+    context "output feedback (ofb)" do
+      let(:mode) { 'ofb' }
+      let(:initialization_vector) { 'abcdefghijklmnop' }
+      let(:cipher_text) { "\x88\xB0\xDFS\x97\xC3\xEF\xEBbD\x02&4}Skz\xD3\x96\x84\xFE\xC0\x12,Z\xCC\\P\xB0\x1A&\n".b }
+
+      let(:smaller_clear_text) { '123456789' }
+      let(:smaller_cipher_text) { "\x89\xB3\xDET\x96\xC0\xEE\xE4c".b }
+
+      context "#decrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.decrypt(cipher_text, initialization_vector) }
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.decrypt(smaller_cipher_text, initialization_vector) }
+          it { is_expected.to eq(smaller_clear_text) }
+        end
+      end
+
+      context "#encrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.encrypt(clear_text, initialization_vector) }
+          it { is_expected.to eq(cipher_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.encrypt(smaller_clear_text, initialization_vector) }
+          it { is_expected.to eq(smaller_cipher_text) }
+        end
+      end
+    end
   end
 
   context "256-bit" do
@@ -201,6 +267,39 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
       let(:mode) { 'cfb' }
       let(:initialization_vector) { 'abcdefghijklmnop' }
       let(:cipher_text) { "\\\xD65\xB0\x9F\xF8\v\xDE\xE0\x00\xA0\xEDh\xD8uj\\\x88_9\xC3\x196\xABT\xCD\xF8:\xFB?\xA7\x13".b }
+
+      let(:smaller_clear_text) { '123456789' }
+      let(:smaller_cipher_text) { "]\xD54\xB7\x9E\xFB\n\xD1\xE1".b }
+
+      context "#decrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.decrypt(cipher_text, initialization_vector) }
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.decrypt(smaller_cipher_text, initialization_vector) }
+          it { is_expected.to eq(smaller_clear_text) }
+        end
+      end
+
+      context "#encrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.encrypt(clear_text, initialization_vector) }
+          it { is_expected.to eq(cipher_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.encrypt(smaller_clear_text, initialization_vector) }
+          it { is_expected.to eq(smaller_cipher_text) }
+        end
+      end
+    end
+
+    context "output feedback (ofb)" do
+      let(:mode) { 'ofb' }
+      let(:initialization_vector) { 'abcdefghijklmnop' }
+      let(:cipher_text) { "\\\xD65\xB0\x9F\xF8\v\xDE\xE0\x00\xA0\xEDh\xD8ujF\x89\xEC!\a\xDA\x03\x03\xF8\xC3\xF2\x19GV%w".b }
 
       let(:smaller_clear_text) { '123456789' }
       let(:smaller_cipher_text) { "]\xD54\xB7\x9E\xFB\n\xD1\xE1".b }
