@@ -99,6 +99,86 @@ module Jason
           @key_schedule = key_schedule.pack('N*')
         end
 
+        def encrypt(clear_text)
+          length = clear_text.length
+          iterations = length / 16 + 1
+
+          cipher_text = "".b
+          iterations.times do |i|
+            to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
+            padding = 16 - to_cipher.length
+            to_cipher << ([padding] * padding).pack('C*') unless padding.zero?
+            cipher_text << cipher(to_cipher)
+          end
+
+          cipher_text
+        end
+
+        private def cipher(clear_text)
+          raise "Block ciphers cipher blocks with strict sizes (16 bytes for AES)" if clear_text.length != 16
+
+          state = clear_text.dup
+          state = add_round_key(state, @key_schedule[0..15])
+
+          1.upto(@rounds - 1) do |round|
+            state = sub_bytes(state)
+            state = shift_rows(state)
+            state = mix_columns(state)
+            state = add_round_key(state, @key_schedule[(round * 16)..((round + 1) * 16 - 1)])
+          end
+
+          state = sub_bytes(state)
+          state = shift_rows(state)
+          state = add_round_key(state, @key_schedule[(@rounds * 16)..((@rounds + 1) * 16 - 1)])
+
+          state
+        end
+
+        private def add_round_key(block, key_schedule_subset)
+          Jason::Math::Utility.xor(block, key_schedule_subset)
+        end
+
+        private def shift_rows(block)
+          i = 0
+          result = "".b
+
+          16.times do
+            result << block[i]
+            i = (i + 5) % 16
+          end
+
+          result
+        end
+
+        private def mix_columns(block)
+          ranges = [0..3, 4..7, 8..11, 12..15]
+          ranges.map { |range| mix_column(block[range]) }.join
+        end
+
+        def mix_column(column)
+          bytes = column.bytes
+          [
+            galois_multiply(bytes[0], 2) ^ galois_multiply(bytes[1], 3) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 1),
+            galois_multiply(bytes[0], 1) ^ galois_multiply(bytes[1], 2) ^ galois_multiply(bytes[2], 3) ^ galois_multiply(bytes[3], 1),
+            galois_multiply(bytes[0], 1) ^ galois_multiply(bytes[1], 1) ^ galois_multiply(bytes[2], 2) ^ galois_multiply(bytes[3], 3),
+            galois_multiply(bytes[0], 3) ^ galois_multiply(bytes[1], 1) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 2),
+          ].pack('C*')
+        end
+
+        # in GF(2^8)
+        private def galois_multiply(a, b)
+          p = 0
+          hi_bit = 0
+          8.times do
+            p ^= a if b & 1 == 1
+            hi_bit = a & 0x80
+            a <<= 1
+            a ^= 0x1b if hi_bit == 0x80
+            b >>= 1
+          end
+          p % 256
+        end
+
         private def rot_word(word)
           ((word << 8) & 0xffffffff) | (word >> 24) 
         end
@@ -132,7 +212,6 @@ module Jason
         end
 
         alias_method :decrypt, :decrypt_openssl
-        alias_method :encrypt, :encrypt_openssl
       end
     end
   end
