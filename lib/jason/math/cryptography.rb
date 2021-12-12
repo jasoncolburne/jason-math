@@ -7,7 +7,12 @@ module Jason
     module Cryptography
       def self.hamming_distance(a, b)
         raise "Cannot compute hamming distance if lengths differ" unless a.length == b.length
-        Jason::Math::Utility.xor(a, b).unpack('B*').first.count('1')
+        Utility.xor(a, b).unpack('B*').first.count('1')
+      end
+
+      def self.pad_pkcs7(data, block_size)
+        padding = block_size - data.length
+        padding.zero? ? data : data + ([padding] * padding).pack('C*')
       end
 
       class Cipher
