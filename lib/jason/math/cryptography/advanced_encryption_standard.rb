@@ -234,7 +234,7 @@ module Jason
 
           iterations.times do |i|
             to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
-            to_cipher = Cryptography.pad_pkcs7(to_cipher, 16)
+            to_cipher = PKCS7.pad_block(to_cipher, 16)
             cipher_text << cipher(to_cipher)
           end
 
@@ -254,10 +254,8 @@ module Jason
           end
 
           if strip_padding
-            padding = clear_text.chars.last.ord
-            raise "Invalid padding, cannot decrypt" if padding > 16 || padding.zero?
-
-            clear_text[0..(length - padding - 1)]
+            PKCS7.validate(clear_text, 16)
+            PKCS7.strip(clear_text, 16)
           else
             clear_text
           end
@@ -273,7 +271,7 @@ module Jason
 
           iterations.times do |i|
             to_xor = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
-            to_xor = Cryptography.pad_pkcs7(to_xor, 16)
+            to_xor = PKCS7.pad_block(to_xor, 16)
             to_cipher = Utility.xor(to_xor, last_block)
             last_block = cipher(to_cipher)
             cipher_text << last_block
@@ -298,10 +296,8 @@ module Jason
           end
 
           if strip_padding
-            padding = clear_text.chars.last.ord
-            raise "Invalid padding, cannot decrypt" if padding > 16 || padding.zero?
-
-            clear_text[0..(length - padding - 1)]
+            PKCS7.validate(clear_text, 16)
+            PKCS7.strip(clear_text, 16)
           else
             clear_text
           end
