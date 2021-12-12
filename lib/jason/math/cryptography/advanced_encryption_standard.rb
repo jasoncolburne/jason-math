@@ -193,7 +193,7 @@ module Jason
         end
 
         def generate_nonce
-          Jason::Math::Utility.and("\x7f" + "\xff" * 15, SecureRandom.bytes(16))
+          Utility.and("\x7f" + "\xff" * 15, SecureRandom.bytes(16))
         end
 
         def self.generate_key(mode)
@@ -234,8 +234,7 @@ module Jason
 
           iterations.times do |i|
             to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
-            padding = 16 - to_cipher.length
-            to_cipher << ([padding] * padding).pack('C*') unless padding.zero?
+            to_cipher = Cryptography.pad_pkcs7(to_cipher, 16)
             cipher_text << cipher(to_cipher)
           end
 
@@ -269,10 +268,9 @@ module Jason
           last_block = initialization_vector
 
           iterations.times do |i|
-            to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
-            padding = 16 - to_cipher.length
-            to_cipher << ([padding] * padding).pack('C*') unless padding.zero?
-            to_cipher = Jason::Math::Utility.xor(to_cipher, last_block)
+            to_xor = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
+            to_xor = Cryptography.pad_pkcs7(to_xor, 16)
+            to_cipher = Utility.xor(to_xor, last_block)
             last_block = cipher(to_cipher)
             cipher_text << last_block
           end
@@ -291,7 +289,7 @@ module Jason
 
           iterations.times do |i|
             current_block = cipher_text[(i * 16)..((i + 1) * 16 - 1)]
-            clear_text << Jason::Math::Utility.xor(decipher(current_block), last_block)
+            clear_text << Utility.xor(decipher(current_block), last_block)
             last_block = current_block
           end
 
@@ -312,7 +310,7 @@ module Jason
           iterations.times do |i|
             ciphered_block = cipher(last_block)
             to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            last_block = Jason::Math::Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+            last_block = Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
             cipher_text << last_block
           end
 
@@ -328,7 +326,7 @@ module Jason
           iterations.times do |i|
             ciphered_block = cipher(last_block)
             last_block = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            clear_text << Jason::Math::Utility.xor(ciphered_block[0..(last_block.length - 1)], last_block)
+            clear_text << Utility.xor(ciphered_block[0..(last_block.length - 1)], last_block)
           end
 
           clear_text
@@ -345,7 +343,7 @@ module Jason
           iterations.times do |i|
             last_block = cipher(last_block)
             to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            cipher_text << Jason::Math::Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
+            cipher_text << Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
           end
 
           cipher_text
@@ -360,7 +358,7 @@ module Jason
           iterations.times do |i|
             last_block = cipher(last_block)
             to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            clear_text << Jason::Math::Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
+            clear_text << Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
           end
 
           clear_text
@@ -372,13 +370,13 @@ module Jason
           length = clear_text.length
           iterations = (length.to_f / 16).ceil
           cipher_text = "".b
-          counter = Jason::Math::Utility.byte_string_to_integer(nonce)
+          counter = Utility.byte_string_to_integer(nonce)
 
           iterations.times do |i|
-            to_cipher = Jason::Math::Utility.integer_to_byte_string(counter)
+            to_cipher = Utility.integer_to_byte_string(counter)
             ciphered_block = cipher(to_cipher)
             to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            cipher_text << Jason::Math::Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+            cipher_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
             counter += 1
           end
 
@@ -393,13 +391,13 @@ module Jason
           length = cipher_text.length
           iterations = (length.to_f / 16).ceil
           clear_text = "".b
-          counter = Jason::Math::Utility.byte_string_to_integer(nonce) + offset
+          counter = Utility.byte_string_to_integer(nonce) + offset
 
           iterations.times do |i|
-            to_cipher = Jason::Math::Utility.integer_to_byte_string(counter)
+            to_cipher = Utility.integer_to_byte_string(counter)
             ciphered_block = cipher(to_cipher)
             to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            clear_text << Jason::Math::Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+            clear_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
             counter += 1
           end
 
@@ -443,7 +441,7 @@ module Jason
         end
 
         def add_round_key(block, key_schedule_subset)
-          Jason::Math::Utility.xor(block, key_schedule_subset)
+          Utility.xor(block, key_schedule_subset)
         end
 
         def shift_rows(block)

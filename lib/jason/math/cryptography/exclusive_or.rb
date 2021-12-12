@@ -5,7 +5,7 @@ module Jason
         def self.cipher(data, key)
           key_characters = key.chars
           data.chars.map do |character|
-            result = Jason::Math::Utility.xor(character, key_characters[0])
+            result = Utility.xor(character, key_characters[0])
             key_characters << key_characters.shift
             result
           end.join
@@ -15,7 +15,7 @@ module Jason
           normalized_hamming_distances_by_key_length = key_length_range.map do |key_length|
             raise "Key length too long to compute hamming distance of cipher text" if key_length * 4 > cipher_text.length
             distances = (0..(chunks_to_scan - 1)).map do |i|
-              Jason::Math::Cryptography.hamming_distance(cipher_text[(key_length * i)..(key_length * (i + 1) - 1)], cipher_text[(key_length * (i + 1))..(key_length * (i + 2) - 1)]).to_f / key_length
+              Cryptography.hamming_distance(cipher_text[(key_length * i)..(key_length * (i + 1) - 1)], cipher_text[(key_length * (i + 1))..(key_length * (i + 2) - 1)]).to_f / key_length
             end
             distances.sum.to_f / distances.count
           end.zip(key_length_range)
@@ -45,8 +45,8 @@ module Jason
         
           length = cipher_text.length
           0.upto(255) do |n|
-            deciphered_data = Jason::Math::Utility.xor((n.chr * length), cipher_text)
-            distance = Jason::Math::Utility::LanguageDetector.distance(deciphered_data, language)  
+            deciphered_data = Utility.xor((n.chr * length), cipher_text)
+            distance = Utility::LanguageDetector.distance(deciphered_data, language)  
             keys_by_english_distance[distance] << n.chr
           end
         
