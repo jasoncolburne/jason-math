@@ -186,10 +186,10 @@ module Jason
           send("encrypt_#{@mode}".to_sym, clear_text, initialization_vector)
         end
 
-        def decrypt(cipher_text, initialization_vector = nil)
+        def decrypt(cipher_text, initialization_vector = nil, strip_padding = true)
           return decrypt_openssl(cipher_text, initialization_vector) if @use_openssl
 
-          send("decrypt_#{@mode}".to_sym, cipher_text, initialization_vector)
+          send("decrypt_#{@mode}".to_sym, cipher_text, initialization_vector, strip_padding)
         end
 
         def generate_nonce
@@ -241,7 +241,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_ecb(cipher_text, initialization_vector = nil)
+        def decrypt_ecb(cipher_text, initialization_vector = nil, strip_padding = true)
           length = cipher_text.length
 
           raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
@@ -253,10 +253,14 @@ module Jason
             clear_text << decipher(cipher_text[(i * 16)..((i + 1) * 16 - 1)])
           end
 
-          padding = clear_text.chars.last.ord
-          raise "Invalid padding, cannot decrypt" if padding > 16 || padding.zero?
+          if strip_padding
+            padding = clear_text.chars.last.ord
+            raise "Invalid padding, cannot decrypt" if padding > 16 || padding.zero?
 
-          clear_text[0..(length - padding - 1)]
+            clear_text[0..(length - padding - 1)]
+          else
+            clear_text
+          end
         end
 
         # Cipher Block Chaining (CBC)
@@ -278,7 +282,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_cbc(cipher_text, initialization_vector)
+        def decrypt_cbc(cipher_text, initialization_vector, strip_padding = true)
           length = cipher_text.length
 
           raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
@@ -293,10 +297,14 @@ module Jason
             last_block = current_block
           end
 
-          padding = clear_text.chars.last.ord
-          raise "Invalid padding, cannot decrypt" if padding > 16 || padding.zero?
+          if strip_padding
+            padding = clear_text.chars.last.ord
+            raise "Invalid padding, cannot decrypt" if padding > 16 || padding.zero?
 
-          clear_text[0..(length - padding - 1)]
+            clear_text[0..(length - padding - 1)]
+          else
+            clear_text
+          end
         end
 
         # Cipher Feedback (CFB)
@@ -317,7 +325,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_cfb(cipher_text, initialization_vector)
+        def decrypt_cfb(cipher_text, initialization_vector, _ = nil)
           length = cipher_text.length
           iterations = (length.to_f / 16).ceil
           clear_text = "".b
@@ -349,7 +357,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_ofb(cipher_text, initialization_vector)
+        def decrypt_ofb(cipher_text, initialization_vector, _ = nil)
           length = cipher_text.length
           iterations = (length.to_f / 16).ceil
           clear_text = "".b
@@ -383,7 +391,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_ctr(cipher_text, nonce)
+        def decrypt_ctr(cipher_text, nonce, _ = nil)
           decrypt_ctr_with_offset(cipher_text, nonce)
         end
 

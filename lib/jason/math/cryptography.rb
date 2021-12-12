@@ -45,8 +45,8 @@ module Jason
           @cipher.encrypt(clear_text, initialization_vector)
         end
 
-        def decrypt(cipher_text, initialization_vector = nil)
-          @cipher.decrypt(cipher_text, initialization_vector)
+        def decrypt(cipher_text, initialization_vector = nil, strip_padding = true)
+          @cipher.decrypt(cipher_text, initialization_vector, strip_padding)
         end
 
         def generate_nonce
