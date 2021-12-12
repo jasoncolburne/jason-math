@@ -12,7 +12,7 @@ module Jason
 
       def self.pad_pkcs7(data, block_size)
         padding = block_size - data.length
-        padding.zero? ? data : data + ([padding] * padding).pack('C*')
+        padding.zero? ? data : (data + ([padding] * padding).pack('C*')).b
       end
 
       class Cipher
