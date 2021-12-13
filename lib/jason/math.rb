@@ -463,6 +463,14 @@ class String
     Jason::Math::Utility.hex_to_base64(self)
   end
 
+  def base64_to_byte_string
+    Jason::Math::Utility.base64_to_byte_string(self)
+  end
+
+  def byte_string_to_base64
+    Jason::Math::Utility.byte_string_to_base64(self)
+  end
+
   def hex_to_byte_string
     Jason::Math::Utility.hex_to_byte_string(self)
   end

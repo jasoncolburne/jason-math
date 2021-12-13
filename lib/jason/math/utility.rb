@@ -94,7 +94,15 @@ module Jason
       end
 
       def self.hex_to_base64(hex_string)
-        Base64.strict_encode64(hex_to_byte_string(hex_string))
+        byte_string_to_base64(hex_to_byte_string(hex_string))
+      end
+
+      def self.base64_to_byte_string(base64_string)
+        Base64.decode64(base64_string)
+      end
+
+      def self.byte_string_to_base64(byte_string)
+        Base64.encode64(byte_string)
       end
 
       def self.hex_to_byte_string(hex_string)
