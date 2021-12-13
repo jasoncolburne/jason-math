@@ -24,19 +24,19 @@ module Jason
         end
   
         def self.strip(data, block_size)
-          padding = data[-1].ord
+          padding = validate(data, block_size)
           data[0..(-padding - 1)]
         end
 
         def self.validate(data, block_size)
-          length = data.length
-
-          raise "Data length must be a multiple of block_size" unless (length % block_size).zero?
+          raise "Data length must be a multiple of block_size" unless (data.length % block_size).zero?
 
           padding = data[-1].ord
 
           raise "Invalid padding" if padding > block_size || padding.zero?
           raise "Invalid padding" unless data[(-padding)..-1] == ([padding] * padding).pack('C*')
+
+          padding
         end
       end
 
