@@ -254,7 +254,6 @@ module Jason
           end
 
           if strip_padding
-            PKCS7.validate(clear_text, 16)
             PKCS7.strip(clear_text, 16)
           else
             clear_text
@@ -296,7 +295,6 @@ module Jason
           end
 
           if strip_padding
-            PKCS7.validate(clear_text, 16)
             PKCS7.strip(clear_text, 16)
           else
             clear_text
