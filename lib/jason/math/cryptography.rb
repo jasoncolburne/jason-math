@@ -113,6 +113,42 @@ module Jason
 
           blocks.size != blocks.to_set.size
         end
+
+        def self.count_clear_text_extra_bytes(encryptor, block_size)
+          current_length = encryptor.encrypt("").size
+          (1..block_size).each do |i|
+            previous_length = current_length
+            current_length = encryptor.encrypt("A".b * i).size
+            return previous_length - i if current_length != previous_length
+          end
+
+          raise "Could not count clear text extra bytes"
+        end
+        
+        def self.count_clear_text_prefix_bytes(encryptor, block_size)
+          current_blocks = split_into_blocks(encryptor.encrypt(""), block_size)
+          first_difference = nil
+          (1..(block_size + 1)).each do |i|
+            previous_blocks = current_blocks
+            current_blocks = split_into_blocks(encryptor.encrypt("A".b * i), block_size)
+            changed = false
+            previous_blocks.each_with_index do |block, index|
+              if block != current_blocks[index]
+                if first_difference.nil?
+                  first_difference = index
+                elsif first_difference != index
+                  changed = true
+                end
+        
+                break
+              end
+            end
+        
+            return first_difference * block_size + (1 - i) % block_size if changed
+          end
+
+          raise "Could not count clear text prefix bytes"
+        end
       end
     end
   end

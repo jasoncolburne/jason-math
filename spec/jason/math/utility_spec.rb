@@ -91,6 +91,24 @@ RSpec.describe Jason::Math::Utility do
     end
   end
 
+  context "#byte_string_to_base64" do
+    subject { described_class.byte_string_to_base64(byte_string) }
+
+    context "simple example" do
+      let(:byte_string) { 'some text to encode' }
+      it { is_expected.to eq("c29tZSB0ZXh0IHRvIGVuY29kZQ==\n") }
+    end
+  end
+
+  context "#base64_to_byte_string" do
+    subject { described_class.base64_to_byte_string(base64_string) }
+
+    context "simple example" do
+      let(:base64_string) { "c29tZSB0ZXh0IHRvIGVuY29kZQ==\n" }
+      it { is_expected.to eq('some text to encode') }
+    end
+  end
+
   context "#hex_to_byte_array" do
     subject { described_class.hex_to_byte_array(hex_string) }
 
