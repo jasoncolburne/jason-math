@@ -85,6 +85,18 @@ module Jason
           details[:class].generate_key(details[:mode])
         end
 
+        def self.block_size(encryptor, maximum_block_size = 128)
+          current_length = encryptor.encrypt("A".b).length
+
+          (2..(maximum_block_size + 1)).each do |i|
+            previous_length = current_length
+            current_length = encryptor.encrypt("A".b * i).length
+            return current_length - previous_length if current_length != previous_length
+          end
+
+          raise "Block size appears to be larger than #{maximum_block_size}"
+        end
+
         def self.detect_ecb?(cipher_text, block_size = 16)
           indicies = (0..cipher_text.length).step(block_size).to_a
 
