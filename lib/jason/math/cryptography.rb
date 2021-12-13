@@ -85,6 +85,13 @@ module Jason
           details[:class].generate_key(details[:mode])
         end
 
+        def self.split_into_blocks(data, block_size)
+          block_count = (data.length.to_f / block_size).ceil
+          (0..(block_count - 1)).map do |i|
+            data[(i * block_size)..((i + 1) * block_size - 1)]
+          end
+        end
+
         def self.block_size(encryptor, maximum_block_size = 128)
           current_length = encryptor.encrypt("A".b).length
 

@@ -482,4 +482,8 @@ class String
   def |(other)
     Jason::Math::Utility.or(self, other)
   end
+
+  def to_blocks(block_size)
+    Jason::Math::Cryptography::Cipher.split_into_blocks(self, block_size)
+  end
 end
