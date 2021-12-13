@@ -70,6 +70,19 @@ RSpec.describe Jason::Math::Cryptography::PKCS7 do
   end
 end
 
+class Encryptor
+  def initialize(algorithm, key_length)
+    @prefix = SecureRandom.random_bytes(SecureRandom.random_number(32))
+    @suffix = SecureRandom.random_bytes(SecureRandom.random_number(32))
+    @initialization_vector = SecureRandom.random_bytes(16)
+    @cipher = Jason::Math::Cryptography::Cipher.new(algorithm, SecureRandom.random_bytes(key_length))
+  end
+
+  def encrypt(clear_text)
+    @cipher.encrypt(@prefix + clear_text + @suffix, @initialization_vector)
+  end
+end
+
 RSpec.describe Jason::Math::Cryptography::Cipher do
   context "#detect_ecb?" do
     subject { described_class.detect_ecb?(cipher_text) }
@@ -102,6 +115,39 @@ RSpec.describe Jason::Math::Cryptography::Cipher do
       let(:algorithm) { :aes_128_cbc }
 
       it { is_expected.to eq false }
+    end
+  end
+
+  context "#block_size" do
+    subject { described_class.block_size(encryptor, maximum_block_size) }
+    let(:maximum_block_size) { 128 }
+    let(:block_size) { 16 }
+    let(:encryptor) { Encryptor.new(algorithm, key_length) }
+
+    context "detects in 128-bit ecb" do
+      let(:algorithm) { :aes_128_ecb }
+      let(:key_length) { 16 }
+      it { is_expected.to eq block_size }
+    end
+
+    context "detects in 256-bit cbc" do
+      let(:algorithm) { :aes_256_cbc }
+      let(:key_length) { 32 }
+      it { is_expected.to eq block_size }
+    end
+
+    context "fails to detect when maximum block size is smaller than block size" do
+      let(:algorithm) { :aes_128_ecb }
+      let(:key_length) { 16 }
+      let(:maximum_block_size) { 2 }
+      it { expect { subject }.to raise_error }
+    end
+
+    context "detects when maximum block size is equal to block size" do
+      let(:algorithm) { :aes_128_ecb }
+      let(:key_length) { 16 }
+      let(:maximum_block_size) { 16 }
+      it { is_expected.to eq block_size }
     end
   end
 end
