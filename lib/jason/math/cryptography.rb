@@ -10,9 +10,34 @@ module Jason
         Utility.xor(a, b).unpack('B*').first.count('1')
       end
 
-      def self.pad_pkcs7(data, block_size)
-        padding = block_size - data.length
-        padding.zero? ? data : (data + ([padding] * padding).pack('C*')).b
+      class PKCS7
+        def self.pad(data, block_size)
+          length = data.length
+          total_length = (length / block_size + 1) * block_size
+          padding = total_length - length
+          (data + ([padding] * padding).pack('C*')).b
+        end
+
+        def self.pad_block(data, block_size)
+          padding = block_size - data.length
+          padding.zero? ? data : (data + ([padding] * padding).pack('C*')).b
+        end
+  
+        def self.strip(data, block_size)
+          padding = data[-1].ord
+          data[0..(-padding - 1)]
+        end
+
+        def self.validate(data, block_size)
+          length = data.length
+
+          raise "Data length must be a multiple of block_size" unless (length % block_size).zero?
+
+          padding = data[-1].ord
+
+          raise "Invalid padding" if padding > block_size || padding.zero?
+          raise "Invalid padding" unless data[(-padding)..-1] == ([padding] * padding).pack('C*')
+        end
       end
 
       class Cipher
