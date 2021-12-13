@@ -71,9 +71,9 @@ RSpec.describe Jason::Math::Cryptography::PKCS7 do
 end
 
 class Encryptor
-  def initialize(algorithm, key_length, add_prefix = true, add_suffix = true)
-    @prefix = add_prefix ? SecureRandom.random_bytes(SecureRandom.random_number(32)) : ""
-    @suffix = add_suffix ? SecureRandom.random_bytes(SecureRandom.random_number(32)) : ""
+  def initialize(algorithm, key_length, add_prefix = true, add_suffix = true, prefix_length = nil, suffix_length = nil)
+    @prefix = add_prefix ? SecureRandom.random_bytes(prefix_length ? prefix_length : SecureRandom.random_number(32)) : ""
+    @suffix = add_suffix ? SecureRandom.random_bytes(suffix_length ? suffix_length : SecureRandom.random_number(32)) : ""
     @initialization_vector = SecureRandom.random_bytes(16)
     @cipher = Jason::Math::Cryptography::Cipher.new(algorithm, SecureRandom.random_bytes(key_length))
   end
@@ -152,6 +152,50 @@ RSpec.describe Jason::Math::Cryptography::Cipher do
       let(:key_length) { 16 }
       let(:maximum_block_size) { 16 }
       it { is_expected.to eq block_size }
+    end
+  end
+
+  context "#count_clear_text_extra_bytes" do
+    subject { described_class.count_clear_text_extra_bytes(encryptor, block_size) }
+    # don't feel the best about randomizing these inputs but
+    # don't want to work out the edge cases right now
+    let(:prefix_length) { SecureRandom.random_number(32) }
+    let(:suffix_length) { SecureRandom.random_number(32) }
+    let(:block_size) { 16 }
+    let(:encryptor) { Encryptor.new(algorithm, key_length, true, true, prefix_length, suffix_length) }
+
+    context "aes 128 ecb" do
+      let(:key_length) { 16 }
+      let(:algorithm) { :aes_128_ecb }
+      it { is_expected.to eq(prefix_length + suffix_length) }
+    end
+
+    context "aes 192 cbc" do
+      let(:key_length) { 24 }
+      let(:algorithm) { :aes_192_cbc }
+      it { is_expected.to eq(prefix_length + suffix_length) }
+    end
+  end
+
+  context "#count_clear_text_prefix_bytes" do
+    subject { described_class.count_clear_text_prefix_bytes(encryptor, block_size) }
+    # don't feel the best about randomizing these inputs but
+    # don't want to work out the edge cases right now
+    let(:prefix_length) { SecureRandom.random_number(32) }
+    let(:suffix_length) { SecureRandom.random_number(32) }
+    let(:block_size) { 16 }
+    let(:encryptor) { Encryptor.new(algorithm, key_length, true, true, prefix_length, suffix_length) }
+
+    context "aes 128 ecb" do
+      let(:key_length) { 16 }
+      let(:algorithm) { :aes_128_ecb }
+      it { is_expected.to eq(prefix_length) }
+    end
+
+    context "aes 192 cbc" do
+      let(:key_length) { 24 }
+      let(:algorithm) { :aes_192_cbc }
+      it { is_expected.to eq(prefix_length) }
     end
   end
 end
