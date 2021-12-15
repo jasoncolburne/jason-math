@@ -372,14 +372,14 @@ module Jason
           length = clear_text.length
           iterations = (length.to_f / 16).ceil
           cipher_text = "".b
-          counter = Utility.byte_string_to_integer(nonce)
+          offset = 0
 
           iterations.times do |i|
-            to_cipher = Utility.integer_to_byte_string(counter)
+            to_cipher = nonce + [offset].pack('Q<*')
             ciphered_block = cipher(to_cipher)
             to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
             cipher_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
-            counter += 1
+            offset += 1
           end
 
           cipher_text
@@ -393,14 +393,13 @@ module Jason
           length = cipher_text.length
           iterations = (length.to_f / 16).ceil
           clear_text = "".b
-          counter = Utility.byte_string_to_integer(nonce) + offset
 
           iterations.times do |i|
-            to_cipher = Utility.integer_to_byte_string(counter)
+            to_cipher = nonce + [offset].pack('Q<*')
             ciphered_block = cipher(to_cipher)
             to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
             clear_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
-            counter += 1
+            offset += 1
           end
 
           clear_text
@@ -409,7 +408,7 @@ module Jason
         # Core Routines
 
         def cipher(clear_text)
-          raise "Block ciphers cipher blocks with strict sizes (16 bytes for AES)" if clear_text.length != 16
+          raise "Block ciphers cipher blocks with strict sizes (16 bytes for typical AES - received #{clear_text.length})" if clear_text.length != 16
 
           state = add_round_key(clear_text, @key_schedule[0..15])
 

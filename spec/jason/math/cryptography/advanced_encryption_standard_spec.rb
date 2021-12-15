@@ -113,11 +113,11 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
 
     context "counter (ctr)" do
       let(:mode) { 'ctr' }
-      let(:nonce) { "0\xDDu8\x05\xD0\x16\x95\xC6\xFE`\xC6\xFAT\xE7\xBF" }
-      let(:cipher_text) { "YE7Vz\xD0`\xB8\x03E\x93r\xC7\xEAe<m[<j[\xDB\xB2\xB1\xC76;\xBE\x9E\xEC\xC0\xF9".b }
+      let(:nonce) { "0\xDDu8\x05\xD0\x16\x95" }
+      let(:cipher_text) { "0\x00$\x00\xC9\x01s\x9E\e\xEF_\xC6\x7Fwi$N\xFB\x1E\x1D\ax\xA6<\x10j/\xED\x0E\xAE\"\x9F".b }
 
       let(:smaller_clear_text) { '123456789' }
-      let(:smaller_cipher_text) { "XF6Q{\xD3a\xB7\x02".b }
+      let(:smaller_cipher_text) { "1\x03%\a\xC8\x02r\x91\x1A".b }
 
       context "#decrypt" do
         context "payload a multiple of block size" do
@@ -251,37 +251,37 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
           it { is_expected.to eq(smaller_cipher_text) }
         end
       end
+    end
 
-      context "counter (ctr)" do
-        let(:mode) { 'ctr' }
-        let(:nonce) { "0\xDDu8\x05\xD0\x16\x95\xC6\xFE`\xC6\xFAT\xE7\xBF" }
-        let(:cipher_text) { "\xA3\xE6t\xFD\xB7\xD6\xC7r\fK\x83\xBAdB\xBB\xAC\x16\x8A\x95\x80\x9DZ:\x1F6\x1D0\\\xB7TU\f".b }
+    context "counter (ctr)" do
+      let(:mode) { 'ctr' }
+      let(:nonce) { "0\xDDu8\x05\xD0\x16\x95" }
+      let(:cipher_text) { "\xB6\x91Y\r\xF5\eh\xF7A<8\b\xC3\xF7\x8AY\x8A\x0F\xB1\f\xF6\bQ\xFDYd\x19F,M\x83w".b }
 
-        let(:smaller_clear_text) { '123456789' }
-        let(:smaller_cipher_text) { "\xA2\xE5u\xFA\xB6\xD5\xC6}\r".b }
+      let(:smaller_clear_text) { '123456789' }
+      let(:smaller_cipher_text) { "\xB7\x92X\n\xF4\x18i\xF8@".b }
 
-        context "#decrypt" do
-          context "payload a multiple of block size" do
-            subject { aes.decrypt(cipher_text, nonce) }
-            it { is_expected.to eq(clear_text) }
-          end
-
-          context "9 byte payload" do
-            subject { aes.decrypt(smaller_cipher_text, nonce) }
-            it { is_expected.to eq(smaller_clear_text) }
-          end
+      context "#decrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.decrypt(cipher_text, nonce) }
+          it { is_expected.to eq(clear_text) }
         end
 
-        context "#encrypt" do
-          context "payload a multiple of block size" do
-            subject { aes.encrypt(clear_text, nonce) }
-            it { is_expected.to eq(cipher_text) }
-          end
+        context "9 byte payload" do
+          subject { aes.decrypt(smaller_cipher_text, nonce) }
+          it { is_expected.to eq(smaller_clear_text) }
+        end
+      end
 
-          context "9 byte payload" do
-            subject { aes.encrypt(smaller_clear_text, nonce) }
-            it { is_expected.to eq(smaller_cipher_text) }
-          end
+      context "#encrypt" do
+        context "payload a multiple of block size" do
+          subject { aes.encrypt(clear_text, nonce) }
+          it { is_expected.to eq(cipher_text) }
+        end
+
+        context "9 byte payload" do
+          subject { aes.encrypt(smaller_clear_text, nonce) }
+          it { is_expected.to eq(smaller_cipher_text) }
         end
       end
     end
@@ -397,11 +397,11 @@ RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
 
     context "counter (ctr)" do
       let(:mode) { 'ctr' }
-      let(:nonce) { "0\xDDu8\x05\xD0\x16\x95\xC6\xFE`\xC6\xFAT\xE7\xBF" }
-      let(:cipher_text) { "\xDB\xC5\"\x02@S\xB2\x13\xCB~\xCB\x14\x8D\xC9\xFD}ii\xEE\x91\xE5,\x94\xFA2W\x83Pe\xA0\x97\xF6".b }
+      let(:nonce) { "0\xDDu8\x05\xD0\x16\x95" }
+      let(:cipher_text) { "\xF4\x05\x91\x1A\x10\xAA\x81\x92'=\xAE$$\x7Fe\xE12_\xD5\xA9(U3\x8C\x98\xBA?\x16<sl\x01".b }
 
       let(:smaller_clear_text) { '123456789' }
-      let(:smaller_cipher_text) { "\xDA\xC6#\x05AP\xB3\x1C\xCA".b }
+      let(:smaller_cipher_text) { "\xF5\x06\x90\x1D\x11\xA9\x80\x9D&".b }
 
       context "#decrypt" do
         context "payload a multiple of block size" do
