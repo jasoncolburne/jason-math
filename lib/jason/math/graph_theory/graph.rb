@@ -9,8 +9,8 @@ module Jason
           @graph = Hash.new { |h, k| h[k] = [] }
         end
       
-        def add_edge(origin, destination, weight = 1)
-          raise "unexpected vertices (#{origin}, #{destination})!" unless [origin, destination].all? { |vertex| @vertices.include?(vertex) }
+        def add_edge(origin, destination, weight = 1, validate = false)
+          raise "unexpected vertices (#{origin}, #{destination})!" if validate && ![origin, destination].all? { |vertex| @vertices.include?(vertex) }
           @graph[origin] << { vertex: destination, weight: weight }
         end
       
