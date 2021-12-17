@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rb_heap'
 
 module Jason
@@ -85,7 +87,7 @@ module Jason
         private
 
         def negate_edge_weights
-          @graph.values.each do |edges|
+          @graph.each_value do |edges|
             edges.each do |edge|
               edge[:weight] = -edge[:weight]
             end

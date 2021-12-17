@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Jason
   module Math
     module Utility
@@ -59,7 +61,7 @@ module Jason
 
           punctuation_frequencies = PUNCTUATION_FREQUENCIES[language]
 
-          punctuation_frequencies.keys.each do |symbol|
+          punctuation_frequencies.each_key do |symbol|
             frequency = text.count(symbol.to_s.b).to_f / text.length
             result += (frequency - punctuation_frequencies[symbol]).abs
           end
@@ -69,7 +71,7 @@ module Jason
 
           letter_frequencies = LETTER_FREQUENCIES[language]
 
-          letter_frequencies.keys.each do |symbol|
+          letter_frequencies.each_key do |symbol|
             letter = symbol.to_s
             frequency = text.count(letter + letter.downcase).to_f / text.length
             result += (frequency - letter_frequencies[symbol]).abs

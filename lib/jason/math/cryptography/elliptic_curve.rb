@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Jason
   module Math
     module Cryptography
@@ -93,7 +95,7 @@ module Jason
             return p1 if p2 == @zero
 
             # p1 + -p1 == 0
-            return @zero if p1.x == p2.x && (p1.y != p2.y || p1.y == 0)
+            return @zero if p1.x == p2.x && (p1.y != p2.y || p1.y.zero?)
 
             l = if p1.x == p2.x
                   (3 * p1.x * p1.x + @a) * inverse(2 * p1.y, @n) % @n
@@ -112,7 +114,7 @@ module Jason
             m2 = p
 
             # O(log2(n)) add
-            while 0 < n
+            while n.positive?
               r = add(r, m2) if n & 1 == 1
               n = n >> 1
               m2 = add(m2, m2)
@@ -122,7 +124,7 @@ module Jason
           end
 
           def order(p)
-            raise 'Invalid order' unless valid?(p) and p != @zero
+            raise 'Invalid order' unless valid?(p) && (p != @zero)
 
             (1..(@n + 1)).each do |i|
               return i if multiply(p, i) == @zero
@@ -142,7 +144,7 @@ module Jason
           end
 
           def generate_public_key(private_key)
-            raise 'Private key out of range' unless 0 < private_key && private_key < @order
+            raise 'Private key out of range' unless private_key.positive? && private_key < @order
 
             @curve.multiply(@generator, private_key)
           end
@@ -152,7 +154,7 @@ module Jason
           include Math
 
           def sign(digest, private_key, entropy)
-            raise 'Entropy out of range' unless 0 < entropy && entropy < @order
+            raise 'Entropy out of range' unless entropy.positive? && entropy < @order
 
             m = @curve.multiply(@generator, entropy)
             [m.x, inverse(entropy, @order) * (digest + m.x * private_key) % @order]

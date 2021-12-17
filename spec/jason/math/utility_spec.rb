@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::Utility do
   context '#binary_search' do
     subject { described_class.binary_search(array, value) }

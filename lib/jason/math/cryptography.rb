@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'jason/math/cryptography/advanced_encryption_standard'
 require 'jason/math/cryptography/elliptic_curve'
 require 'jason/math/cryptography/exclusive_or'
@@ -35,7 +37,7 @@ module Jason
           padding = data[-1].ord
 
           raise 'Invalid padding' if padding > block_size || padding.zero?
-          raise 'Invalid padding' unless data[-padding..-1] == ([padding] * padding).pack('C*')
+          raise 'Invalid padding' unless data[-padding..] == ([padding] * padding).pack('C*')
 
           padding
         end

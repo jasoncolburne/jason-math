@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'openssl'
 
 module Jason
@@ -193,7 +195,7 @@ module Jason
         end
 
         def generate_nonce
-          Utility.and("\x7f" + "\xff" * 15, SecureRandom.bytes(16))
+          Utility.and("\u007F#{"\xff" * 15}", SecureRandom.bytes(16))
         end
 
         def self.generate_key(mode)

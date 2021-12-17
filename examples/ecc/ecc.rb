@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubygems'
 require 'bundler/setup'
 require 'jason/math'
@@ -104,8 +106,8 @@ class CurveService
     private_key = private_key.to_i(16)
 
     plaintext_point = @elgamal.decrypt(ciphertext, private_key)
-    plaintext = i_to_hex(plaintext_point.x)[8..-1]
-    padding = plaintext[-2..-1].to_i(16)
+    plaintext = i_to_hex(plaintext_point.x)[8..]
+    padding = plaintext[-2..].to_i(16)
     [plaintext].pack('H*')[0..(-padding - 1)]
   end
 

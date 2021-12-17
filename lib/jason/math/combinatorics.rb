@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Jason
   module Math
     module Combinatorics
@@ -62,8 +64,8 @@ module Jason
       # https://stackoverflow.com/questions/14053885/integer-partition-algorithm-and-recursion
       def self.count_integer_partitions(n, max = n)
         return 1 + count_integer_partitions(n, max - 1) if n == max
-        return 0 if max == 0 || n < 0
-        return 1 if n == 0 || max == 1
+        return 0 if max.zero? || n.negative?
+        return 1 if n.zero? || max == 1
 
         count_integer_partitions(n, max - 1) + count_integer_partitions(n - max, max)
       end
@@ -74,14 +76,14 @@ module Jason
         indexes = Array.new(number_of_elements, 0)
 
         Enumerator.new do |yielder|
-          while true
+          loop do
             yielder << partition.inject([]) { |collector, part| collector << part.dup }
 
             i = number_of_elements - 1
             index = nil
             done = false
 
-            while true
+            loop do
               if i <= 0
                 done = true
                 break

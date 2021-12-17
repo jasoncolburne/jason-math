@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 RSpec.describe Jason::Math::Cryptography do
@@ -59,7 +61,7 @@ RSpec.describe Jason::Math::Cryptography::PKCS7 do
     end
 
     context 'raises exception when padding length longer than block size' do
-      let(:padded_data) { ('0123456789abcde' + "\x11" * 0x11).b }
+      let(:padded_data) { "0123456789abcde#{"\x11" * 0x11}".b }
       it { expect { subject }.to raise_error }
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'openssl'
 require 'securerandom'
 require 'prime'
@@ -27,7 +29,7 @@ module Jason
         root_n = number**0.5
 
         while (prime = prime_generator.next) <= root_n && (below.nil? || prime < below)
-          return false if number % prime == 0
+          return false if (number % prime).zero?
         end
 
         true
@@ -62,7 +64,7 @@ module Jason
           # TODO: use a better RNG
           a = rand(number - 4) + 2
           x = a.to_bn.mod_exp(d, number)
-          next if x == 1 or x == number - 1
+          next if (x == 1) || (x == number - 1)
 
           probably_prime = false
           (r - 1).times do
@@ -105,9 +107,9 @@ module Jason
             break
           end
 
-          next unless number % prime == 0
+          next unless (number % prime).zero?
 
-          while number % prime == 0
+          while (number % prime).zero?
             number /= prime
             factors[prime] += 1
           end
@@ -141,11 +143,11 @@ module Jason
             yielder << 1 if number == 1 && !proper
           else
             catch :done do
-              while true
+              loop do
                 result = (0..(factor_count - 1)).map { |x| factors_array[x][0]**exponents[x] }.inject(1, :*)
                 yielder << result unless proper && result == number
                 i = 0
-                while true
+                loop do
                   exponents[i] += 1
                   break if exponents[i] <= factors_array[i][1]
 
@@ -164,8 +166,8 @@ module Jason
         return u if u == v
 
         # gcd(0, n) = gcd(n, 0) = n
-        return v if u == 0
-        return u if v == 0
+        return v if u.zero?
+        return u if v.zero?
 
         if u.even?
           if v.odd?
@@ -183,7 +185,7 @@ module Jason
       end
 
       def self.lcm(u, v)
-        return 0 if u == 0 && v == 0
+        return 0 if u.zero? && v.zero?
 
         (u * v) / gcd(u, v)
       end
@@ -193,9 +195,9 @@ module Jason
         max = (number**0.5).to_i
 
         (2..max).each do |i|
-          next unless number % i == 0
+          next unless (number % i).zero?
 
-          number /= i while number % i == 0
+          number /= i while (number % i).zero?
           result -= result / i
         end
 
@@ -211,12 +213,12 @@ module Jason
         root_max_n = numbers.max**0.5
 
         while (prime = prime_generator.next) < root_max_n && numbers.reject { |n| n == 1 }.count > 1
-          divisible = numbers.select { |number| number % prime == 0 }
+          divisible = numbers.select { |number| (number % prime).zero? }
           return false if divisible.count > 1
 
           divisible.each do |number|
             index = numbers.index(number)
-            number /= prime while number % prime == 0
+            number /= prime while (number % prime).zero?
             numbers[index] = number
 
             # we'd need to do the numbers.max call twice to check if it changed and i think just doing it once
@@ -246,7 +248,7 @@ module Jason
       end
 
       def self.lychrel?(number, depth = 50)
-        while depth > 0
+        while depth.positive?
           next_number = number + reverse(number)
           return false if palindrome?(next_number)
 
@@ -258,7 +260,7 @@ module Jason
       end
 
       def self.harshad?(number)
-        number % digits(number).sum == 0
+        (number % digits(number).sum).zero?
       end
 
       def self.right_truncatable_harshad?(number)
@@ -293,10 +295,10 @@ module Jason
       def self.digits(number, base = 10)
         return [0] if number.zero?
 
-        number = number.abs if number < 0
+        number = number.abs if number.negative?
 
         result = []
-        while number > 0
+        while number.positive?
           result.unshift(number % base)
           number /= base
         end
@@ -359,7 +361,7 @@ module Jason
         t0 = 0
         t1 = 1
 
-        while b > 0
+        while b.positive?
           q = a / b
           r = a % b
           a = b
@@ -392,7 +394,7 @@ module Jason
       # p must be prime
       def self.modular_square_roots(a, p)
         raise 'No roots found' if legendre_symbol(a, p) != 1
-        raise 'No roots found' if a == 0
+        raise 'No roots found' if a.zero?
         raise 'No roots found' if p == 2
 
         return modular_exponentiation(a, (p + 1) / 4, p) if p % 4 == 3
@@ -433,7 +435,7 @@ module Jason
         g = modular_exponentiation(n, s, p)
         r = e
 
-        while true
+        loop do
           t = b
           m = 0
           (0..(r - 1)).each do |_m|
@@ -442,7 +444,7 @@ module Jason
             t = modular_exponentiation(t, 2, p)
           end
 
-          return [x, p - x] if m == 0
+          return [x, p - x] if m.zero?
 
           gs = modular_exponentiation(g, 2**(r - m - 1), p)
           g = (gs * gs) % p

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::Combinatorics do
   context '#factorial' do
     subject { described_class.factorial(n) }

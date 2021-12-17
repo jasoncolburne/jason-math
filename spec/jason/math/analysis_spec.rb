@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::Analysis do
   context '#collatz_sequence' do
     subject { described_class.collatz_sequence(n) }

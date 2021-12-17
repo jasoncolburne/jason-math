@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::Cryptography::AdvancedEncryptionStandard do
   let(:aes) { described_class.new("#{mode}_#{bits}".to_sym, key, use_openssl) }
   let(:clear_text) { '0123456789abcdefFEDCBA9876543210' }

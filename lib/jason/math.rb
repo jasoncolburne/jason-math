@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'jason/math/version'
 
 require 'jason/math/algebra'
@@ -382,7 +384,7 @@ end
 
 module ArrayExtensions
   def product(*args)
-    args.length > 0 ? super(*args) : Math.product(self)
+    args.length.positive? ? super(*args) : Math.product(self)
   end
 end
 

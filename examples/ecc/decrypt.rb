@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 if ARGV.count != 2
   puts 'Usage:'
@@ -12,7 +13,7 @@ require 'json'
 
 curve = ARGV.first
 private_key = ARGV.last
-ciphertext = STDIN.readline
+ciphertext = $stdin.readline
 
 service = CurveService.new(curve)
 plaintext = service.decrypt(ciphertext, private_key)

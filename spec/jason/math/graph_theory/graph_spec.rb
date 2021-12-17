@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::GraphTheory::Graph do
   context '#shortest_path' do
     subject { graph.shortest_path(origin, destination) }
