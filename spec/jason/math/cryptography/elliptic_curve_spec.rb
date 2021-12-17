@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorithm do
   let(:dsa) { described_class.new(curve, generator) }
 

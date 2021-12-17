@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 
 require 'jason/math/utility/disjoint_set'
@@ -42,11 +44,11 @@ module Jason
           if d.zero?
             coordinates = (0..(dimensions - 1)).map { |n| "x#{n}" }.join(', ')
             string += padding + "neighbour = [#{coordinates}]\n"
-            string += padding + "neighbour == cell ? nil : neighbour\n"
+            string += "#{padding}neighbour == cell ? nil : neighbour\n"
           else
             string += padding + "((cell[#{d - 1}] - 1)..(cell[#{d - 1}] + 1)).map do |x#{d - 1}|\n"
             string += neighbouring_cells(cell, d - 1)
-            string += padding + "end\n"
+            string += "#{padding}end\n"
           end
 
           @neighbouring_cells_methods[d] = string.chomp + ".flatten(#{d - 1}).compact\n" if dimension.nil?
@@ -79,11 +81,11 @@ module Jason
           unless array.empty?
             if array.count == 1
               to_yield = array.first
-              yielder << to_yield while true
+              loop { yielder << to_yield }
             else
               i = 0
               count = array.count
-              while true
+              loop do
                 yielder << array[i]
                 i += 1
                 i = 0 if i == count

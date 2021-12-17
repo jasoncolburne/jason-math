@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::Algebra do
   context '#solve_quadratic' do
     subject { described_class.solve_quadratic(a, b, c) }

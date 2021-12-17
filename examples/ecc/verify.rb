@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 if ARGV.count != 3
   puts 'Usage:'
@@ -13,7 +14,7 @@ require 'json'
 curve = ARGV.shift
 public_key = ARGV.shift
 signature = ARGV.shift
-digest = STDIN.readline
+digest = $stdin.readline
 
 service = CurveService.new(curve)
 verified = service.verify(digest, public_key, signature)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Jason
   module Math
     module Analysis
@@ -20,7 +22,7 @@ module Jason
           yielder << nk
           yielder << nk1
 
-          while true
+          loop do
             nk2 = nk1 + nk
             yielder << nk2
             nk = nk1
@@ -78,7 +80,7 @@ module Jason
         when :e
           e_continued_fraction_generator = Enumerator.new do |yielder|
             i = 1
-            while true
+            loop do
               yielder << 1
               yielder << 2 * i
               yielder << 1

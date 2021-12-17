@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Jason::Math::Utility::LanguageDetector do
   context '#distance' do
     subject { described_class.distance(text, language) }
