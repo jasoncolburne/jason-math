@@ -6,8 +6,9 @@ module Jason
   module Math
     module Cryptography
       def self.hamming_distance(a, b)
-        raise "Cannot compute hamming distance if lengths differ" unless a.length == b.length
-        Utility.xor(a, b).unpack('B*').first.count('1')
+        raise 'Cannot compute hamming distance if lengths differ' unless a.length == b.length
+
+        Utility.xor(a, b).unpack1('B*').count('1')
       end
 
       class PKCS7
@@ -22,19 +23,19 @@ module Jason
           padding = block_size - data.length
           padding.zero? ? data : (data + ([padding] * padding).pack('C*')).b
         end
-  
+
         def self.strip(data, block_size)
           padding = validate(data, block_size)
           data[0..(-padding - 1)]
         end
 
         def self.validate(data, block_size)
-          raise "Data length must be a multiple of block_size" unless (data.length % block_size).zero?
+          raise 'Data length must be a multiple of block_size' unless (data.length % block_size).zero?
 
           padding = data[-1].ord
 
-          raise "Invalid padding" if padding > block_size || padding.zero?
-          raise "Invalid padding" unless data[(-padding)..-1] == ([padding] * padding).pack('C*')
+          raise 'Invalid padding' if padding > block_size || padding.zero?
+          raise 'Invalid padding' unless data[-padding..-1] == ([padding] * padding).pack('C*')
 
           padding
         end
@@ -56,11 +57,11 @@ module Jason
           aes_256_ecb: { class: AdvancedEncryptionStandard, mode: :ecb_256 }.freeze,
           aes_128_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_128 }.freeze,
           aes_192_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_192 }.freeze,
-          aes_256_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_256 }.freeze,
+          aes_256_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_256 }.freeze
         }.freeze
 
         def initialize(algorithm, key, use_openssl = false)
-          raise "Unsupported algorithm" unless ALGORITHMS.keys.include?(algorithm)
+          raise 'Unsupported algorithm' unless ALGORITHMS.keys.include?(algorithm)
 
           details = ALGORITHMS[algorithm]
           @cipher = details[:class].new(details[:mode], key, use_openssl)
@@ -79,7 +80,7 @@ module Jason
         end
 
         def self.generate_key(algorithm)
-          raise "Unsupported algorithm" unless ALGORITHMS.keys.include?(algorithm)
+          raise 'Unsupported algorithm' unless ALGORITHMS.keys.include?(algorithm)
 
           details = ALGORITHMS[algorithm]
           details[:class].generate_key(details[:mode])
@@ -93,11 +94,11 @@ module Jason
         end
 
         def self.block_size(encryptor, maximum_block_size = 128)
-          current_length = encryptor.encrypt("A".b).length
+          current_length = encryptor.encrypt('A'.b).length
 
           (2..(maximum_block_size + 1)).each do |i|
             previous_length = current_length
-            current_length = encryptor.encrypt("A".b * i).length
+            current_length = encryptor.encrypt('A'.b * i).length
             return current_length - previous_length if current_length != previous_length
           end
 
@@ -115,39 +116,39 @@ module Jason
         end
 
         def self.count_clear_text_extra_bytes(encryptor, block_size)
-          current_length = encryptor.encrypt("").size
+          current_length = encryptor.encrypt('').size
           (1..block_size).each do |i|
             previous_length = current_length
-            current_length = encryptor.encrypt("A".b * i).size
+            current_length = encryptor.encrypt('A'.b * i).size
             return previous_length - i if current_length != previous_length
           end
 
-          raise "Could not count clear text extra bytes"
+          raise 'Could not count clear text extra bytes'
         end
-        
+
         def self.count_clear_text_prefix_bytes(encryptor, block_size)
-          current_blocks = split_into_blocks(encryptor.encrypt(""), block_size)
+          current_blocks = split_into_blocks(encryptor.encrypt(''), block_size)
           first_difference = nil
           (1..(block_size + 1)).each do |i|
             previous_blocks = current_blocks
-            current_blocks = split_into_blocks(encryptor.encrypt("A".b * i), block_size)
+            current_blocks = split_into_blocks(encryptor.encrypt('A'.b * i), block_size)
             changed = false
             previous_blocks.each_with_index do |block, index|
-              if block != current_blocks[index]
-                if first_difference.nil?
-                  first_difference = index
-                elsif first_difference != index
-                  changed = true
-                end
-        
-                break
+              next unless block != current_blocks[index]
+
+              if first_difference.nil?
+                first_difference = index
+              elsif first_difference != index
+                changed = true
               end
+
+              break
             end
-        
+
             return first_difference * block_size + (1 - i) % block_size if changed
           end
 
-          raise "Could not count clear text prefix bytes"
+          raise 'Could not count clear text prefix bytes'
         end
       end
     end

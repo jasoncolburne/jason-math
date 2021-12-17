@@ -14,12 +14,12 @@ module Jason
         while l <= r
           i = (l + r) / 2
 
-          if array[i] < value then
-              l = i + 1
-          elsif array[i] > value then
-              r = i - 1
+          if array[i] < value
+            l = i + 1
+          elsif array[i] > value
+            r = i - 1
           else
-              return i
+            return i
           end
         end
 
@@ -35,12 +35,12 @@ module Jason
 
         dimensions = cell.count
         d = dimension || dimensions
-        padding = " " * (dimensions - d) * 2
-      
+        padding = ' ' * (dimensions - d) * 2
+
         if @neighbouring_cells_methods[d].nil? || dimension
-          string = ""
+          string = ''
           if d.zero?
-            coordinates = (0..(dimensions - 1)).map { |n| "x#{n}" }.join(", ")
+            coordinates = (0..(dimensions - 1)).map { |n| "x#{n}" }.join(', ')
             string += padding + "neighbour = [#{coordinates}]\n"
             string += padding + "neighbour == cell ? nil : neighbour\n"
           else
@@ -48,17 +48,17 @@ module Jason
             string += neighbouring_cells(cell, d - 1)
             string += padding + "end\n"
           end
-      
+
           @neighbouring_cells_methods[d] = string.chomp + ".flatten(#{d - 1}).compact\n" if dimension.nil?
         end
-      
+
         dimension.nil? ? eval(@neighbouring_cells_methods[d]) : string
       end
 
       def self.adjacent_cells(cell)
         adjacent_cells = []
 
-        cell.each_with_index do |value, index|
+        cell.each_with_index do |_value, index|
           cell_negative = cell.dup
           cell_positive = cell.dup
 
@@ -110,7 +110,7 @@ module Jason
       end
 
       def self.byte_string_to_hex(byte_string)
-        byte_string.unpack('H*').first
+        byte_string.unpack1('H*')
       end
 
       def self.hex_to_byte_array(hex_string)
@@ -118,17 +118,20 @@ module Jason
       end
 
       def self.xor(a, b)
-        raise "Inputs must have equal length" unless a.length == b.length
+        raise 'Inputs must have equal length' unless a.length == b.length
+
         a.bytes.zip(b.bytes).map { |x, y| (x ^ y).chr }.join
       end
 
       def self.and(a, b)
-        raise "Inputs must have equal length" unless a.length == b.length
+        raise 'Inputs must have equal length' unless a.length == b.length
+
         a.bytes.zip(b.bytes).map { |x, y| (x & y).chr }.join
       end
 
       def self.or(a, b)
-        raise "Inputs must have equal length" unless a.length == b.length
+        raise 'Inputs must have equal length' unless a.length == b.length
+
         a.bytes.zip(b.bytes).map { |x, y| (x | y).chr }.join
       end
 
@@ -143,11 +146,11 @@ module Jason
         result.pack('N*')
       end
 
-      INT32_MAX = 2 ** 32
+      INT32_MAX = 2**32
 
       def self.byte_string_to_integer(byte_string)
-        byte_string.unpack("N*").reverse.each_with_index.inject(0) do |sum, (byte, index)|
-          sum + byte * (INT32_MAX ** index)
+        byte_string.unpack('N*').reverse.each_with_index.inject(0) do |sum, (byte, index)|
+          sum + byte * (INT32_MAX**index)
         end
       end
     end

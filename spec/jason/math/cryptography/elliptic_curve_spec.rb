@@ -11,7 +11,7 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorit
 
   let(:digest) { 128 }
 
-  context "#sign" do
+  context '#sign' do
     subject { dsa.sign(digest, private_key, entropy) }
 
     let(:private_key) { 11 }
@@ -21,18 +21,18 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorit
     it { is_expected.to eq(expected_signature) }
   end
 
-  context "#validate" do
+  context '#validate' do
     subject { dsa.verify(digest, signature, public_key) }
 
     let(:public_key) { Jason::Math::Cryptography::EllipticCurve::Point.new(1, 1) }
 
-    context "valid signature" do
+    context 'valid signature' do
       let(:signature) { [15, 12] }
 
       it { is_expected.to be_truthy }
     end
 
-    context "invalid signature" do
+    context 'invalid signature' do
       let(:signature) { [15, 11] }
 
       it { is_expected.to be_falsey }
@@ -41,7 +41,7 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorit
 end
 
 RSpec.describe Jason::Math::Cryptography::EllipticCurve::DiffieHellman do
-  context "#compute_secret" do
+  context '#compute_secret' do
     let(:dh) { described_class.new(curve, generator) }
 
     let(:a) { 1 }
@@ -60,13 +60,13 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DiffieHellman do
     let(:public_key_b) { dh.generate_public_key(private_key_b) }
     let(:public_key_c) { dh.generate_public_key(private_key_c) }
 
-    it "ensures secrets match for associated keypairs" do
+    it 'ensures secrets match for associated keypairs' do
       expect(dh.compute_secret(private_key_a, public_key_b)).to eq(dh.compute_secret(private_key_b, public_key_a))
       expect(dh.compute_secret(private_key_a, public_key_c)).to eq(dh.compute_secret(private_key_c, public_key_a))
       expect(dh.compute_secret(private_key_c, public_key_b)).to eq(dh.compute_secret(private_key_b, public_key_c))
     end
 
-    it "ensures secrets do not match for unmatched keys" do
+    it 'ensures secrets do not match for unmatched keys' do
       expect(dh.compute_secret(private_key_a, public_key_b)).not_to eq(dh.compute_secret(private_key_a, public_key_c))
       expect(dh.compute_secret(private_key_b, public_key_a)).not_to eq(dh.compute_secret(private_key_b, public_key_c))
       expect(dh.compute_secret(private_key_c, public_key_a)).not_to eq(dh.compute_secret(private_key_c, public_key_b))
@@ -86,12 +86,14 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::ElGamal do
   let(:generator) { curve.at(x_value).first }
 
   let(:plaintext) { Jason::Math::Cryptography::EllipticCurve::Point.new(15, 11) }
-  let(:ciphertext) { [
-    Jason::Math::Cryptography::EllipticCurve::Point.new(8, 14),
-    Jason::Math::Cryptography::EllipticCurve::Point.new(16, 8),
-  ] }
+  let(:ciphertext) do
+    [
+      Jason::Math::Cryptography::EllipticCurve::Point.new(8, 14),
+      Jason::Math::Cryptography::EllipticCurve::Point.new(16, 8)
+    ]
+  end
 
-  context "#encrypt" do
+  context '#encrypt' do
     subject { eg.encrypt(plaintext, public_key, entropy) }
 
     let(:public_key) { Jason::Math::Cryptography::EllipticCurve::Point.new(13, 10) }
@@ -100,7 +102,7 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::ElGamal do
     it { is_expected.to eq(ciphertext) }
   end
 
-  context "#decrypt" do
+  context '#decrypt' do
     subject { eg.decrypt(ciphertext, private_key) }
 
     let(:private_key) { 5 }

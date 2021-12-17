@@ -10,106 +10,106 @@ module Jason
             bits: 128,
             rounds: 10,
             key_size: 4, # in 4-byte words
-            openssl_algorithm: 'aes-128-cbc',
+            openssl_algorithm: 'aes-128-cbc'
           }.freeze,
           cbc_192: {
             mode: :cbc,
             bits: 192,
             rounds: 12,
             key_size: 6, # in 4-byte words
-            openssl_algorithm: 'aes-192-cbc',
+            openssl_algorithm: 'aes-192-cbc'
           }.freeze,
           cbc_256: {
             mode: :cbc,
             bits: 256,
             rounds: 14,
             key_size: 8, # in 4-byte words
-            openssl_algorithm: 'aes-256-cbc',
+            openssl_algorithm: 'aes-256-cbc'
           }.freeze,
           cfb_128: {
             mode: :cfb,
             bits: 128,
             rounds: 10,
             key_size: 4, # in 4-byte words
-            openssl_algorithm: 'aes-128-cfb',
+            openssl_algorithm: 'aes-128-cfb'
           }.freeze,
           cfb_192: {
             mode: :cfb,
             bits: 192,
             rounds: 12,
             key_size: 6, # in 4-byte words
-            openssl_algorithm: 'aes-192-cfb',
+            openssl_algorithm: 'aes-192-cfb'
           }.freeze,
           cfb_256: {
             mode: :cfb,
             bits: 256,
             rounds: 14,
             key_size: 8, # in 4-byte words
-            openssl_algorithm: 'aes-256-cfb',
+            openssl_algorithm: 'aes-256-cfb'
           }.freeze,
           ctr_128: {
             mode: :ctr,
             bits: 128,
             rounds: 10,
             key_size: 4, # in 4-byte words
-            openssl_algorithm: 'aes-128-ctr',
+            openssl_algorithm: 'aes-128-ctr'
           }.freeze,
           ctr_192: {
             mode: :ctr,
             bits: 192,
             rounds: 12,
             key_size: 6, # in 4-byte words
-            openssl_algorithm: 'aes-192-ctr',
+            openssl_algorithm: 'aes-192-ctr'
           }.freeze,
           ctr_256: {
             mode: :ctr,
             bits: 256,
             rounds: 14,
             key_size: 8, # in 4-byte words
-            openssl_algorithm: 'aes-256-ctr',
+            openssl_algorithm: 'aes-256-ctr'
           }.freeze,
           ecb_128: {
             mode: :ecb,
             bits: 128,
             rounds: 10,
             key_size: 4, # in 4-byte words
-            openssl_algorithm: 'aes-128-ecb',
+            openssl_algorithm: 'aes-128-ecb'
           }.freeze,
           ecb_192: {
             mode: :ecb,
             bits: 192,
             rounds: 12,
             key_size: 6, # in 4-byte words
-            openssl_algorithm: 'aes-192-ecb',
+            openssl_algorithm: 'aes-192-ecb'
           }.freeze,
           ecb_256: {
             mode: :ecb,
             bits: 256,
             rounds: 14,
             key_size: 8, # in 4-byte words
-            openssl_algorithm: 'aes-256-ecb',
+            openssl_algorithm: 'aes-256-ecb'
           }.freeze,
           ofb_128: {
             mode: :ofb,
             bits: 128,
             rounds: 10,
             key_size: 4, # in 4-byte words
-            openssl_algorithm: 'aes-128-ofb',
+            openssl_algorithm: 'aes-128-ofb'
           }.freeze,
           ofb_192: {
             mode: :ofb,
             bits: 192,
             rounds: 12,
             key_size: 6, # in 4-byte words
-            openssl_algorithm: 'aes-192-ofb',
+            openssl_algorithm: 'aes-192-ofb'
           }.freeze,
           ofb_256: {
             mode: :ofb,
             bits: 256,
             rounds: 14,
             key_size: 8, # in 4-byte words
-            openssl_algorithm: 'aes-256-ofb',
-          }.freeze,
+            openssl_algorithm: 'aes-256-ofb'
+          }.freeze
         }.freeze
 
         R_CON = [
@@ -123,7 +123,7 @@ module Jason
           0x40000000,
           0x80000000,
           0x1b000000,
-          0x36000000,
+          0x36000000
         ].freeze
 
         S_BOX = [
@@ -142,7 +142,7 @@ module Jason
           0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
           0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
           0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
-          0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16,
+          0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
         ].freeze
 
         INVERSE_S_BOX = [
@@ -161,7 +161,7 @@ module Jason
           0x1f, 0xdd, 0xa8, 0x33, 0x88, 0x07, 0xc7, 0x31, 0xb1, 0x12, 0x10, 0x59, 0x27, 0x80, 0xec, 0x5f,
           0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef,
           0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
-          0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d,
+          0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
         ].freeze
 
         def initialize(mode, key, use_openssl = false)
@@ -203,22 +203,22 @@ module Jason
         private
 
         def expand_key(key)
-          raise "Invalid key length" unless key.length == @key_size * 4
+          raise 'Invalid key length' unless key.length == @key_size * 4
 
           key_schedule = key.unpack('N*')
 
           i = @key_size
           while i < 4 * (@rounds + 1)
             temp = key_schedule[i - 1]
-            
+
             if (i % @key_size).zero?
               temp = sub_word(rot_word(temp)) ^ R_CON[i / @key_size]
             elsif @key_size > 6 && i % @key_size == 4
               temp = sub_word(temp)
             end
-            
+
             key_schedule << (key_schedule[i - @key_size] ^ temp)
-            
+
             i += 1
           end
 
@@ -227,13 +227,13 @@ module Jason
 
         # Electronic CodeBook (ECB)
 
-        def encrypt_ecb(clear_text, initialization_vector = nil)
+        def encrypt_ecb(clear_text, _initialization_vector = nil)
           length = clear_text.length
           iterations = length / 16 + 1
-          cipher_text = "".b
+          cipher_text = ''.b
 
           iterations.times do |i|
-            to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
+            to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : ''.b
             to_cipher = PKCS7.pad_block(to_cipher, 16)
             cipher_text << cipher(to_cipher)
           end
@@ -241,13 +241,13 @@ module Jason
           cipher_text
         end
 
-        def decrypt_ecb(cipher_text, initialization_vector = nil, strip_padding = true)
+        def decrypt_ecb(cipher_text, _initialization_vector = nil, strip_padding = true)
           length = cipher_text.length
 
-          raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
+          raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % 16).zero?
 
           iterations = length / 16
-          clear_text = "".b
+          clear_text = ''.b
 
           iterations.times do |i|
             clear_text << decipher(cipher_text[(i * 16)..((i + 1) * 16 - 1)])
@@ -265,11 +265,11 @@ module Jason
         def encrypt_cbc(clear_text, initialization_vector)
           length = clear_text.length
           iterations = length / 16 + 1
-          cipher_text = "".b
+          cipher_text = ''.b
           last_block = initialization_vector
 
           iterations.times do |i|
-            to_xor = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : "".b
+            to_xor = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : ''.b
             to_xor = PKCS7.pad_block(to_xor, 16)
             to_cipher = Utility.xor(to_xor, last_block)
             last_block = cipher(to_cipher)
@@ -282,10 +282,10 @@ module Jason
         def decrypt_cbc(cipher_text, initialization_vector, strip_padding = true)
           length = cipher_text.length
 
-          raise "Invalid cipher text length (must be a multiple of block size)" unless (length % 16).zero?
+          raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % 16).zero?
 
           iterations = length / 16
-          clear_text = "".b
+          clear_text = ''.b
           last_block = initialization_vector
 
           iterations.times do |i|
@@ -306,7 +306,7 @@ module Jason
         def encrypt_cfb(clear_text, initialization_vector)
           length = clear_text.length
           iterations = (length.to_f / 16).ceil
-          cipher_text = "".b
+          cipher_text = ''.b
           last_block = initialization_vector
 
           iterations.times do |i|
@@ -322,7 +322,7 @@ module Jason
         def decrypt_cfb(cipher_text, initialization_vector, _ = nil)
           length = cipher_text.length
           iterations = (length.to_f / 16).ceil
-          clear_text = "".b
+          clear_text = ''.b
           last_block = initialization_vector
 
           iterations.times do |i|
@@ -339,7 +339,7 @@ module Jason
         def encrypt_ofb(clear_text, initialization_vector)
           length = clear_text.length
           iterations = (length.to_f / 16).ceil
-          cipher_text = "".b
+          cipher_text = ''.b
           last_block = initialization_vector
 
           iterations.times do |i|
@@ -354,7 +354,7 @@ module Jason
         def decrypt_ofb(cipher_text, initialization_vector, _ = nil)
           length = cipher_text.length
           iterations = (length.to_f / 16).ceil
-          clear_text = "".b
+          clear_text = ''.b
           last_block = initialization_vector
 
           iterations.times do |i|
@@ -371,7 +371,7 @@ module Jason
         def encrypt_ctr(clear_text, nonce)
           length = clear_text.length
           iterations = (length.to_f / 16).ceil
-          cipher_text = "".b
+          cipher_text = ''.b
           offset = 0
 
           iterations.times do |i|
@@ -392,7 +392,7 @@ module Jason
         def decrypt_ctr_with_offset(cipher_text, nonce, offset = 0)
           length = cipher_text.length
           iterations = (length.to_f / 16).ceil
-          clear_text = "".b
+          clear_text = ''.b
 
           iterations.times do |i|
             to_cipher = nonce + [offset].pack('Q<*')
@@ -408,7 +408,9 @@ module Jason
         # Core Routines
 
         def cipher(clear_text)
-          raise "Block ciphers cipher blocks with strict sizes (16 bytes for typical AES - received #{clear_text.length})" if clear_text.length != 16
+          if clear_text.length != 16
+            raise "Block ciphers cipher blocks with strict sizes (16 bytes for typical AES - received #{clear_text.length})"
+          end
 
           state = add_round_key(clear_text, @key_schedule[0..15])
 
@@ -425,7 +427,7 @@ module Jason
         end
 
         def decipher(cipher_text)
-          raise "Block ciphers cipher blocks with strict sizes (16 bytes for AES)" if cipher_text.length != 16
+          raise 'Block ciphers cipher blocks with strict sizes (16 bytes for AES)' if cipher_text.length != 16
 
           state = add_round_key(cipher_text, @key_schedule[(@rounds * 16)..((@rounds + 1) * 16 - 1)])
 
@@ -447,7 +449,7 @@ module Jason
 
         def shift_rows(block)
           i = 0
-          result = "".b
+          result = ''.b
 
           16.times do
             result << block[i]
@@ -459,7 +461,7 @@ module Jason
 
         def inverse_shift_rows(block)
           i = 0
-          result = "".b
+          result = ''.b
 
           16.times do
             result << block[i]
@@ -482,20 +484,40 @@ module Jason
         def mix_column(column)
           bytes = column.bytes
           [
-            galois_multiply(bytes[0], 2) ^ galois_multiply(bytes[1], 3) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 1),
-            galois_multiply(bytes[0], 1) ^ galois_multiply(bytes[1], 2) ^ galois_multiply(bytes[2], 3) ^ galois_multiply(bytes[3], 1),
-            galois_multiply(bytes[0], 1) ^ galois_multiply(bytes[1], 1) ^ galois_multiply(bytes[2], 2) ^ galois_multiply(bytes[3], 3),
-            galois_multiply(bytes[0], 3) ^ galois_multiply(bytes[1], 1) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 2),
+            galois_multiply(bytes[0],
+                            2) ^ galois_multiply(bytes[1],
+                                                 3) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 1),
+            galois_multiply(bytes[0],
+                            1) ^ galois_multiply(bytes[1],
+                                                 2) ^ galois_multiply(bytes[2], 3) ^ galois_multiply(bytes[3], 1),
+            galois_multiply(bytes[0],
+                            1) ^ galois_multiply(bytes[1],
+                                                 1) ^ galois_multiply(bytes[2], 2) ^ galois_multiply(bytes[3], 3),
+            galois_multiply(bytes[0],
+                            3) ^ galois_multiply(bytes[1],
+                                                 1) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 2)
           ].pack('C*')
         end
 
         def inverse_mix_column(column)
           bytes = column.bytes
           [
-            galois_multiply(bytes[0], 0xe) ^ galois_multiply(bytes[1], 0xb) ^ galois_multiply(bytes[2], 0xd) ^ galois_multiply(bytes[3], 0x9),
-            galois_multiply(bytes[0], 0x9) ^ galois_multiply(bytes[1], 0xe) ^ galois_multiply(bytes[2], 0xb) ^ galois_multiply(bytes[3], 0xd),
-            galois_multiply(bytes[0], 0xd) ^ galois_multiply(bytes[1], 0x9) ^ galois_multiply(bytes[2], 0xe) ^ galois_multiply(bytes[3], 0xb),
-            galois_multiply(bytes[0], 0xb) ^ galois_multiply(bytes[1], 0xd) ^ galois_multiply(bytes[2], 0x9) ^ galois_multiply(bytes[3], 0xe),
+            galois_multiply(bytes[0],
+                            0xe) ^ galois_multiply(bytes[1],
+                                                   0xb) ^ galois_multiply(bytes[2],
+                                                                          0xd) ^ galois_multiply(bytes[3], 0x9),
+            galois_multiply(bytes[0],
+                            0x9) ^ galois_multiply(bytes[1],
+                                                   0xe) ^ galois_multiply(bytes[2],
+                                                                          0xb) ^ galois_multiply(bytes[3], 0xd),
+            galois_multiply(bytes[0],
+                            0xd) ^ galois_multiply(bytes[1],
+                                                   0x9) ^ galois_multiply(bytes[2],
+                                                                          0xe) ^ galois_multiply(bytes[3], 0xb),
+            galois_multiply(bytes[0],
+                            0xb) ^ galois_multiply(bytes[1],
+                                                   0xd) ^ galois_multiply(bytes[2],
+                                                                          0x9) ^ galois_multiply(bytes[3], 0xe)
           ].pack('C*')
         end
 
@@ -514,15 +536,15 @@ module Jason
         end
 
         def rot_word(word)
-          ((word << 8) & 0xffffffff) | (word >> 24) 
+          ((word << 8) & 0xffffffff) | (word >> 24)
         end
 
         def sub_word(word)
-          sub_bytes([word].pack('N*')).unpack('N*').first
+          sub_bytes([word].pack('N*')).unpack1('N*')
         end
 
         def sub_bytes_core(bytes, box)
-          result = "".b
+          result = ''.b
           bytes.bytes.each { |byte| result << box[byte].chr }
           result
         end

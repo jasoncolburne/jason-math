@@ -11,6 +11,7 @@ module Jason
 
         def find(element)
           return element if @parents_by_children[element] == element
+
           find(@parents_by_children[element])
         end
 

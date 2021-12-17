@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 if ARGV.count != 3
-  puts "Usage:"
-  puts "  ./verify.rb <curve> <public key> <signature>"
+  puts 'Usage:'
+  puts '  ./verify.rb <curve> <public key> <signature>'
   puts
   puts "$ cat ~/image.png | shasum -a 384 -b | cut -d \" \" -f1 | ./verify.rb secp384r1 $(cat keypair.json | jq -Mr '.public_key') $(cat signature.json | jq -Mr '.signature')"
 end
@@ -20,5 +20,5 @@ verified = service.verify(digest, public_key, signature)
 
 exit 0 if verified
 
-puts "[!] Failed to verify"
+puts '[!] Failed to verify'
 exit 1

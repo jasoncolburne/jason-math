@@ -13,13 +13,13 @@ module Jason
           # but it breaks the naive tests (where n is 19).
           # should likely test with NIST params
           def sqrt(x, n)
-            raise "x must be < n" unless x < n
-            
+            raise 'x must be < n' unless x < n
+
             (1..n).each do |i|
               return [i, n - i] if i * i % n == x
             end
 
-            raise "No root found"
+            raise 'No root found'
           end
         end
 
@@ -48,13 +48,13 @@ module Jason
           end
 
           def to_hex(width)
-            @x.to_s(16).rjust(width, "0") + @y.to_s(16).rjust(width, "0") 
+            @x.to_s(16).rjust(width, '0') + @y.to_s(16).rjust(width, '0')
           end
         end
 
         class Curve
           include Math
-          
+
           attr_reader :a, :b, :n, :zero
 
           # (y**2 = x**3 + a * x + b) mod n
@@ -71,15 +71,16 @@ module Jason
 
             l = (p.y * p.y) % @n
             r = ((p.x * p.x * p.x) + @a * p.x + @b) % @n
-            
+
             l == r
           end
 
           def at(x)
-            raise "x must be < n" unless x < @n
+            raise 'x must be < n' unless x < @n
+
             ysq = (x * x * x + @a * x + @b) % @n
             y, my = sqrt(ysq, @n)
-            
+
             [Point.new(x, y), Point.new(x, my)]
           end
 
@@ -94,11 +95,11 @@ module Jason
             # p1 + -p1 == 0
             return @zero if p1.x == p2.x && (p1.y != p2.y || p1.y == 0)
 
-            if p1.x == p2.x
-              l = (3 * p1.x * p1.x + @a) * inverse(2 * p1.y, @n) % @n
-            else
-              l = (p2.y - p1.y) * inverse(p2.x - p1.x, @n) % @n
-            end
+            l = if p1.x == p2.x
+                  (3 * p1.x * p1.x + @a) * inverse(2 * p1.y, @n) % @n
+                else
+                  (p2.y - p1.y) * inverse(p2.x - p1.x, @n) % @n
+                end
 
             x = (l * l - p1.x - p2.x) % @n
             y = (l * (p1.x - x) - p1.y) % @n
@@ -113,26 +114,27 @@ module Jason
             # O(log2(n)) add
             while 0 < n
               r = add(r, m2) if n & 1 == 1
-              n, m2 = n >> 1, add(m2, m2)
+              n = n >> 1
+              m2 = add(m2, m2)
             end
 
             r
           end
 
           def order(p)
-            raise "Invalid order" unless valid?(p) and p != @zero
+            raise 'Invalid order' unless valid?(p) and p != @zero
 
             (1..(@n + 1)).each do |i|
               return i if multiply(p, i) == @zero
             end
-              
-            raise "Invalid order"
+
+            raise 'Invalid order'
           end
         end
 
         class AlgorithmBase
           def initialize(curve, generator, order = nil)
-            raise "Invalid generator specified" unless curve.valid?(generator)
+            raise 'Invalid generator specified' unless curve.valid?(generator)
 
             @curve = curve
             @generator = generator
@@ -140,8 +142,8 @@ module Jason
           end
 
           def generate_public_key(private_key)
-            raise "Private key out of range" unless 0 < private_key && private_key < @order
-            
+            raise 'Private key out of range' unless 0 < private_key && private_key < @order
+
             @curve.multiply(@generator, private_key)
           end
         end
@@ -150,18 +152,19 @@ module Jason
           include Math
 
           def sign(digest, private_key, entropy)
-            raise "Entropy out of range" unless 0 < entropy && entropy < @order
+            raise 'Entropy out of range' unless 0 < entropy && entropy < @order
 
             m = @curve.multiply(@generator, entropy)
             [m.x, inverse(entropy, @order) * (digest + m.x * private_key) % @order]
           end
 
           def verify(digest, signature, public_key)
-            raise "Invalid public key" unless @curve.valid?(public_key)
-            raise "Invalid public key" unless @curve.multiply(public_key, @order) == @curve.zero
+            raise 'Invalid public key' unless @curve.valid?(public_key)
+            raise 'Invalid public key' unless @curve.multiply(public_key, @order) == @curve.zero
 
             w = inverse(signature[1], @order)
-            u1, u2 = digest * w % @order, signature[0] * w % @order
+            u1 = digest * w % @order
+            u2 = signature[0] * w % @order
             p = @curve.add(@curve.multiply(@generator, u1), @curve.multiply(public_key, u2))
 
             p.x % @order == signature[0]
@@ -172,8 +175,8 @@ module Jason
           # my private_key
           # partner public_key
           def compute_secret(private_key, public_key)
-            raise "Invalid public key" unless @curve.valid?(public_key)
-            raise "Invalid public key" unless @curve.multiply(public_key, @order) == @curve.zero
+            raise 'Invalid public key' unless @curve.valid?(public_key)
+            raise 'Invalid public key' unless @curve.multiply(public_key, @order) == @curve.zero
 
             @curve.multiply(public_key, private_key)
           end
@@ -182,8 +185,8 @@ module Jason
         class ElGamal < AlgorithmBase
           # plaintext is a point on the curve
           def encrypt(plaintext, public_key, entropy)
-            raise "Invalid plaintext value" unless @curve.valid?(plaintext)
-            raise "Invalid public key" unless @curve.valid?(public_key)
+            raise 'Invalid plaintext value' unless @curve.valid?(plaintext)
+            raise 'Invalid public key' unless @curve.valid?(public_key)
 
             [@curve.multiply(@generator, entropy), @curve.add(plaintext, @curve.multiply(public_key, entropy))]
           end
@@ -191,12 +194,11 @@ module Jason
           # ciphertext is an array of two points on the curve
           def decrypt(ciphertext, private_key)
             c1, c2 = ciphertext
-            raise "Invalid ciphertext values" unless @curve.valid?(c1) && @curve.valid?(c2)
+            raise 'Invalid ciphertext values' unless @curve.valid?(c1) && @curve.valid?(c2)
 
             @curve.add(c2, @curve.negate(@curve.multiply(c1, private_key)))
           end
         end
-
       end
     end
   end

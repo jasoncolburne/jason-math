@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 if ARGV.count != 2
-  puts "Usage:"
-  puts "  ./decrypt.rb <curve> <private key>"
+  puts 'Usage:'
+  puts '  ./decrypt.rb <curve> <private key>'
   puts
   puts "$ cat encrypted.json | jq -Mr '.ciphertext' | ./decrypt.rb secp384r1 $(cat keypair.json | jq -Mr '.private_key') > decrypted.json"
 end
