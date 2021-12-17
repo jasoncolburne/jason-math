@@ -8,20 +8,24 @@ module Jason
           @vertices = vertices
           @graph = Hash.new { |h, k| h[k] = [] }
         end
-      
+
         def add_edge(origin, destination, weight = 1, validate = false)
-          raise "unexpected vertices (#{origin}, #{destination})!" if validate && ![origin, destination].all? { |vertex| @vertices.include?(vertex) }
+          raise "unexpected vertices (#{origin}, #{destination})!" if validate && ![origin,
+                                                                                    destination].all? do |vertex|
+                                                                        @vertices.include?(vertex)
+                                                                      end
+
           @graph[origin] << { vertex: destination, weight: weight }
         end
-      
+
         def dijkstra(origin, destination)
           distances = (@vertices - [origin]).zip([Float::INFINITY] * (@vertices.count - 1)).to_h
           distances[origin] = 0
-      
+
           heap = Heap.new { |a, b| distances[a] < distances[b] }
           heap << origin
-      
-          until heap.empty? do
+
+          until heap.empty?
             vertex = heap.pop
             @graph[vertex].each do |edge|
               if distances[edge[:vertex]] > distances[vertex] + edge[:weight]
@@ -30,11 +34,11 @@ module Jason
               end
             end
           end
-      
+
           distances[destination]
         end
 
-        alias_method :shortest_path, :dijkstra
+        alias shortest_path dijkstra
 
         def longest_path(origin, destination)
           negate_edge_weights
@@ -76,7 +80,7 @@ module Jason
           minimum_spanning_tree.count == tree_size ? minimum_spanning_tree : nil
         end
 
-        alias_method :minimum_spanning_tree, :kruskal
+        alias minimum_spanning_tree kruskal
 
         private
 
@@ -87,7 +91,7 @@ module Jason
             end
           end
         end
-      end      
+      end
     end
   end
 end

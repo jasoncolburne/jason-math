@@ -3,6 +3,7 @@ module Jason
     module Combinatorics
       def self.factorial(n)
         return 1 if n.zero?
+
         (1..n).inject(&:*)
       end
 
@@ -17,9 +18,9 @@ module Jason
           last = current
         end
 
-        return current
+        current
       end
-      
+
       def self.nCk(n, k)
         nPk(n, k) / factorial(k)
       end
@@ -63,6 +64,7 @@ module Jason
         return 1 + count_integer_partitions(n, max - 1) if n == max
         return 0 if max == 0 || n < 0
         return 1 if n == 0 || max == 1
+
         count_integer_partitions(n, max - 1) + count_integer_partitions(n - max, max)
       end
 
@@ -87,6 +89,7 @@ module Jason
               index = indexes[i]
               partition[index].pop
               break unless partition[index].empty?
+
               partition.delete_at(index)
               i -= 1
             end

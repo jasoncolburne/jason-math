@@ -1,12 +1,12 @@
-require "jason/math/version"
+require 'jason/math/version'
 
-require "jason/math/algebra"
-require "jason/math/analysis"
-require "jason/math/combinatorics"
-require "jason/math/cryptography"
-require "jason/math/graph_theory"
-require "jason/math/number_theory"
-require "jason/math/utility"
+require 'jason/math/algebra'
+require 'jason/math/analysis'
+require 'jason/math/combinatorics'
+require 'jason/math/cryptography'
+require 'jason/math/graph_theory'
+require 'jason/math/number_theory'
+require 'jason/math/utility'
 
 module Jason
   module Math
@@ -176,7 +176,7 @@ module Math
     Jason::Math::NumberTheory.prime_by_miller_rabin?(n, iterations)
   end
 
-  def self.probably_prime?(n, sieve_below = 1299709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
+  def self.probably_prime?(n, sieve_below = 1_299_709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
     Jason::Math::NumberTheory.probably_prime?(n, sieve_below, iterations_of_fermat, iterations_of_miller_rabin)
   end
 
@@ -305,7 +305,7 @@ class Integer
     Math.prime_by_miller_rabin?(self, iterations)
   end
 
-  def probably_prime?(sieve_below = 1299709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
+  def probably_prime?(sieve_below = 1_299_709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
     Math.probably_prime?(self, sieve_below, iterations_of_fermat, iterations_of_miller_rabin)
   end
 

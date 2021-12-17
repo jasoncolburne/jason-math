@@ -30,43 +30,43 @@ module Jason
             X: 0.002902,
             Z: 0.002722,
             J: 0.001965,
-            Q: 0.001962,
-          }.freeze,
+            Q: 0.001962
+          }.freeze
         }.freeze
 
         PUNCTUATION_FREQUENCIES = {
           english: {
-            :'.' => 0.006530,
-            :',' => 0.006130,
-            :'"' => 0.002670,
-            :"'" => 0.002430,
-            :'–' => 0.001530,
-            :'?' => 0.000560,
-            :':' => 0.000340,
-            :'!' => 0.000330,
-            :';' => 0.000320,
-          }.freeze,
+            '.': 0.006530,
+            ',': 0.006130,
+            '"': 0.002670,
+            "'": 0.002430,
+            '–': 0.001530,
+            '?': 0.000560,
+            ':': 0.000340,
+            '!': 0.000330,
+            ';': 0.000320
+          }.freeze
         }.freeze
 
         def self.distance(text, language = :english)
           result = 0.0
-        
+
           whitespace = "\r\n\t "
           spaces_frequency = text.count(whitespace).to_f / text.length
           result += 0.25 if spaces_frequency < 0.07
-        
+
           text = text.tr(whitespace, '')
-        
+
           punctuation_frequencies = PUNCTUATION_FREQUENCIES[language]
 
           punctuation_frequencies.keys.each do |symbol|
             frequency = text.count(symbol.to_s.b).to_f / text.length
             result += (frequency - punctuation_frequencies[symbol]).abs
           end
-        
+
           punctuation_characters = punctuation_frequencies.keys.map(&:to_s).join
           text = text.tr(punctuation_characters.b, '')
-        
+
           letter_frequencies = LETTER_FREQUENCIES[language]
 
           letter_frequencies.keys.each do |symbol|
@@ -74,14 +74,14 @@ module Jason
             frequency = text.count(letter + letter.downcase).to_f / text.length
             result += (frequency - letter_frequencies[symbol]).abs
           end
-        
+
           alphabet = letter_frequencies.keys.map(&:to_s).join
           non_alpha_text = text.tr(alphabet + alphabet.downcase, '')
-        
+
           result += non_alpha_text.length.to_f / text.length
-        
+
           result
-        end        
+        end
       end
     end
   end

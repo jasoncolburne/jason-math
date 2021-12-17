@@ -26,18 +26,18 @@ class CurveService
     @order = order
   end
 
-  def generate_keypair()
+  def generate_keypair
     private_key = SecureRandom.hex(@hex_characters_required).to_i(16) % @curve.n
 
     @generator ||= Jason::Math::Cryptography::EllipticCurve::AlgorithmBase.new(@curve, @p, @order)
     public_key = @generator.generate_public_key(private_key)
 
-    { 
+    {
       private_key: i_to_hex(private_key),
       public_key: public_key.to_hex(@hex_characters_required)
     }
   end
-  
+
   def sign(digest, private_key)
     @dsa ||= Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorithm.new(@curve, @p, @order)
 
@@ -47,7 +47,7 @@ class CurveService
 
     signature = @dsa.sign(digest, private_key, entropy)
 
-    signature.map { |x| x.to_s(16).rjust(@hex_characters_required, "0") }.join
+    signature.map { |x| x.to_s(16).rjust(@hex_characters_required, '0') }.join
   end
 
   def verify(digest, public_key, signature)
@@ -61,7 +61,7 @@ class CurveService
   end
 
   def encrypt(plaintext, public_key)
-    raise "Plaintext value too long" unless plaintext.b.length * 2 <= @hex_characters_required - 10
+    raise 'Plaintext value too long' unless plaintext.b.length * 2 <= @hex_characters_required - 10
 
     @elgamal ||= Jason::Math::Cryptography::EllipticCurve::ElGamal.new(@curve, @p, @order)
 
@@ -70,10 +70,11 @@ class CurveService
 
     # we have 32 bits to play with in an attempt to find a point on the curve
     filler = 0
-    while filler < 2 ** 31
+    while filler < 2**31
       # convert plaintext to a point
       padding = @hex_characters_required / 2 - plaintext.b.length - 4
-      x_string = filler.to_s(16).rjust(8, "0") + plaintext.b.unpack("H*").first + [padding].pack("C").unpack("H*").first * padding
+      x_string = filler.to_s(16).rjust(8,
+                                       '0') + plaintext.b.unpack1('H*') + [padding].pack('C').unpack1('H*') * padding
       x = x_string.to_i(16)
 
       filler += 1
@@ -81,13 +82,13 @@ class CurveService
       # check if we have found a quadratic residue
       x_prime = (x * x * x + @curve.a * x + @curve.b) % @curve.n
       exponent = (@curve.n - 1) / 2
-      if x_prime.modular_exponentiation(exponent, @curve.n) == 1
-        y, _ = x_prime.modular_square_roots(@curve.n)
-        plaintext_point = Jason::Math::Cryptography::EllipticCurve::Point.new(x, y)
+      next unless x_prime.modular_exponentiation(exponent, @curve.n) == 1
 
-        a, b = @elgamal.encrypt(plaintext_point, public_key, entropy)
-        return a.to_hex(@hex_characters_required) + b.to_hex(@hex_characters_required)
-      end
+      y, = x_prime.modular_square_roots(@curve.n)
+      plaintext_point = Jason::Math::Cryptography::EllipticCurve::Point.new(x, y)
+
+      a, b = @elgamal.encrypt(plaintext_point, public_key, entropy)
+      return a.to_hex(@hex_characters_required) + b.to_hex(@hex_characters_required)
     end
 
     raise "Couldn't find a point on curve, try again"
@@ -115,6 +116,6 @@ class CurveService
   end
 
   def i_to_hex(n)
-    n.to_s(16).rjust(@hex_characters_required, "0")
+    n.to_s(16).rjust(@hex_characters_required, '0')
   end
 end

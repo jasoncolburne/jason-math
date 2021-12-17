@@ -1,8 +1,8 @@
 RSpec.describe Jason::Math::GraphTheory::Graph do
-  context "#shortest_path" do
+  context '#shortest_path' do
     subject { graph.shortest_path(origin, destination) }
 
-    context "stackoverflow example" do
+    context 'stackoverflow example' do
       # example taken from https://stackoverflow.com/questions/30409493/using-bfs-for-weighted-graphs
       let(:origin) { 1 }
       let(:destination) { 5 }
@@ -25,10 +25,10 @@ RSpec.describe Jason::Math::GraphTheory::Graph do
     end
   end
 
-  context "#longest_path" do
+  context '#longest_path' do
     subject { graph.longest_path(origin, destination) }
 
-    context "for some graph" do
+    context 'for some graph' do
       # unverified
       let(:origin) { 1 }
       let(:destination) { 5 }
@@ -51,11 +51,11 @@ RSpec.describe Jason::Math::GraphTheory::Graph do
     end
   end
 
-  context "#minimum_spanning_tree" do
+  context '#minimum_spanning_tree' do
     subject { graph.minimum_spanning_tree }
 
     # https://www.techiedelight.com/kruskals-algorithm-for-finding-minimum-spanning-tree/
-    context "for techiedelight example" do
+    context 'for techiedelight example' do
       let(:graph) { described_class.new(vertices) }
       let(:vertices) { [0, 1, 2, 3, 4, 5, 6] }
 
@@ -73,19 +73,33 @@ RSpec.describe Jason::Math::GraphTheory::Graph do
         graph.add_edge(5, 6, 11)
       end
 
-      it "should be sane" do
-        expect(subject.sort_by { |aggregate| [aggregate[:weight], aggregate[:origin], aggregate[:destination]] }).to eq([
-          { origin: 0, destination: 3, weight: 5 },
-          { origin: 2, destination: 4, weight: 5 },
-          { origin: 3, destination: 5, weight: 6 },
-          { origin: 0, destination: 1, weight: 7 },
-          { origin: 1, destination: 4, weight: 7 },
-          { origin: 4, destination: 6, weight: 9 },
-        ])
+      it 'should be sane' do
+        expect(subject.sort_by do |aggregate|
+                 [aggregate[:weight], aggregate[:origin], aggregate[:destination]]
+               end).to eq([
+                            {
+                              origin: 0, destination: 3, weight: 5
+                            },
+                            {
+                              origin: 2, destination: 4, weight: 5
+                            },
+                            {
+                              origin: 3, destination: 5, weight: 6
+                            },
+                            {
+                              origin: 0, destination: 1, weight: 7
+                            },
+                            {
+                              origin: 1, destination: 4, weight: 7
+                            },
+                            {
+                              origin: 4, destination: 6, weight: 9
+                            }
+                          ])
       end
     end
 
-    context "for disconnected graph" do
+    context 'for disconnected graph' do
       let(:graph) { described_class.new(vertices) }
       let(:vertices) { [0, 1, 2, 3, 4, 5, 6] }
 
