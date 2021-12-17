@@ -380,7 +380,15 @@ class Rational
   end
 end
 
+module ArrayExtensions
+  def product(*args)
+    args.length > 0 ? super(*args) : Math.product(self)
+  end
+end
+
 class Array
+  prepend ArrayExtensions
+
   def enumerate_partitions
     Math.enumerate_partitions(self)
   end
@@ -415,10 +423,6 @@ class Array
 
   def modular_sum(modulus)
     Math.modular_sum(self, modulus)
-  end
-
-  def product
-    Math.product(self)
   end
 
   def modular_product(modulus)
