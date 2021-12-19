@@ -70,7 +70,7 @@ module Jason
         count_integer_partitions(n, max - 1) + count_integer_partitions(n - max, max)
       end
 
-      def self.enumerate_partitions(array)
+      def self.enumerate_partitions(array) # rubocop:disable Metrics/MethodLength
         partition = [array.dup]
         number_of_elements = array.count
         indexes = Array.new(number_of_elements, 0)

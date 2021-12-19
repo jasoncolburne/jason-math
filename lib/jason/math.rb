@@ -17,7 +17,8 @@ module Jason
   end
 end
 
-module Math
+# Enhancing Math
+module Math # rubocop:disable Metrics/ModuleLength
   # algebra
   def self.solve_quadratic(a, b, c)
     Jason::Math::Algebra.solve_quadratic(a, b, c)
@@ -246,6 +247,7 @@ module Math
   end
 end
 
+# Enhancing Integer
 class Integer
   def fibonacci_terms
     Math.fibonacci_enumerator.take(self)
@@ -271,7 +273,7 @@ class Integer
     Math.divisors(self)
   end
 
-  def enumerate_divisors(proper = false)
+  def enumerate_divisors(proper: false)
     Math.enumerate_divisors(self, proper)
   end
 
@@ -376,18 +378,21 @@ class Integer
   end
 end
 
+# Enhancing Rational
 class Rational
   def inverse
     Rational(denominator, numerator)
   end
 end
 
+# We needed to preserve the existing implmentation
 module ArrayExtensions
   def product(*args)
     args.length.positive? ? super(*args) : Math.product(self)
   end
 end
 
+# Enhancing Array
 class Array
   prepend ArrayExtensions
 
@@ -432,6 +437,7 @@ class Array
   end
 end
 
+# Enhancing Set
 class Set
   def co_prime?
     Math.co_prime?(self)
@@ -454,12 +460,14 @@ class Set
   end
 end
 
+# Enhancing Hash
 class Hash
-  def chinese_remainder_theorem(enforce_co_primality = true)
+  def chinese_remainder_theorem(enforce_co_primality: true)
     Math.chinese_remainder_theorem(self, enforce_co_primality)
   end
 end
 
+# Enhancing String
 class String
   def byte_string_to_hex
     Jason::Math::Utility.byte_string_to_hex(self)

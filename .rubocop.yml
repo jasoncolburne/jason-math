@@ -1,0 +1,8 @@
+Naming/MethodParameterName:
+  MinNameLength: 1
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 25

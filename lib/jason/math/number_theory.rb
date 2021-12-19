@@ -392,7 +392,7 @@ module Jason
 
       # https://eli.thegreenplace.net/2009/03/07/computing-modular-square-roots-in-python
       # p must be prime
-      def self.modular_square_roots(a, p)
+      def self.modular_square_roots(a, p) # rubocop:disable Metrics/MethodLength
         raise 'No roots found' if legendre_symbol(a, p) != 1
         raise 'No roots found' if a.zero?
         raise 'No roots found' if p == 2
