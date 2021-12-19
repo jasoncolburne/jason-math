@@ -3,6 +3,7 @@
 require 'jason/math/cryptography/advanced_encryption_standard'
 require 'jason/math/cryptography/elliptic_curve'
 require 'jason/math/cryptography/exclusive_or'
+require 'jason/math/cryptography/mersenne_twister_19937'
 
 module Jason
   module Math
