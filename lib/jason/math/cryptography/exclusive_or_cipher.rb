@@ -10,8 +10,7 @@ module Jason
           def initialize(prng, bytes_per_number)
             @byte_stream = Enumerator.new do |yielder|
               loop do
-                pp bytes_per_number
-                bytes = Utility.integer_to_byte_string(prng.extract_number).rjust("\x00", bytes_per_number)
+                bytes = Utility.integer_to_byte_string(prng.extract_number).rjust(bytes_per_number, "\x00")
                 bytes.each_char do |char|
                   yielder << char
                 end
@@ -74,7 +73,7 @@ module Jason
 
           Cipher.split_into_blocks(padded_clear_text, @block_size).map do |block|
             integer_mask = @prng.extract_number
-            mask = Utility.integer_to_byte_string(integer_mask).rjust("\x00", @block_size)
+            mask = Utility.integer_to_byte_string(integer_mask).rjust(@block_size, "\x00")
             cipher(block, mask)
           end.join
         end
@@ -83,7 +82,7 @@ module Jason
         def decrypt_mt19937_block(cipher_text, strip_padding: true)
           clear_text = Cipher.split_into_blocks(cipher_text, @block_size).map do |block|
             integer_mask = @prng.extract_number
-            mask = Utility.integer_to_byte_string(integer_mask).rjust("\x00", @block_size)
+            mask = Utility.integer_to_byte_string(integer_mask).rjust(@block_size, "\x00")
             cipher(block, mask)
           end.join
 
