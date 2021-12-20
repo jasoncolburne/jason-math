@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,7 +21,7 @@ jobs:
       - run: gem install bundler
       - run: bundle install
       - run: bundle exec rake spec
-  build:
+  rubocop:
     runs-on: ubuntu-latest
     name: Rubocop
     steps:
@@ -31,4 +31,4 @@ jobs:
           ruby-version: 2.6
       - run: gem install bundler
       - run: bundle install
-      - run: bundle exec rubocop
+      - run: rubocop
