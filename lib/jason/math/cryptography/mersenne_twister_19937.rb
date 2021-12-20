@@ -5,6 +5,8 @@ module Jason
     module Cryptography
       # The Mersenne Twister 19937 is the typical PRNG
       class MersenneTwister19937
+        attr_accessor :index
+
         PARAMETERS = {
           mt19937: {
             w: 32,
