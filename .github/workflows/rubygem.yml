@@ -1,4 +1,4 @@
-name: Math RSpec
+name: Jason::Math
 
 on:
   push:
