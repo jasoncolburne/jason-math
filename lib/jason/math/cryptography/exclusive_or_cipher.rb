@@ -5,9 +5,9 @@ module Jason
     module Cryptography
       # A very simple cipher
       class ExclusiveOrCipher
-        MODES = [:repeated_key, :mt19937_keystream].freeze
+        MODES = %i[repeated_key mt19937_keystream].freeze
 
-        def initialize(mode, key, use_openssl: false)
+        def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument
           raise 'Unknown mode' unless MODES.include?(mode)
 
           @key = key
