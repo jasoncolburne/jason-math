@@ -30,7 +30,7 @@ module Jason
 
         MODES = %i[repeated_key mt19937_block mt19937_64_block mt19937_stream mt19937_64_stream].freeze
 
-        def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+        def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument
           raise 'Unknown mode' unless MODES.include?(mode)
 
           @key = key
