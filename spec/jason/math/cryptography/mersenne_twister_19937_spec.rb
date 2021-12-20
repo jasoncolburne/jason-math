@@ -13,6 +13,14 @@ RSpec.describe Jason::Math::Cryptography::MersenneTwister19937 do
       subject { (1..10_000).map { prng.extract_number }.last }
       it { is_expected.to eq(4_123_659_995) }
     end
+
+    context '#untemper yields correct results' do
+      subject { described_class.untemper(tempered_value) }
+
+      let(:untempered_value) { 0x69 }
+      let(:tempered_value) { prng.send(:temper, untempered_value) }
+      it { is_expected.to eq(untempered_value) }
+    end
   end
 
   context '64-bit' do
