@@ -376,6 +376,10 @@ class Integer
   def totient
     Math.totient(self)
   end
+
+  def to_byte_string
+    Jason::Math::Utility.integer_to_byte_string(self)
+  end
 end
 
 # Enhancing Rational
@@ -469,6 +473,10 @@ end
 
 # Enhancing String
 class String
+  def byte_string_to_integer
+    Jason::Math::Utility.byte_string_to_integer(self)
+  end
+
   def byte_string_to_hex
     Jason::Math::Utility.byte_string_to_hex(self)
   end
