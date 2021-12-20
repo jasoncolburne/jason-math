@@ -66,7 +66,8 @@ module Jason
           aes_192_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_192 }.freeze,
           aes_256_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_256 }.freeze,
           xor_repeated_key: { class: ExclusiveOrCipher, mode: :repeated_key }.freeze,
-          xor_mt19937_keystream: { class: ExclusiveOrCipher, mode: :mt19937_keystream }.freeze
+          xor_mt19937_keystream: { class: ExclusiveOrCipher, mode: :mt19937_keystream }.freeze,
+          xor_mt19937_64_keystream: { class: ExclusiveOrCipher, mode: :mt19937_64_keystream }.freeze
         }.freeze
         # rubocop:enable Naming/VariableNumber
 

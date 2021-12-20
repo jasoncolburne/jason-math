@@ -5,21 +5,28 @@ module Jason
     module Cryptography
       # A very simple cipher
       class ExclusiveOrCipher
-        MODES = %i[repeated_key mt19937_keystream].freeze
+        MODES = %i[repeated_key mt19937_keystream mt19937_64_keystream].freeze
 
-        def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument
+        def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument, Metrics/CyclomaticComplexity
           raise 'Unknown mode' unless MODES.include?(mode)
 
           @key = key
           @mode = mode
 
-          return unless mode == :mt19937_keystream
+          case mode
+          when :mt19937_keystream
+            raise 'For the MT19937 keystream, use a 16-bit integer key' unless key.is_a? Integer
+            raise 'For the MT19937 keystream, use a 16-bit integer key' unless key % 2**16 == key
 
-          raise 'For the MT19937 keystream, use a 16-bit integer key' unless key.is_a? Integer
-          raise 'For the MT19937 keystream, use a 16-bit integer key' unless key % 2**16 == key
+            @prng = MersenneTwister19937.new(:mt19937, key)
+            @block_size = 4
+          when :mt19937_64_keystream
+            raise 'For the MT19937-64 keystream, use a 32-bit integer key' unless key.is_a? Integer
+            raise 'For the MT19937-64 keystream, use a 32-bit integer key' unless key % 2**32 == key
 
-          @prng = MersenneTwister19937.new(:mt19937, key)
-          @block_size = 4
+            @prng = MersenneTwister19937.new(:mt19937_64, key) # rubocop:disable Naming/VariableNumber
+            @block_size = 8
+          end
         end
 
         def encrypt(clear_text, _ = nil)
@@ -47,6 +54,7 @@ module Jason
             cipher(block, mask)
           end.join
         end
+        alias encrypt_mt19937_64_keystream encrypt_mt19937_keystream
 
         def decrypt_mt19937_keystream(cipher_text, strip_padding: true)
           clear_text = Cipher.split_into_blocks(cipher_text, @block_size).map do |block|
@@ -61,6 +69,7 @@ module Jason
             clear_text
           end
         end
+        alias decrypt_mt19937_64_keystream decrypt_mt19937_keystream
 
         def self.break_cipher( # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           cipher_text,
