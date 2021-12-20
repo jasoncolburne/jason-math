@@ -2,7 +2,7 @@
 
 require 'jason/math/cryptography/advanced_encryption_standard'
 require 'jason/math/cryptography/elliptic_curve'
-require 'jason/math/cryptography/exclusive_or'
+require 'jason/math/cryptography/exclusive_or_cipher'
 require 'jason/math/cryptography/mersenne_twister_19937'
 
 module Jason
@@ -64,7 +64,9 @@ module Jason
           aes_256_ecb: { class: AdvancedEncryptionStandard, mode: :ecb_256 }.freeze,
           aes_128_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_128 }.freeze,
           aes_192_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_192 }.freeze,
-          aes_256_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_256 }.freeze
+          aes_256_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_256 }.freeze,
+          xor_repeated_key: { class: ExclusiveOrCipher, mode: :repeated_key }.freeze,
+          xor_mt19937_keystream: { class: ExclusiveOrCipher, mode: :mt19937_keystream }.freeze
         }.freeze
         # rubocop:enable Naming/VariableNumber
 
