@@ -2,6 +2,7 @@
 
 module Jason
   module Math
+    # Analysis
     module Analysis
       def self.collatz_sequence(n, sequence = [])
         sequence << n
@@ -50,7 +51,7 @@ module Jason
         a = limit
         result << a
 
-        unless limit == n**0.5
+        unless limit == n**0.5 # rubocop:disable Lint/FloatComparison
           seen = Set[]
           until seen.include?([m, d, a])
             subresult << a unless seen.empty?

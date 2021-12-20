@@ -7,6 +7,7 @@ require 'jason/math/cryptography/mersenne_twister_19937'
 
 module Jason
   module Math
+    # Cryptography
     module Cryptography
       def self.hamming_distance(a, b)
         raise 'Cannot compute hamming distance if lengths differ' unless a.length == b.length
@@ -14,6 +15,7 @@ module Jason
         Utility.xor(a, b).unpack1('B*').count('1')
       end
 
+      # PKCS7 padding
       class PKCS7
         def self.pad(data, block_size)
           length = data.length
@@ -44,7 +46,9 @@ module Jason
         end
       end
 
+      # An abstraction of ciphers
       class Cipher
+        # rubocop:disable Naming/VariableNumber
         ALGORITHMS = {
           aes_128_cbc: { class: AdvancedEncryptionStandard, mode: :cbc_128 }.freeze,
           aes_192_cbc: { class: AdvancedEncryptionStandard, mode: :cbc_192 }.freeze,
@@ -62,20 +66,21 @@ module Jason
           aes_192_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_192 }.freeze,
           aes_256_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_256 }.freeze
         }.freeze
+        # rubocop:enable Naming/VariableNumber
 
-        def initialize(algorithm, key, use_openssl = false)
+        def initialize(algorithm, key, use_openssl: false)
           raise 'Unsupported algorithm' unless ALGORITHMS.keys.include?(algorithm)
 
           details = ALGORITHMS[algorithm]
-          @cipher = details[:class].new(details[:mode], key, use_openssl)
+          @cipher = details[:class].new(details[:mode], key, use_openssl: use_openssl)
         end
 
         def encrypt(clear_text, initialization_vector = nil)
           @cipher.encrypt(clear_text, initialization_vector)
         end
 
-        def decrypt(cipher_text, initialization_vector = nil, strip_padding = true)
-          @cipher.decrypt(cipher_text, initialization_vector, strip_padding)
+        def decrypt(cipher_text, initialization_vector = nil, strip_padding: true)
+          @cipher.decrypt(cipher_text, initialization_vector, strip_padding: strip_padding)
         end
 
         def generate_nonce

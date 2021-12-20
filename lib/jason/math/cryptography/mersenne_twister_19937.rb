@@ -42,7 +42,7 @@ module Jason
 
         def initialize(algorithm = :mt19937, seed = 5489)
           parameters = PARAMETERS[algorithm]
-          parameters.each_key { |key| eval "@#{key} = parameters[:#{key}]" }
+          parameters.each_pair { |key, value| instance_variable_set("@#{key}", value) }
 
           @twister = [nil] * @n
           @index = nil
@@ -52,7 +52,7 @@ module Jason
         end
 
         def seed=(seed)
-          raise "Invalid seed" unless seed.is_a? Integer
+          raise 'Invalid seed' unless seed.is_a? Integer
 
           @index = @n
           @twister[0] = @full_mask & seed
@@ -97,9 +97,7 @@ module Jason
           y & full_mask
         end
 
-        private
-
-        def self.invert_shift_and_xor(value, direction, magnitude, mask, w)
+        private_class_method def self.invert_shift_and_xor(value, direction, magnitude, mask, w) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           value = value.to_s(2).chars.map(&:to_i)
           mask = mask.to_s(2).chars.map(&:to_i)
 
@@ -123,6 +121,8 @@ module Jason
           x.reverse! if direction == :left
           x.map(&:to_s).join.to_i(2)
         end
+
+        private
 
         def twist
           (0..(@n - 1)).each do |i|

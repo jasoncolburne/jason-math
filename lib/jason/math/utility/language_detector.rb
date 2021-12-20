@@ -3,6 +3,7 @@
 module Jason
   module Math
     module Utility
+      # This module is intended to identify data, probabilistically as a given language
       module LanguageDetector
         # this one sums to one, so we need to filter out the punctuation first
         LETTER_FREQUENCIES = {

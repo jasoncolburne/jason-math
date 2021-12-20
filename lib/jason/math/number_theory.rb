@@ -5,9 +5,12 @@ require 'securerandom'
 require 'prime'
 require 'set'
 
+# this file is heavy on the complexity
+# rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
 module Jason
   module Math
-    module NumberTheory
+    # Number Theory
+    module NumberTheory # rubocop:disable Metrics/ModuleLength
       def self.prime(offset)
         prime_generator = Prime::EratosthenesGenerator.new
         (offset - 1).times { prime_generator.take(1) }
@@ -81,7 +84,12 @@ module Jason
         true
       end
 
-      def self.probably_prime?(number, sieve_below = 1_299_709, iterations_of_fermat = nil, iterations_of_miller_rabin = nil)
+      def self.probably_prime?(
+        number,
+        sieve_below = 1_299_709,
+        iterations_of_fermat = nil,
+        iterations_of_miller_rabin = nil
+      )
         return false unless prime?(number, sieve_below)
 
         if number < sieve_below * sieve_below
@@ -130,10 +138,10 @@ module Jason
       end
 
       def self.proper_divisors(number)
-        enumerate_divisors(number, true).to_a
+        enumerate_divisors(number, proper: true).to_a
       end
 
-      def self.enumerate_divisors(number, proper = false)
+      def self.enumerate_divisors(number, proper: false)
         factors_array = factors(number).to_a
         factor_count = factors_array.count
         exponents = [0] * factor_count
@@ -284,9 +292,9 @@ module Jason
       end
 
       def self.pandigital?(numbers, initial = 1)
-        _digits = numbers.is_a?(Integer) ? digits(numbers) : numbers.map { |n| digits(n) }.flatten
-        max = _digits.count - (1 - initial)
-        return false unless (initial..max).to_set == _digits.to_set
+        local_digits = numbers.is_a?(Integer) ? digits(numbers) : numbers.map { |n| digits(n) }.flatten
+        max = local_digits.count - (1 - initial)
+        return false unless (initial..max).to_set == local_digits.to_set
 
         true
       end
@@ -315,24 +323,24 @@ module Jason
 
       def self.concatenate(numbers)
         result = 0
-        _digits = 0
+        local_digits = 0
 
         i = numbers.count - 1
         while i >= 0
           n = numbers[i]
-          result += n * 10**_digits
-          _digits += if n.zero?
-                       1
-                     else
-                       ::Math.log10(n).to_i + 1
-                     end
+          result += n * 10**local_digits
+          local_digits += if n.zero?
+                            1
+                          else
+                            ::Math.log10(n).to_i + 1
+                          end
           i -= 1
         end
 
         result
       end
 
-      def self.chinese_remainder_theorem(mapping, enforce_co_primality = true)
+      def self.chinese_remainder_theorem(mapping, enforce_co_primality: true)
         raise 'moduli not co-prime' if enforce_co_primality && !co_prime?(mapping.keys)
 
         max = mapping.keys.inject(&:*)
@@ -341,9 +349,9 @@ module Jason
       end
 
       def self.polygonal_number(n, offset)
-        if n < 3
-          raise "no polygon with #{n} sides"
-        elsif n == 3
+        raise "no polygon with #{n} sides" if n < 3
+
+        if n == 3
           (offset * offset + offset) / 2
         else
           ((n - 2) * offset - (n - 4)) * offset / 2
@@ -372,7 +380,7 @@ module Jason
         [s0, t0, a]
       end
 
-      def self.modular_exponentiation(base, exponent, modulus, optimize = true)
+      def self.modular_exponentiation(base, exponent, modulus, optimize: true)
         if optimize
           base.to_bn.mod_exp(exponent, modulus).to_i
         else
@@ -468,3 +476,4 @@ module Jason
     end
   end
 end
+# rubocop:enable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
