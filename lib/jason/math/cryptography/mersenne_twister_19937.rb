@@ -44,14 +44,14 @@ module Jason
 
           @twister = [nil] * @n
           @index = nil
-          @full_mask = (1 << @w) - 1
-          @lower_mask = (1 << @r) - 1
-          @upper_mask = @full_mask ^ @lower_mask
+          @full_mask, @lower_mask, @upper_mask = self.class.create_masks(@w, @r)
 
           self.seed = seed
         end
 
         def seed=(seed)
+          raise "Invalid seed" unless seed.is_a? Integer
+
           @index = @n
           @twister[0] = @full_mask & seed
           (1..(@n - 1)).each do |i|
@@ -60,22 +60,67 @@ module Jason
         end
 
         def extract_number
-          raise 'Generator has not been seeded' if @index.nil?
-
           twist if @index == @n
 
-          y = @twister[@index]
-          y ^= ((y >> @u) & @d)
-          y ^= ((y << @s) & @b)
-          y ^= ((y << @t) & @c)
-          y ^= (y >> @l)
-
+          number = temper(@twister[@index])
           @index += 1
+          number & @full_mask
+        end
 
-          @full_mask & y
+        def splice_state(state)
+          @twister = state.dup
+        end
+
+        def self.create_masks(w, r)
+          full_mask = (1 << w) - 1
+          lower_mask = (1 << r) - 1
+          upper_mask = full_mask ^ lower_mask
+          [full_mask, lower_mask, upper_mask]
+        end
+
+        def self.untemper(value, algorithm = :mt19937)
+          w, r, l, t, s, u, c, b, d = [nil] * 9
+          parameters = PARAMETERS[algorithm]
+          parameters.each_pair { |k, v| binding.local_variable_set(k, v) }
+
+          full_mask, _lower_mask, _upper_mask = create_masks(w, r)
+
+          y = value
+
+          y = invert_shift_and_xor(y, :right, l, full_mask, w)
+          y = invert_shift_and_xor(y, :left, t, c, w)
+          y = invert_shift_and_xor(y, :left, s, b, w)
+          y = invert_shift_and_xor(y, :right, u, d, w)
+
+          y & full_mask
         end
 
         private
+
+        def self.invert_shift_and_xor(value, direction, magnitude, mask, w)
+          value = value.to_s(2).chars.map(&:to_i)
+          mask = mask.to_s(2).chars.map(&:to_i)
+
+          value.unshift(0) while value.length < w
+          length.unshift(0) while mask.length < w
+
+          if direction == :left
+            value.reverse!
+            mask.reverse!
+          end
+
+          x = [nil] * w
+          w.times do |n|
+            x[n] = if n < magnitude
+                     value[n]
+                   else
+                     value[n] ^ (mask[n] & x[n - magnitude])
+                   end
+          end
+
+          x.reverse! if direction == :left
+          x.map(&:to_s).join.to_i(2)
+        end
 
         def twist
           (0..(@n - 1)).each do |i|
@@ -86,6 +131,14 @@ module Jason
           end
 
           @index = 0
+        end
+
+        def temper(value)
+          y = value
+          y ^= ((y >> @u) & @d)
+          y ^= ((y << @s) & @b)
+          y ^= ((y << @t) & @c)
+          y ^ (y >> @l)
         end
       end
     end
