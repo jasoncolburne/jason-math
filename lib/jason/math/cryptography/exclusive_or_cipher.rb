@@ -4,14 +4,62 @@ module Jason
   module Math
     module Cryptography
       # A very simple cipher
-      module ExclusiveOr
-        def self.cipher(data, key)
-          key_characters = key.chars
-          data.chars.map do |character|
-            result = Utility.xor(character, key_characters[0])
-            key_characters << key_characters.shift
-            result
+      class ExclusiveOrCipher
+        MODES = [:repeated_key, :mt19937_keystream].freeze
+
+        def initialize(mode, key, use_openssl: false)
+          raise 'Unknown mode' unless MODES.include?(mode)
+
+          @key = key
+          @mode = mode
+
+          return unless mode == :mt19937_keystream
+
+          raise 'For the MT19937 keystream, use a 16-bit integer key' unless key.is_a? Integer
+          raise 'For the MT19937 keystream, use a 16-bit integer key' unless key % 2**16 == key
+
+          @prng = MersenneTwister19937.new(:mt19937, key)
+          @block_size = 4
+        end
+
+        def encrypt(clear_text, _ = nil)
+          send(:"encrypt_#{@mode}", clear_text)
+        end
+
+        def decrypt(cipher_text, _ = nil, strip_padding: true)
+          send(:"decrypt_#{@mode}", cipher_text, strip_padding: strip_padding)
+        end
+
+        def encrypt_repeated_key(clear_text)
+          cipher(clear_text, @key)
+        end
+
+        def decrypt_repeated_key(cipher_text, strip_padding: false) # rubocop:disable Lint/UnusedMethodArgument
+          cipher(cipher_text, @key)
+        end
+
+        def encrypt_mt19937_keystream(clear_text)
+          padded_clear_text = PKCS7.pad(clear_text, @block_size)
+
+          Cipher.split_into_blocks(padded_clear_text, @block_size).map do |block|
+            integer_mask = @prng.extract_number
+            mask = Utility.integer_to_byte_string(integer_mask)
+            cipher(block, mask)
           end.join
+        end
+
+        def decrypt_mt19937_keystream(cipher_text, strip_padding: true)
+          clear_text = Cipher.split_into_blocks(cipher_text, @block_size).map do |block|
+            integer_mask = @prng.extract_number
+            mask = Utility.integer_to_byte_string(integer_mask)
+            cipher(block, mask)
+          end.join
+
+          if strip_padding
+            PKCS7.strip(clear_text, @block_size)
+          else
+            clear_text
+          end
         end
 
         def self.break_cipher( # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
@@ -68,7 +116,7 @@ module Jason
           [minimum_distance, keys_by_english_distance[minimum_distance]]
         end
 
-        def self.transpose_data(data, key_length)
+        private_class_method def self.transpose_data(data, key_length)
           return [data] if key_length == 1
 
           bytes = data.bytes
@@ -83,6 +131,17 @@ module Jason
 
             aggregator
           end
+        end
+
+        private
+
+        def cipher(data, key)
+          key_characters = key.chars
+          data.chars.map do |character|
+            result = Utility.xor(character, key_characters[0])
+            key_characters << key_characters.shift
+            result
+          end.join
         end
       end
     end
