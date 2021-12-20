@@ -5,28 +5,52 @@ module Jason
     module Cryptography
       # A very simple cipher
       class ExclusiveOrCipher
-        MODES = %i[repeated_key mt19937_keystream mt19937_64_keystream].freeze
+        # A generic bytestream constructed atop a PRNG
+        class PRNGByteStream
+          def initialize(prng, bytes_per_number)
+            @byte_stream = Enumerator.new do |yielder|
+              loop do
+                pp bytes_per_number
+                bytes = Utility.integer_to_byte_string(prng.extract_number).rjust("\x00", bytes_per_number)
+                bytes.each_char do |char|
+                  yielder << char
+                end
+              end
+            end
+          end
 
-        def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument, Metrics/CyclomaticComplexity
+          def take_byte
+            take_bytes
+          end
+
+          def take_bytes(count = 1)
+            @byte_stream.take(count).join
+          end
+        end
+
+        MODES = %i[repeated_key mt19937_block mt19937_64_block mt19937_stream mt19937_64_stream].freeze
+
+        def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           raise 'Unknown mode' unless MODES.include?(mode)
 
           @key = key
           @mode = mode
 
-          case mode
-          when :mt19937_keystream
-            raise 'For the MT19937 keystream, use a 16-bit integer key' unless key.is_a? Integer
-            raise 'For the MT19937 keystream, use a 16-bit integer key' unless key % 2**16 == key
+          return if mode == :repeated_key
 
-            @prng = MersenneTwister19937.new(:mt19937, key)
-            @block_size = 4
-          when :mt19937_64_keystream
-            raise 'For the MT19937-64 keystream, use a 32-bit integer key' unless key.is_a? Integer
-            raise 'For the MT19937-64 keystream, use a 32-bit integer key' unless key % 2**32 == key
+          mode_string = mode.to_s
 
-            @prng = MersenneTwister19937.new(:mt19937_64, key) # rubocop:disable Naming/VariableNumber
-            @block_size = 8
-          end
+          @block_size, @bit_length = mode_string.include?('64') ? [8, 64] : [4, 32]
+
+          raise "For the MT19937 XOR cipher, use a #{@bit_length}-bit integer key" unless key.is_a? Integer
+          raise "For the MT19937 XOR cipher, use a #{@bit_length}-bit integer key" unless key % 2**@bit_length == key
+
+          mode = mode_string.chomp('_block').chomp('_stream')
+          @prng = MersenneTwister19937.new(mode.to_sym, key)
+
+          return unless mode_string.include?('stream')
+
+          @key_stream = PRNGByteStream.new(@prng, @block_size)
         end
 
         def encrypt(clear_text, _ = nil)
@@ -45,21 +69,21 @@ module Jason
           cipher(cipher_text, @key)
         end
 
-        def encrypt_mt19937_keystream(clear_text)
+        def encrypt_mt19937_block(clear_text)
           padded_clear_text = PKCS7.pad(clear_text, @block_size)
 
           Cipher.split_into_blocks(padded_clear_text, @block_size).map do |block|
             integer_mask = @prng.extract_number
-            mask = Utility.integer_to_byte_string(integer_mask)
+            mask = Utility.integer_to_byte_string(integer_mask).rjust("\x00", @block_size)
             cipher(block, mask)
           end.join
         end
-        alias encrypt_mt19937_64_keystream encrypt_mt19937_keystream
+        alias encrypt_mt19937_64_block encrypt_mt19937_block
 
-        def decrypt_mt19937_keystream(cipher_text, strip_padding: true)
+        def decrypt_mt19937_block(cipher_text, strip_padding: true)
           clear_text = Cipher.split_into_blocks(cipher_text, @block_size).map do |block|
             integer_mask = @prng.extract_number
-            mask = Utility.integer_to_byte_string(integer_mask)
+            mask = Utility.integer_to_byte_string(integer_mask).rjust("\x00", @block_size)
             cipher(block, mask)
           end.join
 
@@ -69,9 +93,23 @@ module Jason
             clear_text
           end
         end
-        alias decrypt_mt19937_64_keystream decrypt_mt19937_keystream
+        alias decrypt_mt19937_64_block decrypt_mt19937_block
 
-        def self.break_cipher( # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+        def encrypt_mt19937_stream(clear_text)
+          clear_text.chars.map do |char|
+            cipher(char, @key_stream.take_byte)
+          end.join
+        end
+        alias encrypt_mt19937_64_stream encrypt_mt19937_stream
+
+        def decrypt_mt19937_stream(cipher_text)
+          cipher_text.chars.map do |char|
+            cipher(char, @key_stream.take_byte)
+          end.join
+        end
+        alias decrypt_mt19937_64_stream decrypt_mt19937_stream
+
+        def self.break_repeated_key( # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
           cipher_text,
           key_length_range,
           chunks_to_scan = 4,

@@ -13,7 +13,7 @@ RSpec.describe Jason::Math::Cryptography::ExclusiveOrCipher do
   end
 
   context '#break_cipher' do
-    subject { described_class.break_cipher(cipher_text, key_length_range) }
+    subject { described_class.break_repeated_key(cipher_text, key_length_range) }
 
     context 'cryptopals example' do
       let(:cipher_text) do
