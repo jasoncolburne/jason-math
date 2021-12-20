@@ -5,17 +5,17 @@ require 'rb_heap'
 module Jason
   module Math
     module GraphTheory
+      # A mathematical graph (the structure, not diagrams)
       class Graph
         def initialize(vertices)
           @vertices = vertices
           @graph = Hash.new { |h, k| h[k] = [] }
         end
 
-        def add_edge(origin, destination, weight = 1, validate = false)
-          raise "unexpected vertices (#{origin}, #{destination})!" if validate && ![origin,
-                                                                                    destination].all? do |vertex|
-                                                                        @vertices.include?(vertex)
-                                                                      end
+        def add_edge(origin, destination, weight = 1, validate: false)
+          if validate && ![origin, destination].all? { |vertex| @vertices.include?(vertex) }
+            raise "unexpected vertices (#{origin}, #{destination})!"
+          end
 
           @graph[origin] << { vertex: destination, weight: weight }
         end

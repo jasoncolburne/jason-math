@@ -3,6 +3,7 @@
 module Jason
   module Math
     module Utility
+      # A crude progress tracker/estimator
       class CompletionEstimator
         def initialize
           @then = Time.now

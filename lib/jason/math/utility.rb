@@ -8,7 +8,8 @@ require 'jason/math/utility/language_detector'
 
 module Jason
   module Math
-    module Utility
+    # Routines that didn't fit neatly in another area
+    module Utility # rubocop:disable Metrics/ModuleLength
       def self.binary_search(array, value)
         l = 0
         r = array.count - 1
@@ -29,7 +30,7 @@ module Jason
       end
 
       # do not set dimension when calling - used recursively
-      def self.neighbouring_cells(cell, dimension = nil)
+      def self.neighbouring_cells(cell, dimension = nil) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
         return [] if cell.empty?
 
         # we'll cache each dimension's method as we derive it
@@ -54,7 +55,7 @@ module Jason
           @neighbouring_cells_methods[d] = string.chomp + ".flatten(#{d - 1}).compact\n" if dimension.nil?
         end
 
-        dimension.nil? ? eval(@neighbouring_cells_methods[d]) : string
+        dimension.nil? ? eval(@neighbouring_cells_methods[d]) : string # rubocop:disable Security/Eval
       end
 
       def self.adjacent_cells(cell)

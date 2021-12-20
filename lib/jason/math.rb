@@ -62,11 +62,11 @@ module Math # rubocop:disable Metrics/ModuleLength
     Jason::Math::Combinatorics.double_factorial(n)
   end
 
-  def self.nPk(n, k)
+  def self.nPk(n, k) # rubocop:disable Naming/MethodName
     Jason::Math::Combinatorics.nPk(n, k)
   end
 
-  def self.nCk(n, k)
+  def self.nCk(n, k) # rubocop:disable Naming/MethodName
     Jason::Math::Combinatorics.nCk(n, k)
   end
 
@@ -107,8 +107,8 @@ module Math # rubocop:disable Metrics/ModuleLength
     Jason::Math::NumberTheory.proper_divisors(n)
   end
 
-  def self.enumerate_divisors(n, proper = false)
-    Jason::Math::NumberTheory.enumerate_divisors(n, proper)
+  def self.enumerate_divisors(n, proper: false)
+    Jason::Math::NumberTheory.enumerate_divisors(n, proper: proper)
   end
 
   def self.perfect?(n)
@@ -199,8 +199,8 @@ module Math # rubocop:disable Metrics/ModuleLength
     Jason::Math::NumberTheory.co_prime?(numbers)
   end
 
-  def self.chinese_remainder_theorem(values_by_moduli, enforce_co_primality = true)
-    Jason::Math::NumberTheory.chinese_remainder_theorem(values_by_moduli, enforce_co_primality)
+  def self.chinese_remainder_theorem(values_by_moduli, enforce_co_primality: true)
+    Jason::Math::NumberTheory.chinese_remainder_theorem(values_by_moduli, enforce_co_primality: enforce_co_primality)
   end
 
   def self.polygonal_number(n, offset)
@@ -274,7 +274,7 @@ class Integer
   end
 
   def enumerate_divisors(proper: false)
-    Math.enumerate_divisors(self, proper)
+    Math.enumerate_divisors(self, proper: proper)
   end
 
   def enumerate_partitions
@@ -463,7 +463,7 @@ end
 # Enhancing Hash
 class Hash
   def chinese_remainder_theorem(enforce_co_primality: true)
-    Math.chinese_remainder_theorem(self, enforce_co_primality)
+    Math.chinese_remainder_theorem(self, enforce_co_primality: enforce_co_primality)
   end
 end
 

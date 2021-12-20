@@ -2,6 +2,7 @@
 
 module Jason
   module Math
+    # Algebra
     module Algebra
       def self.solve_quadratic(a, b, c)
         # we don't need to do anything special with the discriminant because

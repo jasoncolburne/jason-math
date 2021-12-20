@@ -6,6 +6,7 @@ module Jason
       module EllipticCurve
         # port of https://gist.github.com/bellbind/1414867/04ccbaa3fe97304d3d9d91c36520a662f2e28a45
 
+        # A couple math routines used by ECC
         module Math
           def inverse(x, n)
             NumberTheory.modular_inverse(x, n)
@@ -25,6 +26,7 @@ module Jason
           end
         end
 
+        # A point on an elliptic curve
         class Point
           attr_reader :x, :y
 
@@ -54,6 +56,7 @@ module Jason
           end
         end
 
+        # An elliptic curve
         class Curve
           include Math
 
@@ -134,6 +137,7 @@ module Jason
           end
         end
 
+        # Each algorithm shares this code
         class AlgorithmBase
           def initialize(curve, generator, order = nil)
             raise 'Invalid generator specified' unless curve.valid?(generator)
@@ -150,6 +154,7 @@ module Jason
           end
         end
 
+        # ECDSA
         class DigitalSignatureAlgorithm < AlgorithmBase
           include Math
 
@@ -173,6 +178,7 @@ module Jason
           end
         end
 
+        # ECDH
         class DiffieHellman < AlgorithmBase
           # my private_key
           # partner public_key
@@ -184,6 +190,7 @@ module Jason
           end
         end
 
+        # ElGamal on ECC
         class ElGamal < AlgorithmBase
           # plaintext is a point on the curve
           def encrypt(plaintext, public_key, entropy)

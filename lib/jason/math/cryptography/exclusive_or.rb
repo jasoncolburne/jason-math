@@ -3,6 +3,7 @@
 module Jason
   module Math
     module Cryptography
+      # A very simple cipher
       module ExclusiveOr
         def self.cipher(data, key)
           key_characters = key.chars
@@ -13,22 +14,29 @@ module Jason
           end.join
         end
 
-        def self.break_cipher(cipher_text, key_length_range, chunks_to_scan = 4, keys_to_derive = 3, language = :english)
+        def self.break_cipher( # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+          cipher_text,
+          key_length_range,
+          chunks_to_scan = 4,
+          keys_to_derive = 3,
+          language = :english
+        )
           normalized_hamming_distances_by_key_length = key_length_range.map do |key_length|
             if key_length * 4 > cipher_text.length
               raise 'Key length too long to compute hamming distance of cipher text'
             end
 
             distances = (0..(chunks_to_scan - 1)).map do |i|
-              Cryptography.hamming_distance(cipher_text[(key_length * i)..(key_length * (i + 1) - 1)],
-                                            cipher_text[(key_length * (i + 1))..(key_length * (i + 2) - 1)]).to_f / key_length
+              range_a = (key_length * i)..(key_length * (i + 1) - 1)
+              range_b = (key_length * (i + 1))..(key_length * (i + 2) - 1)
+              Cryptography.hamming_distance(cipher_text[range_a], cipher_text[range_b]).to_f / key_length
             end
+
             distances.sum.to_f / distances.count
           end.zip(key_length_range)
 
-          lengths_to_try = normalized_hamming_distances_by_key_length.sort_by do |distance, _length|
-                             distance
-                           end.first(keys_to_derive).map { |_distance, length| length }
+          lengths_to_try = normalized_hamming_distances_by_key_length.sort_by { |distance, _length| distance }
+          lengths_to_try = lengths_to_try.first(keys_to_derive).map { |_distance, length| length }
           keys_by_distance = lengths_to_try.map do |key_length|
             distances = []
 

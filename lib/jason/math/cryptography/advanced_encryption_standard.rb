@@ -5,7 +5,9 @@ require 'openssl'
 module Jason
   module Math
     module Cryptography
-      class AdvancedEncryptionStandard
+      # Rijndael's algorithm
+      class AdvancedEncryptionStandard # rubocop:disable Metrics/ClassLength
+        # rubocop:disable Naming/VariableNumber
         MODE_DETAILS = {
           cbc_128: {
             mode: :cbc,
@@ -113,6 +115,7 @@ module Jason
             openssl_algorithm: 'aes-256-ofb'
           }.freeze
         }.freeze
+        # rubocop:enable Naming/VariableNumber
 
         R_CON = [
           0,
@@ -166,7 +169,7 @@ module Jason
           0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
         ].freeze
 
-        def initialize(mode, key, use_openssl = false)
+        def initialize(mode, key, use_openssl: false)
           mode_details = MODE_DETAILS[mode]
 
           @use_openssl = use_openssl
@@ -188,10 +191,10 @@ module Jason
           send("encrypt_#{@mode}".to_sym, clear_text, initialization_vector)
         end
 
-        def decrypt(cipher_text, initialization_vector = nil, strip_padding = true)
+        def decrypt(cipher_text, initialization_vector = nil, strip_padding: true)
           return decrypt_openssl(cipher_text, initialization_vector) if @use_openssl
 
-          send("decrypt_#{@mode}".to_sym, cipher_text, initialization_vector, strip_padding)
+          send("decrypt_#{@mode}".to_sym, cipher_text, initialization_vector, strip_padding: strip_padding)
         end
 
         def generate_nonce
@@ -243,7 +246,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_ecb(cipher_text, _initialization_vector = nil, strip_padding = true)
+        def decrypt_ecb(cipher_text, _initialization_vector = nil, strip_padding: true)
           length = cipher_text.length
 
           raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % 16).zero?
@@ -281,7 +284,7 @@ module Jason
           cipher_text
         end
 
-        def decrypt_cbc(cipher_text, initialization_vector, strip_padding = true)
+        def decrypt_cbc(cipher_text, initialization_vector, strip_padding: true)
           length = cipher_text.length
 
           raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % 16).zero?
@@ -411,7 +414,7 @@ module Jason
 
         def cipher(clear_text)
           if clear_text.length != 16
-            raise "Block ciphers cipher blocks with strict sizes (16 bytes for typical AES - received #{clear_text.length})"
+            raise "Block ciphers use strict sizes (16 bytes for typical AES - received #{clear_text.length})"
           end
 
           state = add_round_key(clear_text, @key_schedule[0..15])

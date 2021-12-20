@@ -2,6 +2,7 @@
 
 module Jason
   module Math
+    # Combinartorics routines
     module Combinatorics
       def self.factorial(n)
         return 1 if n.zero?
@@ -23,11 +24,11 @@ module Jason
         current
       end
 
-      def self.nCk(n, k)
+      def self.nCk(n, k) # rubocop:disable Naming/MethodName
         nPk(n, k) / factorial(k)
       end
 
-      def self.nPk(n, k)
+      def self.nPk(n, k) # rubocop:disable Naming/MethodName
         factorial(n) / factorial(n - k)
       end
 

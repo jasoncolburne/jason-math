@@ -3,6 +3,7 @@
 module Jason
   module Math
     module Utility
+      # https://en.wikipedia.org/wiki/Disjoint-set_data_structure
       class DisjointSet
         def initialize(elements)
           @parents_by_children = {}
