@@ -101,7 +101,7 @@ module Jason
         end
         alias encrypt_mt19937_64_stream encrypt_mt19937_stream
 
-        def decrypt_mt19937_stream(cipher_text)
+        def decrypt_mt19937_stream(cipher_text, strip_padding: false) # rubocop:disable Lint/UnusedMethodArgument
           cipher_text.chars.map do |char|
             cipher(char, @key_stream.take_byte)
           end.join
