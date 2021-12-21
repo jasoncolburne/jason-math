@@ -5,28 +5,6 @@ module Jason
     module Cryptography
       # A very simple cipher
       class ExclusiveOrCipher
-        # A generic bytestream constructed atop a PRNG
-        class PRNGByteStream
-          def initialize(prng, bytes_per_number)
-            @byte_stream = Enumerator.new do |yielder|
-              loop do
-                bytes = Utility.integer_to_byte_string(prng.extract_number).rjust(bytes_per_number, "\x00")
-                bytes.each_char do |char|
-                  yielder << char
-                end
-              end
-            end
-          end
-
-          def take_byte
-            take_bytes
-          end
-
-          def take_bytes(count = 1)
-            @byte_stream.take(count).join
-          end
-        end
-
         MODES = %i[repeated_key mt19937_block mt19937_64_block mt19937_stream mt19937_64_stream].freeze
 
         def initialize(mode, key, use_openssl: false) # rubocop:disable Lint/UnusedMethodArgument
