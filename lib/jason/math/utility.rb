@@ -156,6 +156,17 @@ module Jason
           sum + byte * (INT32_MAX**index)
         end
       end
+
+      def self.longest_common_substring(strings)
+        shortest = strings.min_by(&:length)
+        max_length = shortest.length
+        max_length.downto(0) do |length|
+          0.upto(max_length - length) do |start|
+            substring = shortest[start, length]
+            return substring if strings.all? { |s| s.include?(substring) }
+          end
+        end
+      end
     end
   end
 end
