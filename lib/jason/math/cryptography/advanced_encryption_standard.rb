@@ -7,6 +7,8 @@ module Jason
     module Cryptography
       # Rijndael's algorithm
       class AdvancedEncryptionStandard # rubocop:disable Metrics/ClassLength
+        attr_accessor :initialization_vector
+
         # rubocop:disable Naming/VariableNumber
         MODE_DETAILS = {
           cbc_128: {
@@ -181,24 +183,27 @@ module Jason
             @bits = mode_details[:bits]
             @rounds = mode_details[:rounds]
             @key_size = mode_details[:key_size]
+            @block_size = 16 # bytes
+            @initialization_vector = "\x00" * @block_size
+            @counter_limit = 2**(@block_size * 8)
             @key_schedule = expand_key(key)
           end
         end
 
-        def encrypt(clear_text, initialization_vector = nil)
-          return encrypt_openssl(clear_text, initialization_vector) if @use_openssl
+        def encrypt(clear_text)
+          return encrypt_openssl(clear_text) if @use_openssl
 
-          send("encrypt_#{@mode}".to_sym, clear_text, initialization_vector)
+          send("encrypt_#{@mode}".to_sym, clear_text)
         end
 
-        def decrypt(cipher_text, initialization_vector = nil, strip_padding: true)
-          return decrypt_openssl(cipher_text, initialization_vector) if @use_openssl
+        def decrypt(cipher_text, strip_padding: true)
+          return decrypt_openssl(cipher_text) if @use_openssl
 
-          send("decrypt_#{@mode}".to_sym, cipher_text, initialization_vector, strip_padding: strip_padding)
+          send("decrypt_#{@mode}".to_sym, cipher_text, strip_padding: strip_padding)
         end
 
-        def generate_nonce
-          Utility.and("\u007F#{"\xff" * 15}", SecureRandom.bytes(16))
+        def generate_nonce(length = 16)
+          Utility.and("\x7f#{"\xff" * (length - 1)}", SecureRandom.bytes(length))
         end
 
         def self.generate_key(mode)
@@ -232,34 +237,39 @@ module Jason
 
         # Electronic CodeBook (ECB)
 
-        def encrypt_ecb(clear_text, _initialization_vector = nil)
+        def encrypt_ecb(clear_text)
           length = clear_text.length
-          iterations = length / 16 + 1
+          iterations = length / @block_size + 1
           cipher_text = ''.b
 
           iterations.times do |i|
-            to_cipher = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : ''.b
-            to_cipher = PKCS7.pad_block(to_cipher, 16)
+            to_cipher = if i * @block_size < length
+                          clear_text[(i * @block_size)..[(i + 1) * @block_size - 1,
+                                                         length - 1].min]
+                        else
+                          ''.b
+                        end
+            to_cipher = PKCS7.pad_block(to_cipher, @block_size)
             cipher_text << cipher(to_cipher)
           end
 
           cipher_text
         end
 
-        def decrypt_ecb(cipher_text, _initialization_vector = nil, strip_padding: true)
+        def decrypt_ecb(cipher_text, strip_padding: true)
           length = cipher_text.length
 
-          raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % 16).zero?
+          raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % @block_size).zero?
 
-          iterations = length / 16
+          iterations = length / @block_size
           clear_text = ''.b
 
           iterations.times do |i|
-            clear_text << decipher(cipher_text[(i * 16)..((i + 1) * 16 - 1)])
+            clear_text << decipher(cipher_text[(i * @block_size)..((i + 1) * @block_size - 1)])
           end
 
           if strip_padding
-            PKCS7.strip(clear_text, 16)
+            PKCS7.strip(clear_text, @block_size)
           else
             clear_text
           end
@@ -267,40 +277,43 @@ module Jason
 
         # Cipher Block Chaining (CBC)
 
-        def encrypt_cbc(clear_text, initialization_vector)
+        def encrypt_cbc(clear_text)
           length = clear_text.length
-          iterations = length / 16 + 1
+          iterations = length / @block_size + 1
           cipher_text = ''.b
-          last_block = initialization_vector
 
           iterations.times do |i|
-            to_xor = i * 16 < length ? clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min] : ''.b
-            to_xor = PKCS7.pad_block(to_xor, 16)
-            to_cipher = Utility.xor(to_xor, last_block)
-            last_block = cipher(to_cipher)
-            cipher_text << last_block
+            to_xor = if i * @block_size < length
+                       clear_text[(i * @block_size)..[(i + 1) * @block_size - 1,
+                                                      length - 1].min]
+                     else
+                       ''.b
+                     end
+            to_xor = PKCS7.pad_block(to_xor, @block_size)
+            to_cipher = Utility.xor(to_xor, @initialization_vector)
+            @initialization_vector = cipher(to_cipher)
+            cipher_text << @initialization_vector
           end
 
           cipher_text
         end
 
-        def decrypt_cbc(cipher_text, initialization_vector, strip_padding: true)
+        def decrypt_cbc(cipher_text, strip_padding: true)
           length = cipher_text.length
 
-          raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % 16).zero?
+          raise 'Invalid cipher text length (must be a multiple of block size)' unless (length % @block_size).zero?
 
-          iterations = length / 16
+          iterations = length / @block_size
           clear_text = ''.b
-          last_block = initialization_vector
 
           iterations.times do |i|
-            current_block = cipher_text[(i * 16)..((i + 1) * 16 - 1)]
-            clear_text << Utility.xor(decipher(current_block), last_block)
-            last_block = current_block
+            current_block = cipher_text[(i * @block_size)..((i + 1) * @block_size - 1)]
+            clear_text << Utility.xor(decipher(current_block), @initialization_vector)
+            @initialization_vector = current_block
           end
 
           if strip_padding
-            PKCS7.strip(clear_text, 16)
+            PKCS7.strip(clear_text, @block_size)
           else
             clear_text
           end
@@ -308,32 +321,30 @@ module Jason
 
         # Cipher Feedback (CFB)
 
-        def encrypt_cfb(clear_text, initialization_vector)
+        def encrypt_cfb(clear_text)
           length = clear_text.length
-          iterations = (length.to_f / 16).ceil
+          iterations = (length.to_f / @block_size).ceil
           cipher_text = ''.b
-          last_block = initialization_vector
 
           iterations.times do |i|
-            ciphered_block = cipher(last_block)
-            to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            last_block = Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
-            cipher_text << last_block
+            ciphered_block = cipher(@initialization_vector)
+            to_xor = clear_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
+            @initialization_vector = Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+            cipher_text << @initialization_vector
           end
 
           cipher_text
         end
 
-        def decrypt_cfb(cipher_text, initialization_vector, _ = nil)
+        def decrypt_cfb(cipher_text, _ = nil)
           length = cipher_text.length
-          iterations = (length.to_f / 16).ceil
+          iterations = (length.to_f / @block_size).ceil
           clear_text = ''.b
-          last_block = initialization_vector
 
           iterations.times do |i|
-            ciphered_block = cipher(last_block)
-            last_block = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            clear_text << Utility.xor(ciphered_block[0..(last_block.length - 1)], last_block)
+            ciphered_block = cipher(@initialization_vector)
+            @initialization_vector = cipher_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
+            clear_text << Utility.xor(ciphered_block[0..(@initialization_vector.length - 1)], @initialization_vector)
           end
 
           clear_text
@@ -341,31 +352,29 @@ module Jason
 
         # Output Feedback (OFB)
 
-        def encrypt_ofb(clear_text, initialization_vector)
+        def encrypt_ofb(clear_text)
           length = clear_text.length
-          iterations = (length.to_f / 16).ceil
+          iterations = (length.to_f / @block_size).ceil
           cipher_text = ''.b
-          last_block = initialization_vector
 
           iterations.times do |i|
-            last_block = cipher(last_block)
-            to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            cipher_text << Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
+            @initialization_vector = cipher(@initialization_vector)
+            to_xor = clear_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
+            cipher_text << Utility.xor(@initialization_vector[0..(to_xor.length - 1)], to_xor)
           end
 
           cipher_text
         end
 
-        def decrypt_ofb(cipher_text, initialization_vector, _ = nil)
+        def decrypt_ofb(cipher_text, _ = nil)
           length = cipher_text.length
-          iterations = (length.to_f / 16).ceil
+          iterations = (length.to_f / @block_size).ceil
           clear_text = ''.b
-          last_block = initialization_vector
 
           iterations.times do |i|
-            last_block = cipher(last_block)
-            to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
-            clear_text << Utility.xor(last_block[0..(to_xor.length - 1)], to_xor)
+            @initialization_vector = cipher(@initialization_vector)
+            to_xor = cipher_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
+            clear_text << Utility.xor(@initialization_vector[0..(to_xor.length - 1)], to_xor)
           end
 
           clear_text
@@ -373,38 +382,31 @@ module Jason
 
         # Counter (CTR)
 
-        def encrypt_ctr(clear_text, nonce)
+        def encrypt_ctr(clear_text)
           length = clear_text.length
-          iterations = (length.to_f / 16).ceil
+          iterations = (length.to_f / @block_size).ceil
           cipher_text = ''.b
-          offset = 0
 
           iterations.times do |i|
-            to_cipher = nonce + [offset].pack('Q<*')
-            ciphered_block = cipher(to_cipher)
-            to_xor = clear_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            ciphered_block = cipher(@initialization_vector)
+            to_xor = clear_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
             cipher_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
-            offset += 1
+            increment_initialization_vector
           end
 
           cipher_text
         end
 
-        def decrypt_ctr(cipher_text, nonce, _ = nil)
-          decrypt_ctr_with_offset(cipher_text, nonce)
-        end
-
-        def decrypt_ctr_with_offset(cipher_text, nonce, offset = 0)
+        def decrypt_ctr(cipher_text, _ = nil)
           length = cipher_text.length
-          iterations = (length.to_f / 16).ceil
+          iterations = (length.to_f / @block_size).ceil
           clear_text = ''.b
 
           iterations.times do |i|
-            to_cipher = nonce + [offset].pack('Q<*')
-            ciphered_block = cipher(to_cipher)
-            to_xor = cipher_text[(i * 16)..[(i + 1) * 16 - 1, length - 1].min]
+            ciphered_block = cipher(@initialization_vector)
+            to_xor = cipher_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
             clear_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
-            offset += 1
+            increment_initialization_vector
           end
 
           clear_text
@@ -413,7 +415,7 @@ module Jason
         # Core Routines
 
         def cipher(clear_text)
-          if clear_text.length != 16
+          if clear_text.length != @block_size
             raise "Block ciphers use strict sizes (16 bytes for typical AES - received #{clear_text.length})"
           end
 
@@ -423,23 +425,23 @@ module Jason
             state = sub_bytes(state)
             state = shift_rows(state)
             state = mix_columns(state)
-            state = add_round_key(state, @key_schedule[(round * 16)..((round + 1) * 16 - 1)])
+            state = add_round_key(state, @key_schedule[(round * @block_size)..((round + 1) * @block_size - 1)])
           end
 
           state = sub_bytes(state)
           state = shift_rows(state)
-          add_round_key(state, @key_schedule[(@rounds * 16)..((@rounds + 1) * 16 - 1)])
+          add_round_key(state, @key_schedule[(@rounds * @block_size)..((@rounds + 1) * @block_size - 1)])
         end
 
         def decipher(cipher_text)
-          raise 'Block ciphers cipher blocks with strict sizes (16 bytes for AES)' if cipher_text.length != 16
+          raise 'Block ciphers cipher blocks with strict sizes (16 bytes for AES)' if cipher_text.length != @block_size
 
-          state = add_round_key(cipher_text, @key_schedule[(@rounds * 16)..((@rounds + 1) * 16 - 1)])
+          state = add_round_key(cipher_text, @key_schedule[(@rounds * @block_size)..((@rounds + 1) * @block_size - 1)])
 
           (@rounds - 1).downto(1) do |round|
             state = inverse_shift_rows(state)
             state = inverse_sub_bytes(state)
-            state = add_round_key(state, @key_schedule[(round * 16)..((round + 1) * 16 - 1)])
+            state = add_round_key(state, @key_schedule[(round * @block_size)..((round + 1) * @block_size - 1)])
             state = inverse_mix_columns(state)
           end
 
@@ -562,22 +564,28 @@ module Jason
           sub_bytes_core(bytes, INVERSE_S_BOX)
         end
 
-        def decrypt_openssl(cipher_text, initialization_vector)
+        def decrypt_openssl(cipher_text)
           cipher = OpenSSL::Cipher.new(@openssl_algorithm)
           cipher.decrypt
           cipher.key = @key
-          cipher.iv = initialization_vector unless initialization_vector.nil?
+          cipher.iv = @initialization_vector unless @initialization_vector.nil?
           clear_text = cipher.update(cipher_text)
           clear_text + cipher.final
         end
 
-        def encrypt_openssl(clear_text, initialization_vector)
+        def encrypt_openssl(clear_text)
           cipher = OpenSSL::Cipher.new(@openssl_algorithm)
           cipher.encrypt
           cipher.key = @key
-          cipher.iv = initialization_vector unless initialization_vector.nil?
+          cipher.iv = @initialization_vector unless @initialization_vector.nil?
           clear_text = cipher.update(clear_text)
           clear_text + cipher.final
+        end
+
+        def increment_initialization_vector
+          @initialization_vector = Utility.integer_to_byte_string(
+            ((Utility.byte_string_to_integer(@initialization_vector) + 1) % @counter_limit)
+          ).rjust(@block_size, "\x00")
         end
       end
     end
