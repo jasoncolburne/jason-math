@@ -37,12 +37,16 @@ module Jason
           @cipher = details[:class].new(details[:mode], key, use_openssl: use_openssl)
         end
 
-        def encrypt(clear_text, initialization_vector = nil)
-          @cipher.encrypt(clear_text, initialization_vector)
+        def initialization_vector=(initialization_vector)
+          @cipher.initialization_vector = initialization_vector
         end
 
-        def decrypt(cipher_text, initialization_vector = nil, strip_padding: true)
-          @cipher.decrypt(cipher_text, initialization_vector, strip_padding: strip_padding)
+        def encrypt(clear_text)
+          @cipher.encrypt(clear_text)
+        end
+
+        def decrypt(cipher_text, strip_padding: true)
+          @cipher.decrypt(cipher_text, strip_padding: strip_padding)
         end
 
         def generate_nonce
@@ -63,12 +67,12 @@ module Jason
           end
         end
 
-        def self.block_size(encryptor, maximum_block_size = 128)
-          current_length = encryptor.encrypt('A'.b).length
+        def self.block_size(cryptor, maximum_block_size = 128)
+          current_length = cryptor.encrypt('A'.b).length
 
           (2..(maximum_block_size + 1)).each do |i|
             previous_length = current_length
-            current_length = encryptor.encrypt('A'.b * i).length
+            current_length = cryptor.encrypt('A'.b * i).length
             return current_length - previous_length if current_length != previous_length
           end
 
@@ -85,23 +89,23 @@ module Jason
           blocks.size != blocks.to_set.size
         end
 
-        def self.count_clear_text_extra_bytes(encryptor, block_size)
-          current_length = encryptor.encrypt('').size
+        def self.count_clear_text_extra_bytes(cryptor, block_size)
+          current_length = cryptor.encrypt('').size
           (1..block_size).each do |i|
             previous_length = current_length
-            current_length = encryptor.encrypt('A'.b * i).size
+            current_length = cryptor.encrypt('A'.b * i).size
             return previous_length - i if current_length != previous_length
           end
 
           raise 'Could not count clear text extra bytes'
         end
 
-        def self.count_clear_text_prefix_bytes(encryptor, block_size)
-          current_blocks = split_into_blocks(encryptor.encrypt(''), block_size)
+        def self.count_clear_text_prefix_bytes(cryptor, block_size)
+          current_blocks = split_into_blocks(cryptor.encrypt(''), block_size)
           first_difference = nil
           (1..(block_size + 1)).each do |i|
             previous_blocks = current_blocks
-            current_blocks = split_into_blocks(encryptor.encrypt('A'.b * i), block_size)
+            current_blocks = split_into_blocks(cryptor.encrypt('A'.b * i), block_size)
             changed = false
             previous_blocks.each_with_index do |block, index|
               next unless block != current_blocks[index]
