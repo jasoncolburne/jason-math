@@ -100,15 +100,19 @@ module Jason
           raise 'Could not count clear text extra bytes'
         end
 
-        def self.count_clear_text_prefix_bytes(cryptor, block_size)
-          current_blocks = split_into_blocks(cryptor.encrypt(''), block_size)
+        def self.count_clear_text_prefix_bytes(cryptor, block_size) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity
+          j_blocks = split_into_blocks(cryptor.encrypt(''), block_size)
+          c_blocks = split_into_blocks(cryptor.encrypt(''), block_size)
           first_difference = nil
           (1..(block_size + 1)).each do |i|
-            previous_blocks = current_blocks
-            current_blocks = split_into_blocks(cryptor.encrypt('A'.b * i), block_size)
+            previous_j_blocks = j_blocks
+            previous_c_blocks = c_blocks
+            range = 0..(j_blocks.length - 1)
+            j_blocks = split_into_blocks(cryptor.encrypt('j'.b * i), block_size)
+            c_blocks = split_into_blocks(cryptor.encrypt('c'.b * i), block_size)
             changed = false
-            previous_blocks.each_with_index do |block, index|
-              next unless block != current_blocks[index]
+            range.each do |index|
+              next unless j_blocks[index] != previous_j_blocks[index] || c_blocks[index] != previous_c_blocks[index]
 
               if first_difference.nil?
                 first_difference = index
