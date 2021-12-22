@@ -51,6 +51,29 @@ module Jason
           }.freeze
         }.freeze
 
+        def self.ordered_search_space(language = :english)
+          frequencies = LETTER_FREQUENCIES[language].dup
+          punctuation_frequencies = PUNCTUATION_FREQUENCIES[language]
+          frequencies.merge!(punctuation_frequencies)
+
+          search_space = [' ']
+          search_space += frequencies.sort_by { |_symbol, frequency| frequency }.reverse.map do |symbol, _frequency|
+            symbol.to_s.downcase
+          end
+
+          search_space += search_space.map(&:upcase)
+          search_space.uniq!
+
+          search_space += ('0'..'9').to_a
+
+          (0..255).each do |byte|
+            character = byte.chr
+            search_space << character unless search_space.include?(character)
+          end
+
+          search_space
+        end
+
         def self.distance(text, language = :english)
           result = 0.0
 
