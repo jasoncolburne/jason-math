@@ -56,7 +56,7 @@ module Jason
           punctuation_frequencies = PUNCTUATION_FREQUENCIES[language]
           frequencies.merge!(punctuation_frequencies)
 
-          search_space = [' ']
+          search_space = [' ', "\n"]
           search_space += frequencies.sort_by { |_symbol, frequency| frequency }.reverse.map do |symbol, _frequency|
             symbol.to_s.downcase
           end
