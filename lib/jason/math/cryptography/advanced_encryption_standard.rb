@@ -7,7 +7,7 @@ module Jason
     module Cryptography
       # Rijndael's algorithm
       class AdvancedEncryptionStandard # rubocop:disable Metrics/ClassLength
-        attr_accessor :initialization_vector
+        attr_writer :initialization_vector
 
         # rubocop:disable Naming/VariableNumber
         MODE_DETAILS = {
