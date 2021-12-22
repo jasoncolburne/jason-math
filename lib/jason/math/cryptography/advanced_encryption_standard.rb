@@ -210,6 +210,12 @@ module Jason
           SecureRandom.bytes(4 * MODE_DETAILS[mode][:key_size])
         end
 
+        def increment_initialization_vector(offset = 1)
+          @initialization_vector = Utility.integer_to_byte_string(
+            ((Utility.byte_string_to_integer(@initialization_vector) + offset) % @counter_limit)
+          ).rjust(@block_size, "\x00")
+        end
+
         private
 
         def expand_key(key)
@@ -582,12 +588,6 @@ module Jason
           cipher.iv = @initialization_vector unless @initialization_vector.nil?
           clear_text = cipher.update(clear_text)
           clear_text + cipher.final
-        end
-
-        def increment_initialization_vector
-          @initialization_vector = Utility.integer_to_byte_string(
-            ((Utility.byte_string_to_integer(@initialization_vector) + 1) % @counter_limit)
-          ).rjust(@block_size, "\x00")
         end
       end
     end
