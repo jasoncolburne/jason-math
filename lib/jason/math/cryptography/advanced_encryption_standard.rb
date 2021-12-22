@@ -434,7 +434,9 @@ module Jason
         end
 
         def decipher(cipher_text)
-          raise 'Block ciphers cipher blocks with strict sizes (16 bytes for AES)' if cipher_text.length != @block_size
+          if cipher_text.length != @block_size
+            raise "Block ciphers use strict sizes (16 bytes for typical AES - received #{cipher_text.length})"
+          end
 
           state = add_round_key(cipher_text, @key_schedule[(@rounds * @block_size)..((@rounds + 1) * @block_size - 1)])
 
