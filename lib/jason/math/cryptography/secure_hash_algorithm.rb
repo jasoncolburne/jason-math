@@ -38,7 +38,7 @@ module Jason
         alias << update
 
         def finish
-          to_transform = Digest.merkle_damgard_pad(@to_transform, @cumulative_length)
+          to_transform = Digest.pad(@to_transform, @cumulative_length)
           blocks = Cipher.split_into_blocks(to_transform, 64)
           blocks.each { |block| transform(block) }
 
