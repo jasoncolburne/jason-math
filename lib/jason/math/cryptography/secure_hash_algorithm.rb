@@ -51,6 +51,10 @@ module Jason
           finish
         end
 
+        def state=(state)
+          @h0, @h1, @h2, @h3, @h4 = state
+        end
+
         private
 
         def reset
