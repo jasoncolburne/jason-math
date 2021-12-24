@@ -36,7 +36,7 @@ module Jason
         alias << update
 
         def finish
-          to_transform = pad(@to_transform)
+          to_transform = Digest.merkle_damgard_pad(@to_transform, @cumulative_length)
           blocks = Cipher.split_into_blocks(to_transform, 64)
           blocks.each { |block| transform(block) }
 
@@ -59,15 +59,6 @@ module Jason
 
           parameters = PARAMETERS[@algorithm]
           parameters.each_pair { |key, value| instance_variable_set("@#{key}", value) }
-        end
-
-        def pad(message)
-          padded_message = message + "\x80".b
-          overflow_length = (padded_message.length + 8) % 64
-          padding_length = (64 - overflow_length) % 64
-
-          padded_message += "\x00".b * padding_length
-          padded_message + [@cumulative_length << 3].pack('Q>*')
         end
 
         def transform(block) # rubocop:disable Metrics/MethodLength
