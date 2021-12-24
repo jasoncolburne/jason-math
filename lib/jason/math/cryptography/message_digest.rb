@@ -89,14 +89,12 @@ module Jason
           d = @d
 
           x = block.unpack('V16')
-          p [a, b, c, d].pack('V*').byte_string_to_hex
 
           [0, 4, 8, 12].each do |i|
             a = r(a + f(b, c, d) + x[i], 3)
             d = r(d + f(a, b, c) + x[i + 1], 7)
             c = r(c + f(d, a, b) + x[i + 2], 11)
             b = r(b + f(c, d, a) + x[i + 3], 19)
-            p [a, b, c, d].pack('V*').byte_string_to_hex
           end
 
           [0, 1, 2, 3].each do |i|
@@ -104,7 +102,6 @@ module Jason
             d = r(d + g(a, b, c) + x[i + 4] + 0x5a827999, 5)
             c = r(c + g(d, a, b) + x[i + 8] + 0x5a827999, 9)
             b = r(b + g(c, d, a) + x[i + 12] + 0x5a827999, 13)
-            p [a, b, c, d].pack('V*').byte_string_to_hex
           end
 
           [0, 2, 1, 3].each do |i|
@@ -112,7 +109,6 @@ module Jason
             d = r(d + h(a, b, c) + x[i + 8] + 0x6ed9eba1, 9)
             c = r(c + h(d, a, b) + x[i + 4] + 0x6ed9eba1, 11)
             b = r(b + h(c, d, a) + x[i + 12] + 0x6ed9eba1, 15)
-            p [a, b, c, d].pack('V*').byte_string_to_hex
           end
 
           @a = (@a + a) % @max_integer

@@ -7,7 +7,8 @@ module Jason
       class Digest
         # rubocop:disable Naming/VariableNumber
         ALGORITHMS = {
-          sha_1: { class: SecureHashAlgorithm, mode: :'1' }.freeze
+          sha_1: { class: SecureHashAlgorithm, mode: :'1' }.freeze,
+          md4: { class: MessageDigest, mode: :'4' }.freeze
         }.freeze
         # rubocop:enable Naming/VariableNumber
 
