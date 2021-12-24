@@ -30,6 +30,10 @@ module Jason
           @digest.update(message)
         end
 
+        def state=(state)
+          @digest.state = state
+        end
+
         def self.merkle_damgard_pad(message, length = nil, block_size = 64)
           padded_message = message + "\x80".b
           overflow_length = (padded_message.length + 8) % block_size
