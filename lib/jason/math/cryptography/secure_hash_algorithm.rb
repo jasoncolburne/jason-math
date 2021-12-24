@@ -5,6 +5,8 @@ module Jason
     module Cryptography
       # An abstraction of digests
       class SecureHashAlgorithm
+        attr_accessor :cumulative_length
+
         PARAMETERS = {
           '1': {
             h0: 0x67452301,
