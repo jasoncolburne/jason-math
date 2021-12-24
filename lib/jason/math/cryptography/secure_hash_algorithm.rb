@@ -3,17 +3,17 @@
 module Jason
   module Math
     module Cryptography
-      # An abstraction of digests
+      # SHA
       class SecureHashAlgorithm
         attr_accessor :cumulative_length
 
         PARAMETERS = {
           '1': {
             h0: 0x67452301,
-            h1: 0xEFCDAB89,
-            h2: 0x98BADCFE,
+            h1: 0xefcdab89,
+            h2: 0x98badcfe,
             h3: 0x10325476,
-            h4: 0xC3D2E1F0,
+            h4: 0xc3d2e1f0,
             max_integer: 2**32
           }.freeze
         }.freeze
@@ -38,7 +38,7 @@ module Jason
         alias << update
 
         def finish
-          to_transform = Digest.pad(@to_transform, @cumulative_length)
+          to_transform = Digest.pad(@to_transform, :network, @cumulative_length)
           blocks = Cipher.split_into_blocks(to_transform, 64)
           blocks.each { |block| transform(block) }
 
@@ -82,7 +82,7 @@ module Jason
           (0..79).each do |i|
             f, k = case i
                    when 0..19
-                     f = (b & c) | ((~b % 0x100000000) & d)
+                     f = (b & c) | ((~b % @max_integer) & d)
                      [f, 0x5a827999]
                    when 20..39
                      f = b ^ c ^ d

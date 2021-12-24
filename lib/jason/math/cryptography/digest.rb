@@ -38,13 +38,14 @@ module Jason
           @digest.cumulative_length = length
         end
 
-        def self.pad(message, length = nil, block_size = 64)
+        def self.pad(message, byte_order = :network, length = nil, block_size = 64)
           padded_message = message + "\x80".b
           overflow_length = (padded_message.length + 8) % block_size
           padding_length = (block_size - overflow_length) % block_size
 
           padded_message += "\x00".b * padding_length
-          padded_message + [(length || message.length) << 3].pack('Q>*')
+          packing_string = byte_order == :network ? 'Q>*' : 'Q<*'
+          padded_message + [(length || message.length) << 3].pack(packing_string)
         end
       end
     end
