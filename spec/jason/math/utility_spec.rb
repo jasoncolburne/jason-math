@@ -150,4 +150,62 @@ RSpec.describe Jason::Math::Utility do
       it { is_expected.to eq('746865206b696420646f6e277420706c6179'.hex_to_byte_string) }
     end
   end
+
+  context '#rotate_right' do
+    subject { described_class.rotate_right(value, count) }
+    let(:value) { 0x01234567 }
+
+    context 'completely (32 bits)' do
+      let(:count) { 32 }
+
+      it { is_expected.to eq(value) }
+    end
+
+    context 'halfway (16 bits)' do
+      let(:count) { 16 }
+
+      it { is_expected.to eq(0x45670123) }
+    end
+
+    context 'none (0 bits)' do
+      let(:count) { 0 }
+
+      it { is_expected.to eq(value) }
+    end
+
+    context '1 bit' do
+      let(:count) { 1 }
+
+      it { is_expected.to eq(0x8091a2b3) }
+    end
+  end
+
+  context '#rotate_left' do
+    subject { described_class.rotate_left(value, count) }
+    let(:value) { 0x01234567 }
+
+    context 'completely (32 bits)' do
+      let(:count) { 32 }
+
+      it { is_expected.to eq(value) }
+    end
+
+    context 'halfway (16 bits)' do
+      let(:count) { 16 }
+
+      it { is_expected.to eq(0x45670123) }
+    end
+
+    context 'none (0 bits)' do
+      let(:count) { 0 }
+
+      it { is_expected.to eq(value) }
+    end
+
+    context '1 bit' do
+      let(:count) { 1 }
+
+      it { is_expected.to eq(0x02468ace) }
+    end
+  end
 end

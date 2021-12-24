@@ -245,6 +245,14 @@ module Math # rubocop:disable Metrics/ModuleLength
   def self.adjacent_cells(cell)
     Jason::Math::Utility.adjacent_cells(cell)
   end
+
+  def self.rotate_right(value, count)
+    Jason::Math::Utility.rotate_right(value, count)
+  end
+
+  def self.rotate_left(value, count)
+    Jason::Math::Utility.rotate_left(value, count)
+  end
 end
 
 # Enhancing Integer
@@ -379,6 +387,14 @@ class Integer
 
   def to_byte_string
     Jason::Math::Utility.integer_to_byte_string(self)
+  end
+
+  def rotate_right(count)
+    Math.rotate_right(self, count)
+  end
+
+  def rotate_left(count)
+    Math.rotate_left(self, count)
   end
 end
 

@@ -138,6 +138,10 @@ module Jason
         a.bytes.zip(b.bytes).map { |x, y| (x | y).chr }.join
       end
 
+      def self.not(n)
+        n.bytes.map { |x| (~x % 256).chr }.join
+      end
+
       def self.integer_to_byte_string(n)
         result = []
 
@@ -166,6 +170,14 @@ module Jason
             return substring if strings.all? { |s| s.include?(substring) }
           end
         end
+      end
+
+      def self.rotate_right(value, count)
+        (value >> count) | (value << (32 - count)) & 0xffffffff
+      end
+
+      def self.rotate_left(value, count)
+        (value << count) & 0xffffffff | (value >> (32 - count))
       end
     end
   end

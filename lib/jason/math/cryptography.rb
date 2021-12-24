@@ -7,6 +7,8 @@ require 'jason/math/cryptography/mersenne_twister_19937'
 require 'jason/math/cryptography/exclusive_or_cipher'
 require 'jason/math/cryptography/cipher'
 require 'jason/math/cryptography/elliptic_curve'
+require 'jason/math/cryptography/secure_hash_algorithm'
+require 'jason/math/cryptography/digest'
 
 module Jason
   module Math
