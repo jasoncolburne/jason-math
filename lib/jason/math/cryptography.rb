@@ -10,6 +10,7 @@ require 'jason/math/cryptography/elliptic_curve'
 require 'jason/math/cryptography/secure_hash_algorithm'
 require 'jason/math/cryptography/message_digest'
 require 'jason/math/cryptography/digest'
+require 'jason/math/cryptography/hashed_message_authentication_code'
 
 module Jason
   module Math
