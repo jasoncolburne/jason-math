@@ -172,12 +172,14 @@ module Jason
         end
       end
 
-      def self.rotate_right(value, count)
-        (value >> count) | (value << (32 - count)) & 0xffffffff
+      def self.rotate_right(value, count, mask = 0xffffffff)
+        total_bits = mask == 0xffffffff ? 32 : 64 # this is pretty jank
+        (value >> count) | (value << (total_bits - count)) & mask
       end
 
-      def self.rotate_left(value, count)
-        (value << count) & 0xffffffff | (value >> (32 - count))
+      def self.rotate_left(value, count, mask = 0xffffffff)
+        total_bits = mask == 0xffffffff ? 32 : 64 # this is pretty jank
+        (value << count) & mask | (value >> (total_bits - count))
       end
     end
   end

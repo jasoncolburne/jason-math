@@ -8,6 +8,12 @@ module Jason
         # rubocop:disable Naming/VariableNumber
         ALGORITHMS = {
           sha_1: { class: SecureHashAlgorithm, mode: :'1' }.freeze,
+          sha_224: { class: SecureHashAlgorithm, mode: :'224' }.freeze,
+          sha_256: { class: SecureHashAlgorithm, mode: :'256' }.freeze,
+          sha_384: { class: SecureHashAlgorithm, mode: :'384' }.freeze,
+          sha_512: { class: SecureHashAlgorithm, mode: :'512' }.freeze,
+          sha_512_224: { class: SecureHashAlgorithm, mode: :'512_224' }.freeze,
+          sha_512_256: { class: SecureHashAlgorithm, mode: :'512_256' }.freeze,
           md4: { class: MessageDigest, mode: :'4' }.freeze
         }.freeze
         # rubocop:enable Naming/VariableNumber
@@ -41,12 +47,20 @@ module Jason
 
         def self.pad(message, byte_order = :network, length = nil, block_size = 64)
           padded_message = message + "\x80".b
-          overflow_length = (padded_message.length + 8) % block_size
+          overflow_length = (padded_message.length + block_size / 8) % block_size
           padding_length = (block_size - overflow_length) % block_size
 
           padded_message += "\x00".b * padding_length
           packing_string = byte_order == :network ? 'Q>*' : 'Q<*'
-          padded_message + [(length || message.length) << 3].pack(packing_string)
+          length_value = (length || message.length) << 3
+          to_pack = []
+          mask = 0xffffffffffffffff
+          (block_size / 64).times do
+            to_pack.unshift(length_value & mask)
+            length_value >>= 64
+          end
+
+          padded_message + to_pack.pack(packing_string)
         end
       end
     end
