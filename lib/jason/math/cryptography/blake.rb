@@ -121,7 +121,8 @@ module Jason
             s = SIGMA[i % 10]
 
             (0..3).each do |n|
-              v[n], v[n + 4], v[n + 8], v[n + 12] = mix(v[n], v[n + 4], v[n + 8], v[n + 12], m[s[n * 2]], m[s[n * 2 + 1]])
+              v[n], v[n + 4], v[n + 8], v[n + 12] = mix(v[n], v[n + 4], v[n + 8], v[n + 12],
+                                                        m[s[n * 2]], m[s[n * 2 + 1]])
             end
 
             v[0], v[5], v[10], v[15] = mix(v[0], v[5], v[10], v[15], m[s[8]], m[s[9]])
@@ -133,7 +134,7 @@ module Jason
           (0..15).each { |i| @h[i % 8] ^= v[i] }
         end
 
-        def mix(va, vb, vc, vd, x, y)
+        def mix(va, vb, vc, vd, x, y) # rubocop:disable Metrics/ParameterLists
           mask = @max_integer - 1
 
           va = (va + vb + x) % @max_integer
