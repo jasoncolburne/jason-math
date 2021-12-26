@@ -7,14 +7,15 @@ module Jason
       class Digest
         # rubocop:disable Naming/VariableNumber
         ALGORITHMS = {
+          blake2b: { class: Blake, mode: :'2b' }.freeze,
+          md4: { class: MessageDigest, mode: :'4' }.freeze,
           sha_1: { class: SecureHashAlgorithm, mode: :'1' }.freeze,
           sha_224: { class: SecureHashAlgorithm, mode: :'224' }.freeze,
           sha_256: { class: SecureHashAlgorithm, mode: :'256' }.freeze,
           sha_384: { class: SecureHashAlgorithm, mode: :'384' }.freeze,
           sha_512: { class: SecureHashAlgorithm, mode: :'512' }.freeze,
           sha_512_224: { class: SecureHashAlgorithm, mode: :'512_224' }.freeze,
-          sha_512_256: { class: SecureHashAlgorithm, mode: :'512_256' }.freeze,
-          md4: { class: MessageDigest, mode: :'4' }.freeze
+          sha_512_256: { class: SecureHashAlgorithm, mode: :'512_256' }.freeze
         }.freeze
         # rubocop:enable Naming/VariableNumber
 
