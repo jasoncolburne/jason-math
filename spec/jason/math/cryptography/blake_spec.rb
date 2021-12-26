@@ -40,5 +40,12 @@ RSpec.describe Jason::Math::Cryptography::Blake do
 
       it { is_expected.to eq('b32811423377f52d7862286ee1a72ee540524380fda1724a6f25d7978c6fd3244a6caf0498812673c5e05ef583825100') }
     end
+
+    context 'keyed, long message' do
+      let(:message) { 'mathematics!' * 256 }
+      let(:key) { '0123456789abcdefghijklmnopqrstuvwxyz' }
+
+      it { is_expected.to eq("ebe002dd373a8a76076547a079b6a9df3f901f2fb0c5e86a8884276f9d75f42a6688b57e40b2c346d33de53347f99a9a7d33ed205683468ead8fac4c46f3a127") }
+    end
   end
 end
