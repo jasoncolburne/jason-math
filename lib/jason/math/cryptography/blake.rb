@@ -3,7 +3,7 @@
 module Jason
   module Math
     module Cryptography
-      # Diffie-Hellman key exchange
+      # Blake
       class Blake
         SIGMA = [
           [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].freeze,
@@ -46,7 +46,7 @@ module Jason
         end
 
         def update(message)
-          message = key.rjust(128, "\x00") + message if @bytes_processed.zero? && !@key.length.zero?
+          message = @key.ljust(128, "\x00") + message if @bytes_processed.zero? && !@key.length.zero?
 
           to_transform = @to_transform + message
           blocks = Cipher.split_into_blocks(to_transform, @block_size)
