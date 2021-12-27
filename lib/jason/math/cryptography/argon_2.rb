@@ -166,7 +166,7 @@ module Jason
             q += chunk
           end
 
-          8.times do |i| # rubocop:disable Style/CombinableLoops 
+          8.times do |i|
             chunk = q.select.with_index { |_, j| j % 16 == i || (j - 1) % 16 == 2 * i }
             @blake2b.send(:round, chunk, SIXTEEN_ZEROES, SIXTEEN_ZEROES, mka: true)
 
