@@ -79,7 +79,6 @@ module Jason
             blocks[lane][1] = hash(h0 + [1].pack('V1') + [lane].pack('V1'), 1024)
           end
 
-          # (0..0).each do |pass|
           (0..(@iterations - 1)).each do |pass|
             (0..(SYNC_POINTS - 1)).each do |slice|
               (0..(@parallelism - 1)).each do |lane| # as the code implies, this block can be parallelized
@@ -87,17 +86,9 @@ module Jason
                   column = slice * @segment_length + index_in_segment
                   next if pass.zero? && column < 2
 
-                  i, j = get_block_index(blocks, lane, column, pass)
-                  # pp({
-                  #      lane: lane,
-                  #      column: column,
-                  #      slice: slice,
-                  #      index_in_segment: index_in_segment,
-                  #      i: i,
-                  #      j: j
-                  #    })
+                  i, j = get_reference_index(blocks, lane, column, pass)
+
                   previous_block = blocks[lane][(column - 1) % @column_count]
-                  # pp previous_block.byte_string_to_hex
                   reference_block = blocks[i][j]
 
                   blocks[lane][column] = if pass.zero?
@@ -201,7 +192,7 @@ module Jason
           Utility.xor(r_string, z.pack('Q<128'))
         end
 
-        def get_block_index(blocks, lane, column, pass)
+        def get_reference_index(blocks, lane, column, pass)
           slice = column / @segment_length
           j1, j2 = case @hash_type
                    when :argon2i
