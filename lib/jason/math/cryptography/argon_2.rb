@@ -226,9 +226,9 @@ module Jason
         # yet, excluding B[i][j − 1].
         # 2. If l is not the current lane, then R includes all blocks in the last S −1 = 3 segments computed and
         # finished in lane l. If B[i][j] is the first block of a segment, then the very last block from R is excluded.
-        def reference_count(pass, slice, index, same_lane)
-          pass_val = pass.zero? ? slice * @segment_length : @column_count - @segment_length
-          same_lane ? pass_val + (index - 1) : pass_val + (index.zero? ? -1 : 0) # rubocop:disable Style/NestedTernaryOperator
+        def reference_count(pass, slice, index_in_segment, same_lane)
+          index_count = pass.zero? ? slice * @segment_length : @column_count - @segment_length
+          same_lane ? index_count + (index_in_segment - 1) : index_count + (index_in_segment.zero? ? -1 : 0) # rubocop:disable Style/NestedTernaryOperator
         end
 
         def compute_jn_i(lane, slice, pass)
