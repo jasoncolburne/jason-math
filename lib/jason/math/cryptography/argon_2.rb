@@ -71,9 +71,7 @@ module Jason
 
           (0..(@parallelism - 1)).each do |lane|
             blocks << []
-            (0..(@column_count - 1)).each do |column|
-              blocks[lane] << "\x00" * 1024
-            end
+            @column_count.times { blocks[lane] << "\x00" * 1024 }
           end
 
           (0..(@parallelism - 1)).map do |lane|
