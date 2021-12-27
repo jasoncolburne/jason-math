@@ -91,6 +91,7 @@ module Jason
                   previous_block = blocks[lane][(column - 1) % @column_count]
                   reference_block = blocks[i][j]
 
+                  print "prev: #{previous_block[0..7].reverse.byte_string_to_hex}, "
                   blocks[lane][column] = if pass.zero?
                                            compress(previous_block, reference_block)
                                          else
@@ -99,6 +100,7 @@ module Jason
                                              compress(previous_block, reference_block)
                                            )
                                          end
+                  puts "ref: #{reference_block[0..7].reverse.byte_string_to_hex}, curr: #{blocks[lane][column][0..7].reverse.byte_string_to_hex}"
                 end
               end
             end
@@ -154,41 +156,33 @@ module Jason
           #   r[2 * i + 1] = temp
           # end
 
-          q = [0] * 128
-          z = [0] * 128
+          q = []
+          z = [nil] * 128
 
-          [[r, q], [q, z]].each do |outv, inv|
-            (0..7).each do |i|
-              range = (i * 16)..((i + 1) * 16 - 1)
-              chunk = outv[range]
-              @blake2b.send(:round, chunk, SIXTEEN_ZEROES, SIXTEEN_ZEROES, mka: true)
-              outv[range] = chunk
-            end
+          8.times do |i|
+            range = (i * 16)..((i + 1) * 16 - 1)
+            chunk = r[range]
+            @blake2b.send(:round, chunk, SIXTEEN_ZEROES, SIXTEEN_ZEROES, mka: true)
+            q += chunk
+          end
 
-            (0..7).each do |i| # rubocop:disable Style/CombinableLoops
-              (0..7).each do |j|
-                inv[i * 16 + j * 2] = outv[j * 16 + i * 2]
-                inv[i * 16 + j * 2 + 1] = outv[j * 16 + i * 2 + 1]
-              end
+          8.times do |i| # rubocop:disable Style/CombinableLoops 
+            chunk = q.select.with_index { |_, j| j % 16 == i || (j - 1) % 16 == 2 * i }
+            @blake2b.send(:round, chunk, SIXTEEN_ZEROES, SIXTEEN_ZEROES, mka: true)
+
+            8.times do |j|
+              z[j * 16 + 2 * i] = chunk[2 * j]
+              z[j * 16 + 2 * i + 1] = chunk[2 * j + 1]
             end
           end
 
-          # puts
-          # puts
-          # puts
-          # pp r_string.byte_string_to_hex
-          # puts
-          # puts
-          # puts
-          # pp z.pack('Q<128').byte_string_to_hex
-          # puts
-          # puts
-          # puts
-          # result = 
-          # pp result.byte_string_to_hex
-          # puts
-          # puts
-          # puts
+          # pp z.compact.count
+          # (0..63).each do |i|
+          #   temp = z[2 * i]
+          #   z[2 * i] = z[2 * i + 1]
+          #   z[2 * i + 1] = temp
+          # end
+
           Utility.xor(r_string, z.pack('Q<128'))
         end
 
@@ -222,7 +216,7 @@ module Jason
 
           origin = pass.zero? ? 0 : ((slice + 1) % SYNC_POINTS) * @segment_length
 
-          puts "i': #{l} j': #{(origin + z) % @column_count}"
+          print "i': #{l}, j': #{(origin + z) % @column_count}, "
           [l, (origin + z) % @column_count]
         end
 
