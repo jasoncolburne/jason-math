@@ -5,6 +5,9 @@ module Jason
     module Cryptography
       # Blake
       class Blake
+        MASK32 = 0xffffffff
+        MASK64 = 0xffffffffffffffff
+
         SIGMA = [
           [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15].freeze,
           [14, 10, 4, 8, 9, 15, 13, 6, 1, 12, 0, 2, 11, 7, 5, 3].freeze,
@@ -95,6 +98,11 @@ module Jason
           send("state_#{@algorithm}=", state)
         end
 
+        def output_length=(output_length)
+          @output_length = output_length
+          reset
+        end
+
         private
 
         def reset
@@ -106,7 +114,7 @@ module Jason
           parameters.each_pair { |key, value| instance_variable_set("@#{key}", value) }
 
           @h = @h.dup
-          @h[0] ^= (0x01010000 | (@key.length << 8) | @output_length)
+          @h[0] ^= (0x01010000 | (@key.length << 8) | (@output_length & 0xff))
         end
 
         def transform(block)
@@ -115,41 +123,43 @@ module Jason
           v[13] ^= (@bytes_processed >> 64)
           v[14] ^= 0xffffffffffffffff if @last_block
 
-          m = block.unpack('Q<16') # ? should this be Q<16 ?
+          m = block.unpack('Q<16')
 
-          (0..11).each do |i|
-            s = SIGMA[i % 10]
-
-            (0..3).each do |n|
-              v[n], v[n + 4], v[n + 8], v[n + 12] = mix(v[n], v[n + 4], v[n + 8], v[n + 12],
-                                                        m[s[n * 2]], m[s[n * 2 + 1]])
-            end
-
-            v[0], v[5], v[10], v[15] = mix(v[0], v[5], v[10], v[15], m[s[8]], m[s[9]])
-            v[1], v[6], v[11], v[12] = mix(v[1], v[6], v[11], v[12], m[s[10]], m[s[11]])
-            v[2], v[7], v[8], v[13] = mix(v[2], v[7], v[8], v[13], m[s[12]], m[s[13]])
-            v[3], v[4], v[9], v[14] = mix(v[3], v[4], v[9], v[14], m[s[14]], m[s[15]])
-          end
-
+          (0..11).each { |i| round(v, m, SIGMA[i % 10]) }
           (0..15).each { |i| @h[i % 8] ^= v[i] }
         end
 
-        def mix(va, vb, vc, vd, x, y) # rubocop:disable Metrics/ParameterLists
-          mask = @max_integer - 1
+        def mix(va, vb, vc, vd, x, y, mka: false) # rubocop:disable Metrics/ParameterLists
+          z = mka ? 2 * (va & MASK32) * (vb & MASK32) : 0
+          va = (va + vb + x + z) % @max_integer
+          vd = Utility.rotate_right(vd ^ va, 32, MASK64)
 
-          va = (va + vb + x) % @max_integer
-          vd = Utility.rotate_right(vd ^ va, 32, mask)
+          z = mka ? 2 * (vc & MASK32) * (vd & MASK32) : 0
+          vc = (vc + vd + z) % @max_integer
+          vb = Utility.rotate_right(vb ^ vc, 24, MASK64)
 
-          vc = (vc + vd) % @max_integer
-          vb = Utility.rotate_right(vb ^ vc, 24, mask)
+          z = mka ? 2 * (va & MASK32) * (vb & MASK32) : 0
+          va = (va + vb + y + z) % @max_integer
+          vd = Utility.rotate_right(vd ^ va, 16, MASK64)
 
-          va = (va + vb + y) % @max_integer
-          vd = Utility.rotate_right(vd ^ va, 16, mask)
-
-          vc = (vc + vd) % @max_integer
-          vb = Utility.rotate_right(vb ^ vc, 63, mask)
+          z = mka ? 2 * (vc & MASK32) * (vd & MASK32) : 0
+          vc = (vc + vd + z) % @max_integer
+          vb = Utility.rotate_right(vb ^ vc, 63, MASK64)
 
           [va, vb, vc, vd]
+        end
+
+        def round(v, m = [0], s = [0] * 16, mka: false)
+          # pp v if mka
+          (0..3).each do |n|
+            v[n], v[n + 4], v[n + 8], v[n + 12] = mix(v[n], v[n + 4], v[n + 8], v[n + 12],
+                                                      m[s[n * 2]], m[s[n * 2 + 1]], mka: mka)
+          end
+
+          v[0], v[5], v[10], v[15] = mix(v[0], v[5], v[10], v[15], m[s[8]], m[s[9]], mka: mka)
+          v[1], v[6], v[11], v[12] = mix(v[1], v[6], v[11], v[12], m[s[10]], m[s[11]], mka: mka)
+          v[2], v[7], v[8], v[13] = mix(v[2], v[7], v[8], v[13], m[s[12]], m[s[13]], mka: mka)
+          v[3], v[4], v[9], v[14] = mix(v[3], v[4], v[9], v[14], m[s[14]], m[s[15]], mka: mka)
         end
 
         def state_2b=(state)
