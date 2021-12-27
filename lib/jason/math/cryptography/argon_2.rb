@@ -79,43 +79,47 @@ module Jason
             blocks[lane][1] = hash(h0 + [1].pack('V1') + [lane].pack('V1'), 1024)
           end
 
-          (0..0).each do |pass|
-          # (0..(@iterations - 1)).each do |pass|
+          # (0..0).each do |pass|
+          (0..(@iterations - 1)).each do |pass|
             (0..(SYNC_POINTS - 1)).each do |slice|
               (0..(@parallelism - 1)).each do |lane| # as the code implies, this block can be parallelized
                 (0..(@segment_length - 1)).each do |index_in_segment|
                   column = slice * @segment_length + index_in_segment
                   next if pass.zero? && column < 2
 
-                  i, j = get_block_indexes(blocks, lane, column, pass)
-                  pp({
-                       lane: lane,
-                       column: column,
-                       slice: slice,
-                       i: i,
-                       j: j,
-                       index_in_segment: index_in_segment
-                     })
+                  i, j = get_block_index(blocks, lane, column, pass)
+                  # pp({
+                  #      lane: lane,
+                  #      column: column,
+                  #      slice: slice,
+                  #      index_in_segment: index_in_segment,
+                  #      i: i,
+                  #      j: j
+                  #    })
+                  previous_block = blocks[lane][(column - 1) % @column_count]
+                  # pp previous_block.byte_string_to_hex
+                  reference_block = blocks[i][j]
+
                   blocks[lane][column] = if pass.zero?
-                                           compress(blocks[lane][(column - 1) % @column_count], blocks[i][j])
+                                           compress(previous_block, reference_block)
                                          else
                                            Utility.xor(
                                              blocks[lane][column],
-                                             compress(blocks[lane][(column - 1) % @column_count], blocks[i][j])
+                                             compress(previous_block, reference_block)
                                            )
                                          end
                 end
               end
             end
 
-            puts "After pass #{pass}:"
-            (0..(@parallelism - 1)).each do |lane|
-              (0..(@column_count - 1)).each do |column|
-                blocks[lane][column].unpack('Q<128').each_with_index do |block, index|
-                  puts "block #{lane * @column_count + column} [#{index}] #{[block].pack('Q>1').byte_string_to_hex}"
-                end
-              end
-            end
+            # puts "After pass #{pass}:"
+            # (0..(@parallelism - 1)).each do |lane|
+            #   (0..(@column_count - 1)).each do |column|
+            #     blocks[lane][column].unpack('Q<128').each_with_index do |block, index|
+            #       puts "block #{lane * @column_count + column} [#{index}] #{[block].pack('Q>1').byte_string_to_hex}"
+            #     end
+            #   end
+            # end
           end
 
           c = ZERO
@@ -159,13 +163,16 @@ module Jason
           #   r[2 * i + 1] = temp
           # end
 
-          pp r
           q = [0] * 128
           z = [0] * 128
 
           [[r, q], [q, z]].each do |outv, inv|
-            (0..7).each { |i| @blake2b.send(:round, outv[(i * 16)..((i + 1) * 16 - 1)],
-                                            SIXTEEN_ZEROES, SIXTEEN_ZEROES, mka: true) }
+            (0..7).each do |i|
+              range = (i * 16)..((i + 1) * 16 - 1)
+              chunk = outv[range]
+              @blake2b.send(:round, chunk, SIXTEEN_ZEROES, SIXTEEN_ZEROES, mka: true)
+              outv[range] = chunk
+            end
 
             (0..7).each do |i| # rubocop:disable Style/CombinableLoops
               (0..7).each do |j|
@@ -175,10 +182,26 @@ module Jason
             end
           end
 
+          # puts
+          # puts
+          # puts
+          # pp r_string.byte_string_to_hex
+          # puts
+          # puts
+          # puts
+          # pp z.pack('Q<128').byte_string_to_hex
+          # puts
+          # puts
+          # puts
+          # result = 
+          # pp result.byte_string_to_hex
+          # puts
+          # puts
+          # puts
           Utility.xor(r_string, z.pack('Q<128'))
         end
 
-        def get_block_indexes(blocks, lane, column, pass)
+        def get_block_index(blocks, lane, column, pass)
           slice = column / @segment_length
           j1, j2 = case @hash_type
                    when :argon2i
@@ -193,9 +216,9 @@ module Jason
                      end
                    end
 
-          puts "#{j1.to_s(16)}, #{j2.to_s(16)}"
           l = slice.zero? && pass.zero? ? lane : j2 % @parallelism
-          w = reference_count(lane, column % @segment_length, pass, l == lane) # this is |R|, in case you can't follow
+          w = reference_count(pass, slice, column % @segment_length, l == lane) # this is |R|, in case you can't follow
+          print "segment_index: #{column % @segment_length} lane: #{lane}, column: #{column} slice: #{slice}, j1: #{j1.to_s(16)}, j2: #{j2.to_s(16)}, w: #{w}, "
 
           # To avoid floating-point computation, we use the following integer approximation:
           # x = J1^2 / 2^32;
@@ -206,10 +229,10 @@ module Jason
           y = ((w * x) & MASK64) >> 32
           z = w - 1 - y
 
-          origin = 0
-          origin = ((slice + 1) % SYNC_POINTS) * @segment_length unless pass.zero?
+          origin = pass.zero? ? 0 : ((slice + 1) % SYNC_POINTS) * @segment_length
 
-          [l, origin + z]
+          puts "i': #{l} j': #{(origin + z) % @column_count}"
+          [l, (origin + z) % @column_count]
         end
 
         # Then we determine the set of indices R that can be referenced for given [i][j] according to the following
@@ -218,9 +241,9 @@ module Jason
         # yet, excluding B[i][j − 1].
         # 2. If l is not the current lane, then R includes all blocks in the last S −1 = 3 segments computed and
         # finished in lane l. If B[i][j] is the first block of a segment, then the very last block from R is excluded.
-        def reference_count(lane, slice, pass, same_lane)
+        def reference_count(pass, slice, index, same_lane)
           pass_val = pass.zero? ? slice * @segment_length : @column_count - @segment_length
-          same_lane ? pass_val + (lane - 1) : pass_val + (lane.zero? ? -1 : 0) # rubocop:disable Style/NestedTernaryOperator
+          same_lane ? pass_val + (index - 1) : pass_val + (index.zero? ? -1 : 0) # rubocop:disable Style/NestedTernaryOperator
         end
 
         def compute_jn_i(lane, slice, pass)
@@ -245,8 +268,9 @@ module Jason
         end
 
         def compute_jn_d(blocks, lane, column)
-          puts "taking jn from #{lane}, #{column}"
-          [blocks[lane][column - 1][4..7].unpack1('V1'), blocks[lane][column - 1][0..3].unpack1('V1')]
+          # puts "taking jn from #{lane}, #{column - 1}"
+          previous_column = (column - 1) % @column_count
+          [blocks[lane][previous_column][0..3].unpack1('V1'), blocks[lane][previous_column][4..7].unpack1('V1')]
         end
       end
     end
