@@ -47,7 +47,6 @@ module Jason
           @column_count = @block_count / @parallelism
           @segment_length = @column_count / SYNC_POINTS
           @address_generators = {}
-          @z = nil
 
           @blake2b << [@parallelism].pack('V1')
           @blake2b << [@tag_length].pack('V1')
