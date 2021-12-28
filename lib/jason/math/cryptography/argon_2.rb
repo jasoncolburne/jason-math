@@ -47,7 +47,8 @@ module Jason
                          end
           @column_count = @block_count / @parallelism
           @segment_length = @column_count / SYNC_POINTS
-          @address_generator = nil
+          @address_generators = {}
+          @z = nil
 
           @blake2b << [@parallelism].pack('V1')
           @blake2b << [@tag_length].pack('V1')
@@ -64,6 +65,7 @@ module Jason
           @blake2b << associated_data
 
           h0 = @blake2b.digest
+          puts h0.byte_string_to_hex
 
           blocks = []
 
@@ -89,7 +91,6 @@ module Jason
                   previous_block = blocks[lane][(column - 1) % @column_count]
                   reference_block = blocks[i][j]
 
-                  print "prev: #{previous_block[0..7].reverse.byte_string_to_hex}, "
                   blocks[lane][column] = if pass.zero?
                                            compress(previous_block, reference_block)
                                          else
@@ -98,7 +99,6 @@ module Jason
                                              compress(previous_block, reference_block)
                                            )
                                          end
-                  puts "ref: #{reference_block[0..7].reverse.byte_string_to_hex}, curr: #{blocks[lane][column][0..7].reverse.byte_string_to_hex}"
                 end
               end
             end
@@ -187,7 +187,6 @@ module Jason
 
           l = slice.zero? && pass.zero? ? lane : j2 % @parallelism
           w = reference_count(pass, slice, column % @segment_length, l == lane) # this is |R|, in case you can't follow
-          print "segment_index: #{column % @segment_length} lane: #{lane}, column: #{column} slice: #{slice}, j1: #{j1.to_s(16)}, j2: #{j2.to_s(16)}, w: #{w}, "
 
           # To avoid floating-point computation, we use the following integer approximation:
           # x = J1^2 / 2^32;
@@ -200,7 +199,6 @@ module Jason
 
           origin = pass.zero? ? 0 : ((slice + 1) % SYNC_POINTS) * @segment_length
 
-          print "i': #{l}, j': #{(origin + z) % @column_count}, "
           [l, (origin + z) % @column_count]
         end
 
@@ -216,24 +214,24 @@ module Jason
         end
 
         def compute_jn_i(lane, slice, pass)
-          @z ||= [pass].pack('Q<1') +
-                 [lane].pack('Q<1') +
-                 [slice].pack('Q<1') +
-                 [@block_count].pack('Q<1') +
-                 [@iterations].pack('Q<1') +
-                 [HASH_TYPES[@hash_type]].pack('Q<1')
+          z = [pass].pack('Q<1') +
+              [lane].pack('Q<1') +
+              [slice].pack('Q<1') +
+              [@block_count].pack('Q<1') +
+              [@iterations].pack('Q<1') +
+              [HASH_TYPES[@hash_type]].pack('Q<1')
 
-          @address_generator ||= Enumerator.new do |yielder|
+          generator_key = [lane, slice, pass]
+          @address_generators[generator_key] ||= Enumerator.new do |yielder|
             i = 1
             loop do
-              yielder << compress(ZERO, compress(ZERO, @z + [i].pack('Q<1') + ZERO[0..967]))
+              addresses = compress(ZERO, compress(ZERO, z + [i].pack('Q<1') + ZERO[0..967])).unpack('Q<128')
+              (0..127).each { |j| yielder << [addresses[j] & MASK32, addresses[j] >> 32] }
               i += 1
             end
           end
 
-          @addresses = @address_generator.next
-
-          [0, 0]
+          @address_generators[generator_key].next
         end
 
         def compute_jn_d(blocks, lane, column)
