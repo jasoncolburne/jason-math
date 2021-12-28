@@ -63,22 +63,20 @@ module Jason
           @blake2b << associated_data
 
           h0 = @blake2b.digest
-          puts h0.byte_string_to_hex
-
-          blocks = []
-          @parallelism.times { blocks << [] }
 
           # initial state
-          (0..(@parallelism - 1)).map do |lane|
+          blocks = []
+          @parallelism.times do |lane|
+            blocks << []
             blocks[lane][0] = hash(h0 + [0].pack('V1') + [lane].pack('V1'), 1024)
             blocks[lane][1] = hash(h0 + [1].pack('V1') + [lane].pack('V1'), 1024)
           end
 
           # the meat
-          (0..(@iterations - 1)).each do |pass|
-            (0..(SYNC_POINTS - 1)).each do |slice|
-              (0..(@parallelism - 1)).each do |lane| # as the code implies, this block can be parallelized
-                (0..(@segment_length - 1)).each do |index_in_segment|
+          @iterations.times do |pass|
+            SYNC_POINTS.times do |slice|
+              @parallelism.times do |lane| # as the code implies, this block can be parallelized
+                @segment_length.times do |index_in_segment|
                   column = slice * @segment_length + index_in_segment
                   next if pass.zero? && column < 2
 
@@ -216,7 +214,7 @@ module Jason
             i = 1
             loop do
               addresses = compress(ZERO, compress(ZERO, z + [i].pack('Q<1') + ZERO[0..967])).unpack('Q<128')
-              (0..127).each { |j| yielder << [addresses[j] & MASK32, addresses[j] >> 32] }
+              128.times { |j| yielder << [addresses[j] & MASK32, addresses[j] >> 32] }
               i += 1
             end
           end
