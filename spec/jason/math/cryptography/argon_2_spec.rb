@@ -1,6 +1,6 @@
 RSpec.describe Jason::Math::Cryptography::Argon2 do
-  subject { kdf.derive(password, associated_data).byte_string_to_hex }
-  let(:kdf) { described_class.new(salt, parallelism, tag_length, memory_size, iterations, key, hash_type) }
+  subject { kdf.derive(password, salt, associated_data).byte_string_to_hex }
+  let(:kdf) { described_class.new(parallelism, tag_length, memory_size, iterations, key, hash_type) }
   let(:password) { "\x01" * 32 }
   let(:salt) { "\x02" * 16 }
   let(:parallelism) { 4 }
