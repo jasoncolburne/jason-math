@@ -19,13 +19,13 @@ module Jason
           argon2id: 2
         }.freeze
 
-        def initialize(
+        def initialize( # rubocop:disable Metrics/ParameterLists
           salt,                  # Bytes (8..2^32-1)    Salt (16 bytes recommended for password hashing)
           parallelism,
           tag_length,            # Number (4..2^32-1)   Desired number of returned bytes
           memory_size,           # Number (8p..2^32-1)  Amount of memory (in kibibytes) to use
           iterations,            # Number (1..2^32-1)   Number of iterations to perform
-          key = '',              # Bytes (0..2^32-1)    Optional key (Errata: PDF says 0..32 bytes, RFC says 0..2^32 bytes)
+          key = '',              # Bytes (0..2^32-1)    Optional key (Errata: PDF says 0..32 bytes, RFC says 0..2^32)
           hash_type = :argon2id  # Number (0=Argon2d, 1=Argon2i, 2=Argon2id)
         )
           @salt = salt
@@ -39,7 +39,7 @@ module Jason
           @blake2b = Blake.new(:'2b', 64)
         end
 
-        def derive(password, associated_data = '')
+        def derive(password, associated_data = '') # rubocop:disable Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
           @block_count = if @memory_size >= 2 * SYNC_POINTS * @parallelism
                            (@memory_size / (SYNC_POINTS * @parallelism)) * (SYNC_POINTS * @parallelism)
                          else
@@ -170,7 +170,7 @@ module Jason
           Utility.xor(r_string, z.pack('Q<128'))
         end
 
-        def get_reference_index(blocks, lane, column, pass)
+        def get_reference_index(blocks, lane, column, pass) # rubocop:disable Metrics/CyclomaticComplexity
           slice = column / @segment_length
           j1, j2 = case @hash_type
                    when :argon2i
