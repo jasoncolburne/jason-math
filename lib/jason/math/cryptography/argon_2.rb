@@ -67,9 +67,10 @@ module Jason
           # initial state
           blocks = []
           @parallelism.times do |lane|
-            blocks << []
-            blocks[lane][0] = hash(h0 + [0].pack('V1') + [lane].pack('V1'), 1024)
-            blocks[lane][1] = hash(h0 + [1].pack('V1') + [lane].pack('V1'), 1024)
+            blocks << [
+              hash(h0 + [0].pack('V1') + [lane].pack('V1'), 1024),
+              hash(h0 + [1].pack('V1') + [lane].pack('V1'), 1024)
+            ]
           end
 
           # the meat
