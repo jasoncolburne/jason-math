@@ -27,7 +27,7 @@ module Jason
       def self.secure_compare(byte_string_to_test, known_byte_string)
         result = true
 
-        byte_string_to_test.b.each_char.each_with_index do |char, index|
+        byte_string_to_test.b.each_char.with_index do |char, index|
           result &&= (char == known_byte_string.b[index])
         end
 
