@@ -68,17 +68,15 @@ module Jason
           puts h0.byte_string_to_hex
 
           blocks = []
+          @parallelism.times { blocks << [] }
 
-          (0..(@parallelism - 1)).each do |lane|
-            blocks << []
-            @column_count.times { blocks[lane] << "\x00" * 1024 }
-          end
-
+          # initial state
           (0..(@parallelism - 1)).map do |lane|
             blocks[lane][0] = hash(h0 + [0].pack('V1') + [lane].pack('V1'), 1024)
             blocks[lane][1] = hash(h0 + [1].pack('V1') + [lane].pack('V1'), 1024)
           end
 
+          # the meat
           (0..(@iterations - 1)).each do |pass|
             (0..(SYNC_POINTS - 1)).each do |slice|
               (0..(@parallelism - 1)).each do |lane| # as the code implies, this block can be parallelized
@@ -104,6 +102,7 @@ module Jason
             end
           end
 
+          # reduce down to a single value
           c = ZERO
           (0..(@parallelism - 1)).each do |lane|
             c = Utility.xor(c, blocks[lane][@column_count - 1])
@@ -111,6 +110,8 @@ module Jason
 
           hash(c, @tag_length)
         end
+
+        private
 
         def hash(message, digest_length)
           initial_message = [digest_length].pack('V1') + message
