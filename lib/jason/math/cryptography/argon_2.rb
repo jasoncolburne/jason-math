@@ -102,15 +102,6 @@ module Jason
                 end
               end
             end
-
-            # puts "After pass #{pass}:"
-            # (0..(@parallelism - 1)).each do |lane|
-            #   (0..(@column_count - 1)).each do |column|
-            #     blocks[lane][column].unpack('Q<128').each_with_index do |block, index|
-            #       puts "block #{lane * @column_count + column} [#{index}] #{[block].pack('Q>1').byte_string_to_hex}"
-            #     end
-            #   end
-            # end
           end
 
           c = ZERO
