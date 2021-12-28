@@ -40,6 +40,15 @@ module Jason
         end
 
         def derive(password, associated_data = '')
+          @block_count = if @memory_size >= 2 * SYNC_POINTS * @parallelism
+                           (@memory_size / (SYNC_POINTS * @parallelism)) * (SYNC_POINTS * @parallelism)
+                         else
+                           2 * SYNC_POINTS * @parallelism
+                         end
+          @column_count = @block_count / @parallelism
+          @segment_length = @column_count / SYNC_POINTS
+          @address_generator = nil
+
           @blake2b << [@parallelism].pack('V1')
           @blake2b << [@tag_length].pack('V1')
           @blake2b << [@memory_size].pack('V1')
@@ -55,17 +64,6 @@ module Jason
           @blake2b << associated_data
 
           h0 = @blake2b.digest
-          puts "pre-hashing digest:"
-          pp h0.byte_string_to_hex
-
-          @block_count = if @memory_size >= 2 * SYNC_POINTS * @parallelism
-                           (@memory_size / (SYNC_POINTS * @parallelism)) * (SYNC_POINTS * @parallelism)
-                         else
-                           2 * SYNC_POINTS * @parallelism
-                         end
-          @column_count = @block_count / @parallelism
-          @segment_length = @column_count / SYNC_POINTS
-          @address_generator = nil
 
           blocks = []
 
@@ -135,9 +133,9 @@ module Jason
 
           r = (digest_length.to_f / 32).ceil - 2
           v = [initial_digest]
-          r.times { v << @blake2b.digest(v.last) }
+          (r - 1).times { v << @blake2b.digest(v.last) }
 
-          bytes_remaining = digest_length - 32 * (r + 1)
+          bytes_remaining = digest_length - 32 * r
           @blake2b.output_length = bytes_remaining unless bytes_remaining == 64
           digest = v.map { |block| block[0..31] }.join + @blake2b.digest(v.last)
           @blake2b.output_length = 64 unless bytes_remaining == 64
@@ -147,14 +145,7 @@ module Jason
 
         def compress(x, y)
           r_string = Utility.xor(x, y)
-
           r = r_string.unpack('Q<128')
-          # might have to swap all pairs ?
-          # (0..63).each do |i|
-          #   temp = r[2 * i]
-          #   r[2 * i] = r[2 * i + 1]
-          #   r[2 * i + 1] = temp
-          # end
 
           q = []
           z = [nil] * 128
@@ -167,7 +158,7 @@ module Jason
           end
 
           8.times do |i|
-            chunk = q.select.with_index { |_, j| j % 16 == i || (j - 1) % 16 == 2 * i }
+            chunk = q.select.with_index { |_, j| j % 16 == 2 * i || (j - 1) % 16 == 2 * i }
             @blake2b.send(:round, chunk, SIXTEEN_ZEROES, SIXTEEN_ZEROES, mka: true)
 
             8.times do |j|
@@ -175,13 +166,6 @@ module Jason
               z[j * 16 + 2 * i + 1] = chunk[2 * j + 1]
             end
           end
-
-          # pp z.compact.count
-          # (0..63).each do |i|
-          #   temp = z[2 * i]
-          #   z[2 * i] = z[2 * i + 1]
-          #   z[2 * i + 1] = temp
-          # end
 
           Utility.xor(r_string, z.pack('Q<128'))
         end
@@ -253,7 +237,6 @@ module Jason
         end
 
         def compute_jn_d(blocks, lane, column)
-          # puts "taking jn from #{lane}, #{column - 1}"
           previous_column = (column - 1) % @column_count
           [blocks[lane][previous_column][0..3].unpack1('V1'), blocks[lane][previous_column][4..7].unpack1('V1')]
         end

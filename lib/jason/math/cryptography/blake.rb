@@ -150,7 +150,6 @@ module Jason
         end
 
         def round(v, m = [0], s = [0] * 16, mka: false)
-          # pp v if mka
           (0..3).each do |n|
             v[n], v[n + 4], v[n + 8], v[n + 12] = mix(v[n], v[n + 4], v[n + 8], v[n + 12],
                                                       m[s[n * 2]], m[s[n * 2 + 1]], mka: mka)
