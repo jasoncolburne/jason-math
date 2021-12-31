@@ -40,10 +40,10 @@ module Jason
 
           def derive(password, salt, associated_data = '') # rubocop:disable Metrics/MethodLength
             @block_count = if @memory_size >= 2 * SYNC_POINTS * @parallelism
-                            (@memory_size / (SYNC_POINTS * @parallelism)) * (SYNC_POINTS * @parallelism)
-                          else
-                            2 * SYNC_POINTS * @parallelism
-                          end
+                             (@memory_size / (SYNC_POINTS * @parallelism)) * (SYNC_POINTS * @parallelism)
+                           else
+                             2 * SYNC_POINTS * @parallelism
+                           end
             @salt = salt
             @column_count = @block_count / @parallelism
             @segment_length = @column_count / SYNC_POINTS
@@ -88,13 +88,13 @@ module Jason
                     reference_block = blocks[i][j]
 
                     blocks[lane][column] = if pass.zero?
-                                            compress(previous_block, reference_block)
-                                          else
-                                            Utility.xor(
-                                              blocks[lane][column],
-                                              compress(previous_block, reference_block)
-                                            )
-                                          end
+                                             compress(previous_block, reference_block)
+                                           else
+                                             Utility.xor(
+                                               blocks[lane][column],
+                                               compress(previous_block, reference_block)
+                                             )
+                                           end
                   end
                 end
               end
@@ -163,20 +163,20 @@ module Jason
           def get_reference_index(blocks, lane, column, pass) # rubocop:disable Metrics/CyclomaticComplexity
             slice = column / @segment_length
             j1, j2 = case @hash_type
-                    when :argon2i
-                      compute_jn_i(lane, slice, pass)
-                    when :argon2d
-                      compute_jn_d(blocks, lane, column)
-                    when :argon2id
-                      if pass.zero? && slice < SYNC_POINTS / 2
-                        compute_jn_i(lane, slice, pass)
-                      else
-                        compute_jn_d(blocks, lane, column)
-                      end
-                    end
+                     when :argon2i
+                       compute_jn_i(lane, slice, pass)
+                     when :argon2d
+                       compute_jn_d(blocks, lane, column)
+                     when :argon2id
+                       if pass.zero? && slice < SYNC_POINTS / 2
+                         compute_jn_i(lane, slice, pass)
+                       else
+                         compute_jn_d(blocks, lane, column)
+                       end
+                     end
 
             l = slice.zero? && pass.zero? ? lane : j2 % @parallelism
-            w = reference_count(pass, slice, column % @segment_length, l == lane) # this is |R|, in case you can't follow
+            w = reference_count(pass, slice, column % @segment_length, l == lane) # this is |R|
 
             # To avoid floating-point computation, we use the following integer approximation:
             # x = J1^2 / 2^32;

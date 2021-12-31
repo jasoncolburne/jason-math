@@ -113,10 +113,10 @@ module Jason
             x = [nil] * w
             w.times do |n|
               x[n] = if n < magnitude
-                      value[n]
-                    else
-                      value[n] ^ (mask[n] & x[n - magnitude])
-                    end
+                       value[n]
+                     else
+                       value[n] ^ (mask[n] & x[n - magnitude])
+                     end
             end
 
             x.reverse! if direction == :left

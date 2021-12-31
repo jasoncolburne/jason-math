@@ -206,19 +206,19 @@ module Jason
 
             (0..79).each do |i|
               f, k = case i
-                    when 0..19
-                      f = (b & c) | ((~b % @max_integer) & d)
-                      [f, 0x5a827999]
-                    when 20..39
-                      f = b ^ c ^ d
-                      [f, 0x6ed9eba1]
-                    when 40..59
-                      f = (b & c) | (b & d) | (c & d)
-                      [f, 0x8f1bbcdc]
-                    when 60..79
-                      f = b ^ c ^ d
-                      [f, 0xca62c1d6]
-                    end
+                     when 0..19
+                       f = (b & c) | ((~b % @max_integer) & d)
+                       [f, 0x5a827999]
+                     when 20..39
+                       f = b ^ c ^ d
+                       [f, 0x6ed9eba1]
+                     when 40..59
+                       f = (b & c) | (b & d) | (c & d)
+                       [f, 0x8f1bbcdc]
+                     when 60..79
+                       f = b ^ c ^ d
+                       [f, 0xca62c1d6]
+                     end
 
               temp = (Utility.rotate_left(a, 5) + f + e + k + w[i]) % @max_integer
               e = d
@@ -267,13 +267,13 @@ module Jason
 
             (0..(@rounds - 1)).each do |i|
               s1 = Utility.rotate_right(e, o[9], mask) ^ \
-                  Utility.rotate_right(e, o[10], mask) ^ \
-                  Utility.rotate_right(e, o[11], mask)
+                   Utility.rotate_right(e, o[10], mask) ^ \
+                   Utility.rotate_right(e, o[11], mask)
               ch = (e & f) ^ ((~e % @max_integer) & g)
               temp1 = h + s1 + ch + k[i] + w[i] # modular arithmetic handled in computation below
               s0 = Utility.rotate_right(a, o[6], mask) ^ \
-                  Utility.rotate_right(a, o[7], mask) ^ \
-                  Utility.rotate_right(a, o[8], mask)
+                   Utility.rotate_right(a, o[7], mask) ^ \
+                   Utility.rotate_right(a, o[8], mask)
               maj = (a & b) ^ (a & c) ^ (b & c)
               temp2 = s0 + maj # modular arithmetic handled in computation below
 

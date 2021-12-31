@@ -4,7 +4,7 @@ module Jason
   module Math
     module Cryptography
       class Digest
-          # MD4 for now
+        # MD4 for now
         class MessageDigest
           attr_accessor :cumulative_length
 

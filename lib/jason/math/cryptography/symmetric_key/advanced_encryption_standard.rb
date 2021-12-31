@@ -252,7 +252,7 @@ module Jason
             iterations.times do |i|
               to_cipher = if i * @block_size < length
                             clear_text[(i * @block_size)..[(i + 1) * @block_size - 1,
-                                                          length - 1].min]
+                                                           length - 1].min]
                           else
                             ''.b
                           end
@@ -291,11 +291,11 @@ module Jason
 
             iterations.times do |i|
               to_xor = if i * @block_size < length
-                        clear_text[(i * @block_size)..[(i + 1) * @block_size - 1,
+                         clear_text[(i * @block_size)..[(i + 1) * @block_size - 1,
                                                         length - 1].min]
-                      else
-                        ''.b
-                      end
+                       else
+                         ''.b
+                       end
               to_xor = PKCS7.pad_block(to_xor, @block_size)
               to_cipher = Utility.xor(to_xor, @initialization_vector)
               @initialization_vector = cipher(to_cipher)
@@ -445,7 +445,8 @@ module Jason
               raise "Block ciphers use strict sizes (16 bytes for typical AES - received #{cipher_text.length})"
             end
 
-            state = add_round_key(cipher_text, @key_schedule[(@rounds * @block_size)..((@rounds + 1) * @block_size - 1)])
+            state = add_round_key(cipher_text,
+                                  @key_schedule[(@rounds * @block_size)..((@rounds + 1) * @block_size - 1)])
 
             (@rounds - 1).downto(1) do |round|
               state = inverse_shift_rows(state)
@@ -502,16 +503,16 @@ module Jason
             [
               galois_multiply(bytes[0],
                               2) ^ galois_multiply(bytes[1],
-                                                  3) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 1),
+                                                   3) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 1),
               galois_multiply(bytes[0],
                               1) ^ galois_multiply(bytes[1],
-                                                  2) ^ galois_multiply(bytes[2], 3) ^ galois_multiply(bytes[3], 1),
+                                                   2) ^ galois_multiply(bytes[2], 3) ^ galois_multiply(bytes[3], 1),
               galois_multiply(bytes[0],
                               1) ^ galois_multiply(bytes[1],
-                                                  1) ^ galois_multiply(bytes[2], 2) ^ galois_multiply(bytes[3], 3),
+                                                   1) ^ galois_multiply(bytes[2], 2) ^ galois_multiply(bytes[3], 3),
               galois_multiply(bytes[0],
                               3) ^ galois_multiply(bytes[1],
-                                                  1) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 2)
+                                                   1) ^ galois_multiply(bytes[2], 1) ^ galois_multiply(bytes[3], 2)
             ].pack('C*')
           end
 
@@ -520,19 +521,19 @@ module Jason
             [
               galois_multiply(bytes[0],
                               0xe) ^ galois_multiply(bytes[1],
-                                                    0xb) ^ galois_multiply(bytes[2],
+                                                     0xb) ^ galois_multiply(bytes[2],
                                                                             0xd) ^ galois_multiply(bytes[3], 0x9),
               galois_multiply(bytes[0],
                               0x9) ^ galois_multiply(bytes[1],
-                                                    0xe) ^ galois_multiply(bytes[2],
+                                                     0xe) ^ galois_multiply(bytes[2],
                                                                             0xb) ^ galois_multiply(bytes[3], 0xd),
               galois_multiply(bytes[0],
                               0xd) ^ galois_multiply(bytes[1],
-                                                    0x9) ^ galois_multiply(bytes[2],
+                                                     0x9) ^ galois_multiply(bytes[2],
                                                                             0xe) ^ galois_multiply(bytes[3], 0xb),
               galois_multiply(bytes[0],
                               0xb) ^ galois_multiply(bytes[1],
-                                                    0xd) ^ galois_multiply(bytes[2],
+                                                     0xd) ^ galois_multiply(bytes[2],
                                                                             0x9) ^ galois_multiply(bytes[3], 0xe)
             ].pack('C*')
           end
