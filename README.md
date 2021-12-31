@@ -2,9 +2,13 @@
 
 A Math gem.
 
-Not production ready. Eventual goal is to underpin with performant C code.
-May be useful for educational purposes, as the pure Ruby algorithms are typically closer to English.
-I use this library to complete challenges on various platforms.
+Not production ready. The eventual goal is to underpin with performant C code, probably built from
+my `red` OS abstraction.
+
+This library may be useful, at this time, for educational purposes, as the pure Ruby algorithms are typically closer to English.
+
+I use this library to complete challenges on various platforms. Sorry about the self-indulgent naming,
+I wanted to simply call the gem `Math` and that namespace was obviously taken.
 
 ## Installation
 
