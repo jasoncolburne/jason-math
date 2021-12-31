@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Jason::Math::Cryptography::ExclusiveOrCipher do
+RSpec.describe Jason::Math::Cryptography::SymmetricKey::ExclusiveOrCipher do
   context '#cipher cryptopals example' do
     subject { cipher.decrypt(plaintext) }
 

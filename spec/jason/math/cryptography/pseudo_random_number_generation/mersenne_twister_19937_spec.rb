@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-RSpec.describe Jason::Math::Cryptography::MersenneTwister19937 do
+RSpec.describe Jason::Math::Cryptography::PseudoRandomNumberGeneration::MersenneTwister19937 do
   context '32-bit' do
     let(:prng) { described_class.new(:mt19937) }
 

@@ -1,18 +1,18 @@
 # frozen_string_literal: true
 
-require 'jason/math/cryptography/p_r_n_g_byte_stream'
+require 'jason/math/cryptography/pseudo_random_number_generation/p_r_n_g_byte_stream'
 require 'jason/math/cryptography/p_k_c_s_7'
-require 'jason/math/cryptography/advanced_encryption_standard'
-require 'jason/math/cryptography/mersenne_twister_19937'
-require 'jason/math/cryptography/exclusive_or_cipher'
+require 'jason/math/cryptography/symmetric_key/advanced_encryption_standard'
+require 'jason/math/cryptography/pseudo_random_number_generation/mersenne_twister_19937'
+require 'jason/math/cryptography/symmetric_key/exclusive_or_cipher'
 require 'jason/math/cryptography/cipher'
-require 'jason/math/cryptography/elliptic_curve'
-require 'jason/math/cryptography/blake'
-require 'jason/math/cryptography/argon_2'
-require 'jason/math/cryptography/message_digest'
-require 'jason/math/cryptography/secure_hash_algorithm'
+require 'jason/math/cryptography/asymmetric_key/elliptic_curve'
+require 'jason/math/cryptography/digest/blake'
+require 'jason/math/cryptography/key_stretching/argon_2'
+require 'jason/math/cryptography/digest/message_digest'
+require 'jason/math/cryptography/digest/secure_hash_algorithm'
 require 'jason/math/cryptography/digest'
-require 'jason/math/cryptography/hashed_message_authentication_code'
+require 'jason/math/cryptography/message_authentication/hashed_message_authentication_code'
 
 module Jason
   module Math

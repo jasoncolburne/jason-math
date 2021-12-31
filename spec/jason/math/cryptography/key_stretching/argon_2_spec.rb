@@ -1,4 +1,4 @@
-RSpec.describe Jason::Math::Cryptography::Argon2 do
+RSpec.describe Jason::Math::Cryptography::KeyStretching::Argon2 do
   subject { kdf.derive(password, salt, associated_data).byte_string_to_hex }
   let(:kdf) { described_class.new(parallelism, tag_length, memory_size, iterations, key, hash_type) }
   let(:password) { "\x01" * 32 }
