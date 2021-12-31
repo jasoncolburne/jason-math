@@ -2,6 +2,10 @@
 
 A Math gem.
 
+Not production ready. Eventual goal is to underpin with performant C code.
+May be useful for educational purposes, as the pure Ruby algorithms are typically closer to English.
+I use this library to complete challenges on various platforms.
+
 ## Installation
 
 Add this line to your application's Gemfile:
