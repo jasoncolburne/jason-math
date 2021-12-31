@@ -38,7 +38,7 @@ module Jason
             @blake2b = Digest::Blake.new(:'2b', 64)
           end
 
-          def derive(password, salt, associated_data = '') # rubocop:disable Metrics/MethodLength
+          def stretch(password, salt, associated_data = '') # rubocop:disable Metrics/MethodLength
             @block_count = if @memory_size >= 2 * SYNC_POINTS * @parallelism
                              (@memory_size / (SYNC_POINTS * @parallelism)) * (SYNC_POINTS * @parallelism)
                            else
