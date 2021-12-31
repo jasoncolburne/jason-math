@@ -1,6 +1,6 @@
 # https://www.di-mgt.com.au/sha_testvectors.html
 
-RSpec.describe Jason::Math::Cryptography::SecureHashAlgorithm do
+RSpec.describe Jason::Math::Cryptography::Digest::SecureHashAlgorithm do
   subject { digest_machine.digest(message).byte_string_to_hex }
   let(:digest_machine) { described_class.new(algorithm) }
   let(:message) { 'abc' }

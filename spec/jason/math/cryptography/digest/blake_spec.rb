@@ -1,4 +1,4 @@
-RSpec.describe Jason::Math::Cryptography::Blake do
+RSpec.describe Jason::Math::Cryptography::Digest::Blake do
   subject { digest_machine.digest(message).byte_string_to_hex }
   let(:digest_machine) { described_class.new(algorithm, output_length, key) }
   let(:message) { 'The quick brown fox jumps over the lazy dog' }

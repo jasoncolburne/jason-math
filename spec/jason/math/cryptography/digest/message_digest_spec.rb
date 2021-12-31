@@ -1,4 +1,4 @@
-RSpec.describe Jason::Math::Cryptography::MessageDigest do
+RSpec.describe Jason::Math::Cryptography::Digest::MessageDigest do
   context 'md4' do
     subject { digest_machine.digest(message) }
     let(:digest_machine) { described_class.new(:'4') }

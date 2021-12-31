@@ -7,26 +7,26 @@ module Jason
       class Cipher
         # rubocop:disable Naming/VariableNumber
         ALGORITHMS = {
-          aes_128_cbc: { class: AdvancedEncryptionStandard, mode: :cbc_128 }.freeze,
-          aes_192_cbc: { class: AdvancedEncryptionStandard, mode: :cbc_192 }.freeze,
-          aes_256_cbc: { class: AdvancedEncryptionStandard, mode: :cbc_256 }.freeze,
-          aes_128_cfb: { class: AdvancedEncryptionStandard, mode: :cfb_128 }.freeze,
-          aes_192_cfb: { class: AdvancedEncryptionStandard, mode: :cfb_192 }.freeze,
-          aes_256_cfb: { class: AdvancedEncryptionStandard, mode: :cfb_256 }.freeze,
-          aes_128_ctr: { class: AdvancedEncryptionStandard, mode: :ctr_128 }.freeze,
-          aes_192_ctr: { class: AdvancedEncryptionStandard, mode: :ctr_192 }.freeze,
-          aes_256_ctr: { class: AdvancedEncryptionStandard, mode: :ctr_256 }.freeze,
-          aes_128_ecb: { class: AdvancedEncryptionStandard, mode: :ecb_128 }.freeze,
-          aes_192_ecb: { class: AdvancedEncryptionStandard, mode: :ecb_192 }.freeze,
-          aes_256_ecb: { class: AdvancedEncryptionStandard, mode: :ecb_256 }.freeze,
-          aes_128_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_128 }.freeze,
-          aes_192_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_192 }.freeze,
-          aes_256_ofb: { class: AdvancedEncryptionStandard, mode: :ofb_256 }.freeze,
-          xor_repeated_key: { class: ExclusiveOrCipher, mode: :repeated_key }.freeze,
-          xor_mt19937_block: { class: ExclusiveOrCipher, mode: :mt19937_block }.freeze,
-          xor_mt19937_64_block: { class: ExclusiveOrCipher, mode: :mt19937_64_block }.freeze,
-          xor_mt19937_stream: { class: ExclusiveOrCipher, mode: :mt19937_64_stream }.freeze,
-          xor_mt19937_64_stream: { class: ExclusiveOrCipher, mode: :mt19937_64_stream }.freeze
+          aes_128_cbc: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :cbc_128 }.freeze,
+          aes_192_cbc: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :cbc_192 }.freeze,
+          aes_256_cbc: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :cbc_256 }.freeze,
+          aes_128_cfb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :cfb_128 }.freeze,
+          aes_192_cfb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :cfb_192 }.freeze,
+          aes_256_cfb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :cfb_256 }.freeze,
+          aes_128_ctr: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ctr_128 }.freeze,
+          aes_192_ctr: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ctr_192 }.freeze,
+          aes_256_ctr: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ctr_256 }.freeze,
+          aes_128_ecb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ecb_128 }.freeze,
+          aes_192_ecb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ecb_192 }.freeze,
+          aes_256_ecb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ecb_256 }.freeze,
+          aes_128_ofb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ofb_128 }.freeze,
+          aes_192_ofb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ofb_192 }.freeze,
+          aes_256_ofb: { class: SymmetricKey::AdvancedEncryptionStandard, mode: :ofb_256 }.freeze,
+          xor_repeated_key: { class: SymmetricKey::ExclusiveOrCipher, mode: :repeated_key }.freeze,
+          xor_mt19937_block: { class: SymmetricKey::ExclusiveOrCipher, mode: :mt19937_block }.freeze,
+          xor_mt19937_64_block: { class: SymmetricKey::ExclusiveOrCipher, mode: :mt19937_64_block }.freeze,
+          xor_mt19937_stream: { class: SymmetricKey::ExclusiveOrCipher, mode: :mt19937_64_stream }.freeze,
+          xor_mt19937_64_stream: { class: SymmetricKey::ExclusiveOrCipher, mode: :mt19937_64_stream }.freeze
         }.freeze
         # rubocop:enable Naming/VariableNumber
 

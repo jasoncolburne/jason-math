@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorithm do
+RSpec.describe Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::DigitalSignatureAlgorithm do
   let(:dsa) { described_class.new(curve, generator) }
 
   let(:a) { 1 }
   let(:b) { 18 }
   let(:n) { 19 }
-  let(:curve) { Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n) }
+  let(:curve) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Curve.new(a, b, n) }
 
   let(:x_value) { 7 }
   let(:generator) { curve.at(x_value).first }
@@ -26,7 +26,7 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorit
   context '#validate' do
     subject { dsa.verify(digest, signature, public_key) }
 
-    let(:public_key) { Jason::Math::Cryptography::EllipticCurve::Point.new(1, 1) }
+    let(:public_key) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(1, 1) }
 
     context 'valid signature' do
       let(:signature) { [15, 12] }
@@ -42,14 +42,14 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorit
   end
 end
 
-RSpec.describe Jason::Math::Cryptography::EllipticCurve::DiffieHellman do
+RSpec.describe Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::DiffieHellman do
   context '#compute_secret' do
     let(:dh) { described_class.new(curve, generator) }
 
     let(:a) { 1 }
     let(:b) { 18 }
     let(:n) { 19 }
-    let(:curve) { Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n) }
+    let(:curve) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Curve.new(a, b, n) }
 
     let(:x_value) { 7 }
     let(:generator) { curve.at(x_value).first }
@@ -76,29 +76,29 @@ RSpec.describe Jason::Math::Cryptography::EllipticCurve::DiffieHellman do
   end
 end
 
-RSpec.describe Jason::Math::Cryptography::EllipticCurve::ElGamal do
+RSpec.describe Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::ElGamal do
   let(:eg) { described_class.new(curve, generator) }
 
   let(:a) { 1 }
   let(:b) { 18 }
   let(:n) { 19 }
-  let(:curve) { Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n) }
+  let(:curve) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Curve.new(a, b, n) }
 
   let(:x_value) { 7 }
   let(:generator) { curve.at(x_value).first }
 
-  let(:plaintext) { Jason::Math::Cryptography::EllipticCurve::Point.new(15, 11) }
+  let(:plaintext) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(15, 11) }
   let(:ciphertext) do
     [
-      Jason::Math::Cryptography::EllipticCurve::Point.new(8, 14),
-      Jason::Math::Cryptography::EllipticCurve::Point.new(16, 8)
+      Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(8, 14),
+      Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(16, 8)
     ]
   end
 
   context '#encrypt' do
     subject { eg.encrypt(plaintext, public_key, entropy) }
 
-    let(:public_key) { Jason::Math::Cryptography::EllipticCurve::Point.new(13, 10) }
+    let(:public_key) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(13, 10) }
     let(:entropy) { 15 }
 
     it { is_expected.to eq(ciphertext) }
