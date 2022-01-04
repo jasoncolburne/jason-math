@@ -92,12 +92,10 @@ module Jason
       )
         return false unless prime?(number, sieve_below)
 
-        if number < sieve_below * sieve_below
-          true
-        else
-          prime_by_weak_fermat?(number,
-                                iterations_of_fermat) && prime_by_miller_rabin?(number, iterations_of_miller_rabin)
-        end
+        return true if number < sieve_below * sieve_below
+
+        prime_by_weak_fermat?(number, iterations_of_fermat) && \
+          prime_by_miller_rabin?(number, iterations_of_miller_rabin)
       end
 
       # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2

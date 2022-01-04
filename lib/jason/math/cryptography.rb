@@ -7,6 +7,7 @@ require 'jason/math/cryptography/pseudo_random_number_generation/mersenne_twiste
 require 'jason/math/cryptography/symmetric_key/exclusive_or_cipher'
 require 'jason/math/cryptography/cipher'
 require 'jason/math/cryptography/asymmetric_key/elliptic_curve'
+require 'jason/math/cryptography/asymmetric_key/rivest_shamir_adleman'
 require 'jason/math/cryptography/digest/blake'
 require 'jason/math/cryptography/key_stretching/argon_2'
 require 'jason/math/cryptography/digest/message_digest'
