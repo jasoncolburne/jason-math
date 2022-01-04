@@ -4,7 +4,7 @@ module Jason
   module Math
     module Cryptography
       module AsymmetricKey
-        # RSA
+        # RSA - do not use, generated keys unlikely to be secure
         class RivestShamirAdleman
           attr_writer :modulus, :private_key, :public_key
 
