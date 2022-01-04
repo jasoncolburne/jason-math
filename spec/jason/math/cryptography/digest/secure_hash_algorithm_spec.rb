@@ -131,5 +131,10 @@ RSpec.describe Jason::Math::Cryptography::Digest::SecureHashAlgorithm do
     context 'short message' do
       it { is_expected.to eq('b751850b1a57168a5693cd924b6b096e08f621827444f70d884f5d0240d2712e10e116e9192af3c91a7ec57647e3934057340b4cf408d5a56592f8274eec53f0') }
     end
+
+    context 'longer message' do
+      let(:message) { 'i am the bomb' * 6 }
+      it { is_expected.to eq('d57b76d956b896ad4dc4b2a29326fd4b16ff16a678ace1dda0d95c309cb78e98ecad1b991018c400f95426948c4750da5265ce0f91996b5f08104b296a77ebeb') }
+    end
   end
 end

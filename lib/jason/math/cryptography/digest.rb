@@ -15,7 +15,13 @@ module Jason
           sha_384: { class: SecureHashAlgorithm, mode: :'384' }.freeze,
           sha_512: { class: SecureHashAlgorithm, mode: :'512' }.freeze,
           sha_512_224: { class: SecureHashAlgorithm, mode: :'512_224' }.freeze,
-          sha_512_256: { class: SecureHashAlgorithm, mode: :'512_256' }.freeze
+          sha_512_256: { class: SecureHashAlgorithm, mode: :'512_256' }.freeze,
+          shake128: { class: SecureHashAlgorithm, mode: :shake128 }.freeze,
+          shake256: { class: SecureHashAlgorithm, mode: :shake256 }.freeze,
+          sha_3_224: { class: SecureHashAlgorithm, mode: :'3_224' }.freeze,
+          sha_3_256: { class: SecureHashAlgorithm, mode: :'3_256' }.freeze,
+          sha_3_384: { class: SecureHashAlgorithm, mode: :'3_384' }.freeze,
+          sha_3_512: { class: SecureHashAlgorithm, mode: :'3_512' }.freeze
         }.freeze
         # rubocop:enable Naming/VariableNumber
 
