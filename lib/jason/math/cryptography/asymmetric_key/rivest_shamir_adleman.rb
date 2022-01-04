@@ -9,14 +9,26 @@ module Jason
           attr_writer :modulus, :private_key, :public_key
 
           PARAMETERS = {
+            '512': {
+              key_length: 64 # in bytes
+            }.freeze,
             '1024': {
               key_length: 128 # in bytes
             }.freeze,
-            '2048': {
+            '2048': { # 112 bits of security
               key_length: 256 # in bytes
+            }.freeze,
+            '3072': { # 128 bits of security
+              key_length: 384 # in bytes
             }.freeze,
             '4096': {
               key_length: 512 # in bytes
+            }.freeze,
+            '7680': { # 192 bits of security
+              key_length: 960 # in bytes
+            }.freeze,
+            '15360': { # 256 bits of security
+              key_length: 1920 # in bytes
             }.freeze
           }.freeze
 
