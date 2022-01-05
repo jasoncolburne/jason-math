@@ -47,6 +47,26 @@ module Jason
               class: Digest::SecureHashAlgorithm,
               mode: :'512_256',
               block_size: 128
+            }.freeze,
+            sha_3_224: {
+              class: Digest::SecureHashAlgorithm,
+              mode: :'3_224',
+              block_size: 144
+            }.freeze,
+            sha_3_256: {
+              class: Digest::SecureHashAlgorithm,
+              mode: :'3_256',
+              block_size: 136
+            }.freeze,
+            sha_3_384: {
+              class: Digest::SecureHashAlgorithm,
+              mode: :'3_384',
+              block_size: 104
+            }.freeze,
+            sha_3_512: {
+              class: Digest::SecureHashAlgorithm,
+              mode: :'3_512',
+              block_size: 72
             }.freeze
           }.freeze
           # rubocop:enable Naming/VariableNumber
@@ -74,7 +94,7 @@ module Jason
           end
           alias << update
 
-          def digest(message = '')
+          def tag(message = '')
             start unless @started
             @started = false # this is the incorrect place for this but saves a temp var
             inner_message = @digest.digest(message)

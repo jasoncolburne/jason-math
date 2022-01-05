@@ -120,10 +120,21 @@ module Jason
         hex_to_byte_string(hex_string).bytes
       end
 
-      def self.xor(a, b)
-        raise 'Inputs must have equal length' unless a.length == b.length
+      def self.xor(*args)
+        if args.first.is_a? Array
+          length = args.first.first.length
 
-        a.bytes.zip(b.bytes).map { |x, y| (x ^ y).chr }.join
+          raise 'Inputs must have equal length' unless args.first.all? { |value| value.length == length }
+
+          args.first.inject("\x00" * length) { |a, b| xor(a, b) }
+        else
+          a = args[0]
+          b = args[1]
+
+          raise 'Inputs must have equal length' unless a.length == b.length
+
+          a.bytes.zip(b.bytes).map { |x, y| (x ^ y).chr }.join
+        end
       end
 
       def self.and(a, b)
