@@ -11,28 +11,18 @@ class CurveService
     curves = YAML.load_file('./curves.yml')
     params = curves[curve]
 
-    raise 'Unknown Curve Specified' unless params
+    raise 'Unknown Curve Specified' if params.nil?
 
     hex_characters_required = params['hex_characters_required']
     @hex_characters_required = hex_characters_required
 
-    n = params['n'].to_i(16)
-    a = params['a'].to_i(16)
-    b = params['b'].to_i(16)
-    x = hex_to_i(params['generator'], 0)
-    y = hex_to_i(params['generator'], 1)
-    order = params['order'].to_i(16)
-
-    @curve = Jason::Math::Cryptography::EllipticCurve::Curve.new(a, b, n)
-    @p = Jason::Math::Cryptography::EllipticCurve::Point.new(x, y)
-    @order = order
+    @ecc = Jason::Math::Cryptography::AsymmetricKey::EllipticCurve.new(curve.to_sym)
   end
 
   def generate_keypair
-    private_key = SecureRandom.hex(@hex_characters_required).to_i(16) % @curve.n
-
-    @generator ||= Jason::Math::Cryptography::EllipticCurve::AlgorithmBase.new(@curve, @p, @order)
-    public_key = @generator.generate_public_key(private_key)
+    private_key = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.curve.n
+    @ecc.private_key = private_key
+    public_key = @ecc.generate_public_key!
 
     {
       private_key: i_to_hex(private_key),
@@ -41,34 +31,28 @@ class CurveService
   end
 
   def sign(digest, private_key)
-    @dsa ||= Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorithm.new(@curve, @p, @order)
+    digest = digest.to_i(16) % @ecc.curve.n
+    @ecc.private_key = private_key.to_i(16)
+    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.curve.n
 
-    digest = digest.to_i(16) % @curve.n
-    private_key = private_key.to_i(16)
-    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @curve.n
-
-    signature = @dsa.sign(digest, private_key, entropy)
+    signature = @ecc.sign(digest, entropy)
 
     signature.map { |x| x.to_s(16).rjust(@hex_characters_required, '0') }.join
   end
 
   def verify(digest, public_key, signature)
-    @dsa ||= Jason::Math::Cryptography::EllipticCurve::DigitalSignatureAlgorithm.new(@curve, @p, @order)
-
-    digest = digest.to_i(16) % @curve.n
+    digest = digest.to_i(16) % @ecc.curve.n
     signature = [hex_to_i(signature, 0), hex_to_i(signature, 1)]
-    public_key = Jason::Math::Cryptography::EllipticCurve::Point.new(hex_to_i(public_key, 0), hex_to_i(public_key, 1))
+    @ecc.public_key = Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(hex_to_i(public_key, 0), hex_to_i(public_key, 1))
 
-    @dsa.verify(digest, signature, public_key)
+    @ecc.verify(digest, signature)
   end
 
   def encrypt(plaintext, public_key)
     raise 'Plaintext value too long' unless plaintext.b.length * 2 <= @hex_characters_required - 10
 
-    @elgamal ||= Jason::Math::Cryptography::EllipticCurve::ElGamal.new(@curve, @p, @order)
-
-    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @curve.n
-    public_key = Jason::Math::Cryptography::EllipticCurve::Point.new(hex_to_i(public_key, 0), hex_to_i(public_key, 1))
+    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.curve.n
+    @ecc.public_key = Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(hex_to_i(public_key, 0), hex_to_i(public_key, 1))
 
     # we have 32 bits to play with in an attempt to find a point on the curve
     filler = 0
@@ -82,14 +66,14 @@ class CurveService
       filler += 1
 
       # check if we have found a quadratic residue
-      x_prime = (x * x * x + @curve.a * x + @curve.b) % @curve.n
-      exponent = (@curve.n - 1) / 2
-      next unless x_prime.modular_exponentiation(exponent, @curve.n) == 1
+      x_prime = (x * x * x + @ecc.curve.a * x + @ecc.curve.b) % @ecc.curve.n
+      exponent = (@ecc.curve.n - 1) / 2
+      next unless x_prime.modular_exponentiation(exponent, @ecc.curve.n) == 1
 
-      y, = x_prime.modular_square_roots(@curve.n)
-      plaintext_point = Jason::Math::Cryptography::EllipticCurve::Point.new(x, y)
+      y, = x_prime.modular_square_roots(@ecc.curve.n)
+      plaintext_point = Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(x, y)
 
-      a, b = @elgamal.encrypt(plaintext_point, public_key, entropy)
+      a, b = @ecc.encrypt(plaintext_point, entropy)
       return a.to_hex(@hex_characters_required) + b.to_hex(@hex_characters_required)
     end
 
@@ -97,15 +81,13 @@ class CurveService
   end
 
   def decrypt(ciphertext, private_key)
-    @elgamal ||= Jason::Math::Cryptography::EllipticCurve::ElGamal.new(@curve, @p, @order)
-
     ciphertext = [
-      Jason::Math::Cryptography::EllipticCurve::Point.new(hex_to_i(ciphertext, 0), hex_to_i(ciphertext, 1)),
-      Jason::Math::Cryptography::EllipticCurve::Point.new(hex_to_i(ciphertext, 2), hex_to_i(ciphertext, 3))
+      Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(hex_to_i(ciphertext, 0), hex_to_i(ciphertext, 1)),
+      Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(hex_to_i(ciphertext, 2), hex_to_i(ciphertext, 3))
     ]
-    private_key = private_key.to_i(16)
+    @ecc.private_key = private_key.to_i(16)
 
-    plaintext_point = @elgamal.decrypt(ciphertext, private_key)
+    plaintext_point = @ecc.decrypt(ciphertext)
     plaintext = i_to_hex(plaintext_point.x)[8..]
     padding = plaintext[-2..].to_i(16)
     [plaintext].pack('H*')[0..(-padding - 1)]
