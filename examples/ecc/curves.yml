@@ -1,13 +1,27 @@
 secp112r1:
   hex_characters_required: 28
+secp112r2:
+  hex_characters_required: 28
 secp128r1:
   hex_characters_required: 32
+secp128r2:
+  hex_characters_required: 32
+secp160k1:
+  hex_characters_required: 40
 secp160r1:
   hex_characters_required: 40
+secp160r2:
+  hex_characters_required: 40
+secp192k1:
+  hex_characters_required: 48
 secp192r1:
   hex_characters_required: 48
+secp224k1:
+  hex_characters_required: 56
 secp224r1:
   hex_characters_required: 56
+secp256k1:
+  hex_characters_required: 64
 secp256r1:
   hex_characters_required: 64
 secp384r1:

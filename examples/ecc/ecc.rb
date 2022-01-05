@@ -20,7 +20,7 @@ class CurveService
   end
 
   def generate_keypair
-    private_key = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.curve.n
+    private_key = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.n
     @ecc.private_key = private_key
     public_key = @ecc.generate_public_key!
 
@@ -31,9 +31,9 @@ class CurveService
   end
 
   def sign(digest, private_key)
-    digest = digest.to_i(16) % @ecc.curve.n
+    digest = digest.to_i(16) % @ecc.n
     @ecc.private_key = private_key.to_i(16)
-    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.curve.n
+    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.n
 
     signature = @ecc.sign(digest, entropy)
 
@@ -41,7 +41,7 @@ class CurveService
   end
 
   def verify(digest, public_key, signature)
-    digest = digest.to_i(16) % @ecc.curve.n
+    digest = digest.to_i(16) % @ecc.n
     signature = [hex_to_i(signature, 0), hex_to_i(signature, 1)]
     @ecc.public_key = Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(hex_to_i(public_key, 0), hex_to_i(public_key, 1))
 
@@ -51,7 +51,7 @@ class CurveService
   def encrypt(plaintext, public_key)
     raise 'Plaintext value too long' unless plaintext.b.length * 2 <= @hex_characters_required - 10
 
-    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.curve.n
+    entropy = SecureRandom.hex(@hex_characters_required).to_i(16) % @ecc.n
     @ecc.public_key = Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(hex_to_i(public_key, 0), hex_to_i(public_key, 1))
 
     # we have 32 bits to play with in an attempt to find a point on the curve
@@ -66,11 +66,11 @@ class CurveService
       filler += 1
 
       # check if we have found a quadratic residue
-      x_prime = (x * x * x + @ecc.curve.a * x + @ecc.curve.b) % @ecc.curve.n
-      exponent = (@ecc.curve.n - 1) / 2
-      next unless x_prime.modular_exponentiation(exponent, @ecc.curve.n) == 1
+      x_prime = (x * x * x + @ecc.curve.a * x + @ecc.curve.b) % @ecc.n
+      exponent = (@ecc.n - 1) / 2
+      next unless x_prime.modular_exponentiation(exponent, @ecc.n) == 1
 
-      y, = x_prime.modular_square_roots(@ecc.curve.n)
+      y, = x_prime.modular_square_roots(@ecc.n)
       plaintext_point = Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(x, y)
 
       a, b = @ecc.encrypt(plaintext_point, entropy)
