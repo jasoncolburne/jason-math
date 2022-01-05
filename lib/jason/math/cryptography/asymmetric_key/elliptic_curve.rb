@@ -151,7 +151,7 @@ module Jason
               ].freeze,
               n: '3fffffff7fffffffbe0024720613b5a3'
             },
-            secp160k1: {
+            secp160k1: { # 80 bits of security
               p: 'fffffffffffffffffffffffffffffffeffffac73',
               a: '0000000000000000000000000000000000000000',
               b: '0000000000000000000000000000000000000007',
@@ -161,7 +161,7 @@ module Jason
               ].freeze,
               n: '0100000000000000000001b8fa16dfab9aca16b6b3'
             },
-            secp160r1: {
+            secp160r1: { # 80 bits of security
               p: 'ffffffffffffffffffffffffffffffff7fffffff',
               a: 'ffffffffffffffffffffffffffffffff7ffffffc',
               b: '1c97befc54bd7a8b65acf89f81d4d4adc565fa45',
@@ -171,7 +171,7 @@ module Jason
               ].freeze,
               n: '0100000000000000000001f4c8f927aed3ca752257'
             },
-            secp160r2: {
+            secp160r2: { # 80 bits of security
               p: 'fffffffffffffffffffffffffffffffeffffac73',
               a: 'fffffffffffffffffffffffffffffffeffffac70',
               b: 'b4e134d3fb59eb8bab57274904664d5af50388ba',
@@ -201,7 +201,7 @@ module Jason
               ].freeze,
               n: 'ffffffffffffffffffffffff99def836146bc9b1b4d22831'
             },
-            secp224k1: {
+            secp224k1: { # 112 bits of security
               p: 'fffffffffffffffffffffffffffffffffffffffffffffffeffffe56d',
               a: '00000000000000000000000000000000000000000000000000000000',
               b: '00000000000000000000000000000000000000000000000000000005',
@@ -211,7 +211,7 @@ module Jason
               ].freeze,
               n: '010000000000000000000000000001dce8d2ec6184caf0a971769fb1f7'
             },
-            secp224r1: {
+            secp224r1: { # 112 bits of security
               p: 'ffffffffffffffffffffffffffffffff000000000000000000000001',
               a: 'fffffffffffffffffffffffffffffffefffffffffffffffffffffffe',
               b: 'b4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4',
@@ -221,7 +221,7 @@ module Jason
               ].freeze,
               n: 'ffffffffffffffffffffffffffff16a2e0b8f03e13dd29455c5c2a3d'
             },
-            secp256k1: {
+            secp256k1: { # 128 bits of security
               p: 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2f',
               a: '0000000000000000000000000000000000000000000000000000000000000000',
               b: '0000000000000000000000000000000000000000000000000000000000000007',
@@ -231,7 +231,7 @@ module Jason
               ].freeze,
               n: 'fffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141'
             },
-            secp256r1: {
+            secp256r1: { # 128 bits of security
               p: 'ffffffff00000001000000000000000000000000ffffffffffffffffffffffff',
               a: 'ffffffff00000001000000000000000000000000fffffffffffffffffffffffc',
               b: '5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b',
@@ -241,7 +241,7 @@ module Jason
               ].freeze,
               n: 'ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551'
             },
-            secp384r1: {
+            secp384r1: { # 192 bits of security
               p: 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000ffffffff',
               a: 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000fffffffc',
               b: 'b3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef',
@@ -252,7 +252,7 @@ module Jason
               n: 'ffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973'
             }.freeze,
             # rubocop:disable Layout/LineLength
-            secp521r1: {
+            secp521r1: { # 256 bits of security
               p: '01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
               a: '01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc',
               b: '0051953eb9618e1c9a1f929a21a0b68540eea2da725b99b315f3b8b489918ef109e156193951ec7e937b1652c0bd3bb1bf073573df883d2c34f1ef451fd46b503f00',
