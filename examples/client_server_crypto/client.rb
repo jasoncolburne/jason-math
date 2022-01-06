@@ -23,7 +23,12 @@ argon = Cryptography::KeyStretching::Argon2.new(1, 32, 16384, 1)
 key = argon.stretch(password, salt)
 aes = Cryptography::SymmetricKey::AdvancedEncryptionStandard.new(:gcm_256, key)
 aes.initialization_vector = initialization_vector
-client_private_key = aes.decrypt(ciphered_private_key, '', tag).byte_string_to_integer
+begin
+  client_private_key = aes.decrypt(ciphered_private_key, '', tag).byte_string_to_integer
+rescue RuntimeError
+  puts 'could not decrypt data (bad password or corrupt file)'
+  exit(1)
+end
 
 socket = TCPSocket.new('0.0.0.0', ARGV.first || 1337)
 curve = :secp384r1
@@ -41,7 +46,12 @@ signature = Cryptography::AsymmetricKey::EllipticCurve::Point.from_byte_string(d
 sha = Cryptography::Digest::SecureHashAlgorithm.new(:'3_384')
 digest = sha.digest(payload).byte_string_to_integer
 ecc.public_key = Cryptography::AsymmetricKey::EllipticCurve::Point.from_byte_string(File.read('./server.pub').b)
-raise "could not verify server signature" unless ecc.verify(digest, signature)
+
+if !ecc.verify(digest, signature)
+  puts "could not verify server signature"
+  exit(2)
+end
+
 puts "verified server signature"
 
 puts "received public key: #{data[0..95].byte_string_to_hex}"
