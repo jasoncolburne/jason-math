@@ -86,7 +86,7 @@ module Jason
                 @modulus = n
               end
 
-              return [@public_key, d, n]
+              return [n, d, @public_key]
             end
           end
         end
