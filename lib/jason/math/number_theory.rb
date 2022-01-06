@@ -98,6 +98,31 @@ module Jason
           prime_by_miller_rabin?(number, iterations_of_miller_rabin)
       end
 
+      def self.large_random_prime(bytes)
+        candidate = nil
+        maximum = 2**(bytes * 8) - 1
+
+        loop do
+          if candidate.nil?
+            candidate = SecureRandom.random_bytes(bytes / 2)
+            candidate[0] = Utility.or(candidate[0], "\x80") # make it big
+            candidate[-1] = Utility.or(candidate[-1], "\x01") # make it odd
+            candidate = Utility.byte_string_to_integer(candidate)
+          else
+            candidate += 2
+          end
+
+          if candidate > maximum
+            candidate = nil
+            next
+          end
+
+          next unless NumberTheory.probably_prime?(candidate)
+
+          return candidate
+        end
+      end
+
       # returns a hash like { p1 => e1, p2 => e2 } where p1, p2 are primes and e1, e2
       # are their exponents
       def self.factors(number)

@@ -13,10 +13,10 @@ RSpec.describe Jason::Math::Cryptography::AsymmetricKey::EllipticCurve do
     let(:entropy) { 7407278997792429614718100118346226834821648880804871967998880577171127884109236798793589667645988119130728773680793 }
 
     let(:digest) { 'digest'.byte_string_to_integer }
-    let(:signature) { [
+    let(:signature) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(
       21449428499623135505784348435000890599661991798623885506423971580432277046166109693266600311822416106100166650664855,
       24797422184631820620560845656760730787347368306427043109544330552033025512140077305030035110697330124202962596483839
-    ] }
+     ) }
 
     let(:clear_text) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(
       21337967993269287603260625663048392874508418251095735152326232336820795502397741501036006553204045565663256,
@@ -46,7 +46,7 @@ RSpec.describe Jason::Math::Cryptography::AsymmetricKey::EllipticCurve do
       end
 
       context 'invalid signature' do
-        let(:signature) { [15, 11] }
+        let(:signature) { Jason::Math::Cryptography::AsymmetricKey::EllipticCurve::Point.new(15, 11) }
         it { is_expected.to be_falsey }
       end
     end

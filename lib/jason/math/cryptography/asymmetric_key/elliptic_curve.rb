@@ -37,8 +37,22 @@ module Jason
               @x.to_s(16).rjust(width, '0') + @y.to_s(16).rjust(width, '0')
             end
 
-            def self.from_hex(hex_string, width)
+            def to_byte_string(width)
+              Utility.integer_to_byte_string(@x).rjust(width, "\x00") +
+                Utility.integer_to_byte_string(@y).rjust(width, "\x00")
+            end
+
+            def self.from_hex(hex_string)
+              width = hex_string.length / 2
               new(hex_string[0..(width - 1)].to_i(16), hex_string[width..(2 * width - 1)].to_i(16))
+            end
+
+            def self.from_byte_string(byte_string)
+              width = byte_string.length / 2
+              new(
+                Utility.byte_string_to_integer(byte_string[0..(width - 1)]),
+                Utility.byte_string_to_integer(byte_string[width..(2 * width - 1)])
+              )
             end
           end
 
@@ -317,16 +331,16 @@ module Jason
             raise 'Entropy out of range' unless entropy.positive? && entropy < @n
 
             m = @curve.multiply(@generator, entropy)
-            [m.x, NumberTheory.modular_inverse(entropy, @n) * (digest + m.x * @private_key) % @n]
+            Point.new(m.x, NumberTheory.modular_inverse(entropy, @n) * (digest + m.x * @private_key) % @n)
           end
 
           def verify(digest, signature)
-            w = NumberTheory.modular_inverse(signature[1], @n)
+            w = NumberTheory.modular_inverse(signature.y, @n)
             u1 = digest * w % @n
-            u2 = signature[0] * w % @n
+            u2 = signature.x * w % @n
             p = @curve.add(@curve.multiply(@generator, u1), @curve.multiply(@public_key, u2))
 
-            p.x % @n == signature[0]
+            p.x % @n == signature.x
           end
 
           # Diffie Hellman
