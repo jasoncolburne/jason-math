@@ -36,6 +36,10 @@ module Jason
             def to_hex(width)
               @x.to_s(16).rjust(width, '0') + @y.to_s(16).rjust(width, '0')
             end
+
+            def self.from_hex(hex_string, width)
+              new(hex_string[0..(width - 1)].to_i(16), hex_string[width..(2 * width - 1)].to_i(16))
+            end
           end
 
           # An elliptic curve
@@ -284,7 +288,7 @@ module Jason
 
             unless private_key.nil?
               self.private_key = private_key
-              self.public_key = @curve.multiply(@generator, @private_key) if public_key.nil?
+              generate_public_key! if public_key.nil?
             end
 
             self.public_key = public_key unless public_key.nil?
