@@ -157,18 +157,16 @@ module Jason
         result = []
 
         until n.zero?
-          result.unshift(n & 0xffffffff)
-          n >>= 32
+          result.unshift(n & 0xff)
+          n >>= 8
         end
 
-        result.pack('N*')
+        result.pack('C*')
       end
 
-      INT32_MAX = 2**32
-
       def self.byte_string_to_integer(byte_string)
-        byte_string.unpack('N*').reverse.each_with_index.inject(0) do |sum, (byte, index)|
-          sum + byte * (INT32_MAX**index)
+        byte_string.unpack('C*').reverse.each_with_index.inject(0) do |sum, (byte, index)|
+          sum + byte * (256**index)
         end
       end
 
