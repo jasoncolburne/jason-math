@@ -193,7 +193,7 @@ module Jason
             0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
           ].freeze
 
-          def initialize(mode, key, use_openssl: false)
+          def initialize(mode, key, use_openssl: false) # rubocop:disable Metrics/MethodLength
             mode_details = MODE_DETAILS[mode]
 
             @use_openssl = use_openssl
@@ -233,7 +233,10 @@ module Jason
 
           def decrypt(cipher_text, authenticated_data = nil, tag = nil, strip_padding: true)
             return decrypt_openssl(cipher_text) if @use_openssl
-            return send("decrypt_#{@mode}".to_sym, cipher_text, strip_padding: strip_padding) if authenticated_data.nil? || tag.nil?
+
+            if authenticated_data.nil? || tag.nil?
+              return send("decrypt_#{@mode}".to_sym, cipher_text, strip_padding: strip_padding)
+            end
 
             send("decrypt_#{@mode}".to_sym, cipher_text, authenticated_data, tag)
           end
@@ -685,7 +688,7 @@ module Jason
             result
           end
 
-          def galois_multiply_f_2_128(x, y)
+          def galois_multiply_f_2_128(x, y) # rubocop:disable Naming/VariableNumber
             result = 0
             x = Utility.byte_string_to_integer(x)
 
@@ -694,7 +697,7 @@ module Jason
               x = (x >> 1) ^ ((x & 1) * 0xE1000000000000000000000000000000)
             end
 
-            Utility.integer_to_byte_string(result).rjust(@block_size, "\x00")[-16..-1]
+            Utility.integer_to_byte_string(result).rjust(@block_size, "\x00")[-16..]
           end
 
           def decrypt_openssl(cipher_text)
