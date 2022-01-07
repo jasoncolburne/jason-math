@@ -67,7 +67,7 @@ module Jason
           KECCAK_ALGORITHMS = %i[shake128 shake256 3_224 3_256 3_384 3_512].freeze
 
           PARAMETERS = {
-            '1': {
+            '1': { # 80 bits of security
               h: [
                 0x67452301,
                 0xefcdab89,
@@ -78,7 +78,7 @@ module Jason
               max_integer: 2**32,
               block_size: 64
             }.freeze,
-            '224': {
+            '224': { # 112 bits of security
               h: [
                 0xc1059ed8,
                 0x367cd507,
@@ -93,7 +93,7 @@ module Jason
               max_integer: 2**32,
               block_size: 64
             }.freeze,
-            '256': {
+            '256': { # 128 bits of security
               h: [
                 0x6a09e667,
                 0xbb67ae85,
@@ -108,7 +108,7 @@ module Jason
               max_integer: 2**32,
               block_size: 64
             }.freeze,
-            '384': {
+            '384': { # 192 bits of security
               h: [
                 0xcbbb9d5dc1059ed8,
                 0x629a292a367cd507,
@@ -123,7 +123,7 @@ module Jason
               max_integer: 2**64,
               block_size: 128
             }.freeze,
-            '512': {
+            '512': { # 256 bits of security
               h: [
                 0x6a09e667f3bcc908,
                 0xbb67ae8584caa73b,
@@ -138,7 +138,7 @@ module Jason
               max_integer: 2**64,
               block_size: 128
             }.freeze,
-            '512_224': {
+            '512_224': { # 112 bits of security
               h: [
                 0x8c3d37c819544da2,
                 0x73e1996689dcd4d6,
@@ -153,7 +153,7 @@ module Jason
               max_integer: 2**64,
               block_size: 128
             }.freeze,
-            '512_256': {
+            '512_256': { # 128 bits of security
               h: [
                 0x22312194fc2bf72c,
                 0x9f555fa3c84c64c2,
@@ -182,28 +182,28 @@ module Jason
               mask: 0xffffffffffffffff,
               block_size: 136
             },
-            '3_224': {
+            '3_224': { # 112 bits of security
               r: 1152,
               c: 448,
               d: 0x06,
               mask: 0xffffffffffffffff,
               block_size: 144
             },
-            '3_256': {
+            '3_256': { # 128 bits of security
               r: 1088,
               c: 512,
               d: 0x06,
               mask: 0xffffffffffffffff,
               block_size: 136
             },
-            '3_384': {
+            '3_384': { # 192 bits of security
               r: 832,
               c: 768,
               d: 0x06,
               mask: 0xffffffffffffffff,
               block_size: 104
             },
-            '3_512': {
+            '3_512': { # 256 bits of security
               r: 576,
               c: 1024,
               d: 0x06,

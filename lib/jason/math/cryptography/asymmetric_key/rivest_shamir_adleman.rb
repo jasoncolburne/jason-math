@@ -12,7 +12,7 @@ module Jason
             '512': {
               key_length: 64 # in bytes
             }.freeze,
-            '1024': {
+            '1024': { # 80 bits of security
               key_length: 128 # in bytes
             }.freeze,
             '2048': { # 112 bits of security
