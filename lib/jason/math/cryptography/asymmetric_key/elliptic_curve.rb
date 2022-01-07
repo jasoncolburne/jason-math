@@ -111,6 +111,66 @@ module Jason
           # include Math
 
           PARAMETERS = {
+            secp112r1: {
+              n: 'db7c2abf62e35e668076bead208b',
+              a: 'db7c2abf62e35e668076bead2088',
+              b: '659ef8ba043916eede8911702b22',
+              generator: %w[
+                09487239995a5ee76b55f9c2f098
+                a89ce5af8724c0a23e0e0ff77500
+              ].freeze,
+              order: 'db7c2abf62e35e7628dfac6561c5'
+            },
+            secp128r1: {
+              n: 'fffffffdffffffffffffffffffffffff',
+              a: 'fffffffdfffffffffffffffffffffffc',
+              b: 'e87579c11079f43dd824993c2cee5ed3',
+              generator: %w[
+                161ff7528b899b2d0c28607ca52c5b86
+                cf5ac8395bafeb13c02da292dded7a83
+              ].freeze,
+              order: 'fffffffe0000000075a30d1b9038a115'
+            },
+            secp160r1: {
+              n: 'ffffffffffffffffffffffffffffffff7fffffff',
+              a: 'ffffffffffffffffffffffffffffffff7ffffffc',
+              b: '1c97befc54bd7a8b65acf89f81d4d4adc565fa45',
+              generator: %w[
+                4a96b5688ef573284664698968c38bb913cbfc82
+                23a628553168947d59dcc912042351377ac5fb32
+              ].freeze,
+              order: '0100000000000000000001f4c8f927aed3ca752257'
+            },
+            secp192r1: {
+              n: 'fffffffffffffffffffffffffffffffeffffffffffffffff',
+              a: 'fffffffffffffffffffffffffffffffefffffffffffffffc',
+              b: '64210519e59c80e70fa7e9ab72243049feb8deecc146b9b1',
+              generator: %w[
+                188da80eb03090f67cbf20eb43a18800f4ff0afd82ff1012
+                07192b95ffc8da78631011ed6b24cdd573f977a11e794811
+              ].freeze,
+              order: 'ffffffffffffffffffffffff99def836146bc9b1b4d22831'
+            },
+            secp224r1: {
+              n: 'ffffffffffffffffffffffffffffffff000000000000000000000001',
+              a: 'fffffffffffffffffffffffffffffffefffffffffffffffffffffffe',
+              b: 'b4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4',
+              generator: %w[
+                b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21
+                bd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34
+              ].freeze,
+              order: 'ffffffffffffffffffffffffffff16a2e0b8f03e13dd29455c5c2a3d'
+            },
+            secp256r1: {
+              n: 'ffffffff00000001000000000000000000000000ffffffffffffffffffffffff',
+              a: 'ffffffff00000001000000000000000000000000fffffffffffffffffffffffc',
+              b: '5ac635d8aa3a93e7b3ebbd55769886bc651d06b0cc53b0f63bce3c3e27d2604b',
+              generator: %w[
+                6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296
+                4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5
+              ].freeze,
+              order: 'ffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551'
+            },
             secp384r1: {
               n: 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000ffffffff',
               a: 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000fffffffc',
