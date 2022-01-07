@@ -4,28 +4,9 @@ module Jason
   module Math
     module Cryptography
       module AsymmetricKey
-        module EllipticCurve
-          # port of https://gist.github.com/bellbind/1414867/04ccbaa3fe97304d3d9d91c36520a662f2e28a45
-
-          # A couple math routines used by ECC
-          module Math
-            def inverse(x, n)
-              NumberTheory.modular_inverse(x, n)
-            end
-
-            # want to replace with an optimized version for prime n
-            # but it breaks the naive tests (where n is 19).
-            # should likely test with NIST params
-            def sqrt(x, n)
-              raise 'x must be < n' unless x < n
-
-              (1..n).each do |i|
-                return [i, n - i] if i * i % n == x
-              end
-
-              raise 'No root found'
-            end
-          end
+        # ECC
+        class EllipticCurve
+          # originally, a port of https://gist.github.com/bellbind/1414867/04ccbaa3fe97304d3d9d91c36520a662f2e28a45
 
           # A point on an elliptic curve
           class Point
@@ -59,8 +40,6 @@ module Jason
 
           # An elliptic curve
           class Curve
-            include Math
-
             attr_reader :a, :b, :n, :zero
 
             # (y**2 = x**3 + a * x + b) mod n
@@ -81,15 +60,6 @@ module Jason
               l == r
             end
 
-            def at(x)
-              raise 'x must be < n' unless x < @n
-
-              ysq = (x * x * x + @a * x + @b) % @n
-              y, my = sqrt(ysq, @n)
-
-              [Point.new(x, y), Point.new(x, my)]
-            end
-
             def negate(p)
               Point.new(p.x, -p.y % @n)
             end
@@ -102,9 +72,9 @@ module Jason
               return @zero if p1.x == p2.x && (p1.y != p2.y || p1.y.zero?)
 
               l = if p1.x == p2.x
-                    (3 * p1.x * p1.x + @a) * inverse(2 * p1.y, @n) % @n
+                    (3 * p1.x * p1.x + @a) * NumberTheory.modular_inverse(2 * p1.y, @n) % @n
                   else
-                    (p2.y - p1.y) * inverse(p2.x - p1.x, @n) % @n
+                    (p2.y - p1.y) * NumberTheory.modular_inverse(p2.x - p1.x, @n) % @n
                   end
 
               x = (l * l - p1.x - p2.x) % @n
@@ -138,76 +108,120 @@ module Jason
             end
           end
 
-          # Each algorithm shares this code
-          class AlgorithmBase
-            def initialize(curve, generator, order = nil)
-              raise 'Invalid generator specified' unless curve.valid?(generator)
+          # include Math
 
-              @curve = curve
-              @generator = generator
-              @order = order || curve.order(generator)
+          PARAMETERS = {
+            secp384r1: {
+              n: 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000ffffffff',
+              a: 'fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffeffffffff0000000000000000fffffffc',
+              b: 'b3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef',
+              generator: %w[
+                aa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7
+                3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f
+              ].freeze,
+              order: 'ffffffffffffffffffffffffffffffffffffffffffffffffc7634d81f4372ddf581a0db248b0a77aecec196accc52973'
+            }.freeze,
+            # rubocop:disable Layout/LineLength
+            secp521r1: {
+              n: '01ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
+              a: '01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc',
+              b: '0051953eb9618e1c9a1f929a21a0b68540eea2da725b99b315f3b8b489918ef109e156193951ec7e937b1652c0bd3bb1bf073573df883d2c34f1ef451fd46b503f00',
+              generator: %w[
+                00c6858e06b70404e9cd9e3ecb662395b4429c648139053fb521f828af606b4d3dbaa14b5e77efe75928fe1dc127a2ffa8de3348b3c1856a429bf97e7e31c2e5bd66
+                011839296a789a3bc0045c8a5fb42c7d1bd998f54449579b446817afbd17273e662c97ee72995ef42640c550b9013fad0761353c7086a272c24088be94769fd16650
+              ].freeze,
+              order: '01fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffa51868783bf2f966b7fcc0148f709a5d03bb5c9b8899c47aebb6fb71e91386409'
+            }.freeze
+            # rubocop:enable Layout/LineLength
+          }.freeze
+
+          attr_reader :curve
+
+          def initialize(algorithm, private_key = nil, public_key = nil)
+            parameters = PARAMETERS[algorithm]
+            raise 'unsupported algorithm' if parameters.nil?
+
+            a = parameters[:a].to_i(16)
+            b = parameters[:b].to_i(16)
+            n = parameters[:n].to_i(16)
+
+            @curve = Curve.new(a, b, n)
+            @generator = Point.new(
+              parameters[:generator][0].to_i(16),
+              parameters[:generator][1].to_i(16)
+            )
+            @order = parameters[:order].to_i(16) || curve.order(@generator)
+
+            unless private_key.nil?
+              self.private_key = private_key
+              self.public_key = @curve.multiply(@generator, @private_key) if public_key.nil?
             end
 
-            def generate_public_key(private_key)
-              raise 'Private key out of range' unless private_key.positive? && private_key < @order
-
-              @curve.multiply(@generator, private_key)
-            end
+            self.public_key = public_key unless public_key.nil?
           end
 
-          # ECDSA
-          class DigitalSignatureAlgorithm < AlgorithmBase
-            include Math
-
-            def sign(digest, private_key, entropy)
-              raise 'Entropy out of range' unless entropy.positive? && entropy < @order
-
-              m = @curve.multiply(@generator, entropy)
-              [m.x, inverse(entropy, @order) * (digest + m.x * private_key) % @order]
-            end
-
-            def verify(digest, signature, public_key)
-              raise 'Invalid public key' unless @curve.valid?(public_key)
-              raise 'Invalid public key' unless @curve.multiply(public_key, @order) == @curve.zero
-
-              w = inverse(signature[1], @order)
-              u1 = digest * w % @order
-              u2 = signature[0] * w % @order
-              p = @curve.add(@curve.multiply(@generator, u1), @curve.multiply(public_key, u2))
-
-              p.x % @order == signature[0]
-            end
+          def generate_public_key!
+            self.public_key = @curve.multiply(@generator, @private_key)
           end
 
-          # ECDH
-          class DiffieHellman < AlgorithmBase
-            # my private_key
-            # partner public_key
-            def compute_secret(private_key, public_key)
-              raise 'Invalid public key' unless @curve.valid?(public_key)
-              raise 'Invalid public key' unless @curve.multiply(public_key, @order) == @curve.zero
+          def private_key=(private_key)
+            raise 'Private key out of range' unless private_key.positive? && private_key < @order
 
-              @curve.multiply(public_key, private_key)
-            end
+            @private_key = private_key
+          end
+
+          def public_key=(public_key)
+            raise 'Invalid public key' unless @curve.valid?(public_key)
+            raise 'Invalid public key' unless @curve.multiply(public_key, @order) == @curve.zero
+
+            @public_key = public_key
+          end
+
+          # DigitalSignatureAlgorithm
+
+          def sign(digest, entropy)
+            raise 'Entropy out of range' unless entropy.positive? && entropy < @order
+
+            m = @curve.multiply(@generator, entropy)
+            [m.x, NumberTheory.modular_inverse(entropy, @order) * (digest + m.x * @private_key) % @order]
+          end
+
+          def verify(digest, signature)
+            w = NumberTheory.modular_inverse(signature[1], @order)
+            u1 = digest * w % @order
+            u2 = signature[0] * w % @order
+            p = @curve.add(@curve.multiply(@generator, u1), @curve.multiply(@public_key, u2))
+
+            p.x % @order == signature[0]
+          end
+
+          # Diffie Hellman
+
+          # my private_key
+          # partner public_key
+          def compute_secret(private_key, public_key)
+            raise 'Private key out of range' unless private_key.positive? && private_key < @order
+            raise 'Invalid public key' unless @curve.valid?(public_key)
+            raise 'Invalid public key' unless @curve.multiply(public_key, @order) == @curve.zero
+
+            @curve.multiply(public_key, private_key)
           end
 
           # ElGamal on ECC
-          class ElGamal < AlgorithmBase
-            # plaintext is a point on the curve
-            def encrypt(plaintext, public_key, entropy)
-              raise 'Invalid plaintext value' unless @curve.valid?(plaintext)
-              raise 'Invalid public key' unless @curve.valid?(public_key)
 
-              [@curve.multiply(@generator, entropy), @curve.add(plaintext, @curve.multiply(public_key, entropy))]
-            end
+          # plaintext is a point on the curve
+          def encrypt(plaintext, entropy)
+            raise 'Invalid plaintext value' unless @curve.valid?(plaintext)
 
-            # ciphertext is an array of two points on the curve
-            def decrypt(ciphertext, private_key)
-              c1, c2 = ciphertext
-              raise 'Invalid ciphertext values' unless @curve.valid?(c1) && @curve.valid?(c2)
+            [@curve.multiply(@generator, entropy), @curve.add(plaintext, @curve.multiply(@public_key, entropy))]
+          end
 
-              @curve.add(c2, @curve.negate(@curve.multiply(c1, private_key)))
-            end
+          # ciphertext is an array of two points on the curve
+          def decrypt(ciphertext)
+            c1, c2 = ciphertext
+            raise 'Invalid ciphertext values' unless @curve.valid?(c1) && @curve.valid?(c2)
+
+            @curve.add(c2, @curve.negate(@curve.multiply(c1, @private_key)))
           end
         end
       end
