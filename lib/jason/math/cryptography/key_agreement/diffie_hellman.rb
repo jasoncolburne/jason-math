@@ -54,9 +54,11 @@ module Jason
             @mode = mode
 
             @p = if p.nil?
-                   parameters[:p].nil? ? 
-                     NumberTheory.large_random_prime(parameters[:prime_length]) :
+                   if parameters[:p].nil?
+                     NumberTheory.large_random_prime(parameters[:prime_length])
+                   else
                      parameters[:p].to_i(16)
+                   end
                  else
                    p
                  end
