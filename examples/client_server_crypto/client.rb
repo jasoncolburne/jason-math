@@ -68,9 +68,9 @@ socket.write(payload + signature)
 
 secret = ecc.compute_secret(my_private_key, partner_public_key)
 secret = (secret.x ^ secret.y).to_byte_string.rjust(48, "\x00")
-puts "computed shared secret: #{secret.byte_string_to_hex}"
+puts "computed shared secret: #{secret.byte_string_to_hex}" if DEBUG
 key = secret[0..23] ^ secret[24..47]
-puts "derived aes-gcm key: #{key.byte_string_to_hex}"
+puts "derived aes-gcm key: #{key.byte_string_to_hex}" if DEBUG
 aes = Cryptography::SymmetricKey::AdvancedEncryptionStandard.new(:gcm_192, key)
 
 puts "using initialization vector: #{initialization_vector.byte_string_to_hex}"
