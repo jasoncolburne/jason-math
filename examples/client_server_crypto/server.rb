@@ -26,7 +26,12 @@ class SecretManager
 end
 
 loop do
-  client = server.accept
+  begin
+    client = server.accept
+  rescue Interrupt
+    puts
+    break
+  end
 
   ecc = Cryptography::AsymmetricKey::EllipticCurve.new(curve)
   my_private_ecdh_key = SecureRandom.random_bytes(48).byte_string_to_integer % ecc.n
