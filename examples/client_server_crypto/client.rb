@@ -7,6 +7,10 @@ require 'bundler/setup'
 require 'jason/math'
 require 'securerandom'
 
+# DEBUG=1 ./client.rb # to see the ciphertext
+# ctrl-d to end your session
+
+DEBUG = !!ENV['DEBUG']
 Cryptography = Jason::Math::Cryptography
 
 password = IO::console.getpass 'password: '
@@ -72,14 +76,30 @@ aes = Cryptography::SymmetricKey::AdvancedEncryptionStandard.new(:gcm_192, key)
 puts "using initialization vector: #{initialization_vector.byte_string_to_hex}"
 aes.initialization_vector = initialization_vector
 
+puts
+
 loop do
   payload = socket.recv(4096)
-  cipher_text = payload[0..(payload.length - 17)]
+  break if payload.empty?
+  puts payload.byte_string_to_hex if DEBUG
+
+  cipher_text = payload[0..- 17]
   tag = payload[-16..]
   clear_text = aes.decrypt(cipher_text, '', tag)
+
+  print 'server: '
   print clear_text
 
+  print 'client> '
   clear_text = $stdin.gets
+  if clear_text.nil?
+    puts
+    break
+  end
+
   cipher_text, tag = aes.encrypt(clear_text, '')
   socket.write(cipher_text + tag)
+  puts (cipher_text + tag).byte_string_to_hex if DEBUG
 end
+
+socket.close

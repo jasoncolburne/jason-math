@@ -7,6 +7,10 @@ require 'jason/math'
 require 'securerandom'
 require 'socket'
 
+# DEBUG=1 ./server.rb # to see the ciphertext
+# ctrl-d to end a session, ctrl-c to exit
+
+DEBUG = !!ENV['DEBUG']
 Cryptography = Jason::Math::Cryptography
 
 server = TCPServer.new(ARGV[0] || 1337)
@@ -63,18 +67,36 @@ loop do
   puts "using initialization vector: #{initialization_vector.byte_string_to_hex}"
   aes.initialization_vector = initialization_vector
 
+  puts
+
   loop do
+    print 'server> '
     clear_text = $stdin.gets
+    if clear_text.nil?
+      puts
+      break
+    end
+
     cipher_text, tag = aes.encrypt(clear_text, '')
     client.write(cipher_text + tag)
+    puts (cipher_text + tag).byte_string_to_hex if DEBUG
 
     payload = client.recv(4096)
-    cipher_text = payload[0..(payload.length - 17)]
+    break if payload.empty?
+
+    puts payload.byte_string_to_hex if DEBUG
+
+    cipher_text = payload[0..-17]
     tag = payload[-16..]
     clear_text = aes.decrypt(cipher_text, '', tag)
+
+    print 'client: '
     print clear_text
   end
 
+  puts
+  puts '----------------------------------------------------------------------'
+  puts
   client.close
 end
 

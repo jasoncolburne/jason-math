@@ -226,17 +226,14 @@ module Jason
 
           def encrypt(clear_text, authenticated_data = nil)
             return encrypt_openssl(clear_text) if @use_openssl
-            return send("encrypt_#{@mode}".to_sym, clear_text) if authenticated_data.nil?
+            return send("encrypt_#{@mode}".to_sym, clear_text) unless @mode == :gcm
 
             send("encrypt_#{@mode}".to_sym, clear_text, authenticated_data)
           end
 
           def decrypt(cipher_text, authenticated_data = nil, tag = nil, strip_padding: true)
             return decrypt_openssl(cipher_text) if @use_openssl
-
-            if authenticated_data.nil? || tag.nil?
-              return send("decrypt_#{@mode}".to_sym, cipher_text, strip_padding: strip_padding)
-            end
+            return send("decrypt_#{@mode}".to_sym, cipher_text, strip_padding: strip_padding) unless @mode == :gcm
 
             send("decrypt_#{@mode}".to_sym, cipher_text, authenticated_data, tag)
           end
