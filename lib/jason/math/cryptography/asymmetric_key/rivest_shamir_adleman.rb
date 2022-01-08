@@ -36,7 +36,7 @@ module Jason
             @algorithm = algorithm
             @modulus = modulus unless modulus.nil?
             @private_key = private_key unless private_key.nil?
-            @public_key = public_key
+            @public_key = public_key unless public_key.nil?
 
             parameters = PARAMETERS[@algorithm]
             parameters.each_pair { |key, value| instance_variable_set("@#{key}", value) }
@@ -64,28 +64,9 @@ module Jason
             digest % @modulus == NumberTheory.modular_exponentiation(signature, @public_key, @modulus)
           end
 
-          def generate_keypair(update_instance: true) # rubocop:disable Metrics/MethodLength
+          def generate_keypair!(update_instance: true)
             loop do
-              primes = []
-
-              prime_candidate = nil
-              while primes.length < 2
-                if prime_candidate.nil?
-                  candidate = SecureRandom.random_bytes(@key_length / 2)
-                  candidate[0] = Utility.or(candidate[0], "\x80") # make it big
-                  candidate[-1] = Utility.or(candidate[-1], "\x01") # make it odd
-
-                  prime_candidate = candidate.byte_string_to_integer
-                else
-                  prime_candidate += 2
-                end
-
-                next unless NumberTheory.probably_prime?(prime_candidate)
-
-                primes << prime_candidate
-              end
-
-              p, q = primes
+              p, q = 2.times.map { NumberTheory.large_random_prime(@key_length / 2) }
               n = p * q
               l = NumberTheory.lcm(p - 1, q - 1)
 
