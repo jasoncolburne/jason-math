@@ -171,6 +171,38 @@ RSpec.describe Jason::Math::Cryptography::SymmetricKey::AdvancedEncryptionStanda
         end
       end
     end
+
+    context 'galois counter (gcm)' do
+      let(:mode) { 'gcm' }
+      let(:initialization_vector) { "\x51\x75\x3c\x65\x80\xc2\x72\x6f\x20\x71\x84\x14\x00\x00\x00\x00".b }
+      let(:clear_text) { "\x47\x61\x6c\x6c\x69\x61\x20\x65\x73\x74\x20\x6f\x6d\x6e\x69\x73\x20\x64\x69\x76\x69\x73\x61\x20\x69\x6e\x20\x70\x61\x72\x74\x65\x73\x20\x74\x72\x65\x73".b }
+      let(:cipher_text) { "\xf2\x4d\xe3\xa3\xfb\x34\xde\x6c\xac\xba\x86\x1c\x9d\x7e\x4b\xca\xbe\x63\x3b\xd5\x0d\x29\x4e\x6f\x42\xa5\xf4\x7a\x51\xc7\xd1\x9b\x36\xde\x3a\xdf\x88\x33".b }
+      let(:tag) { "\x89\x9d\x7f\x27\xbe\xb1\x6a\x91\x52\xcf\x76\x5e\xe4\x39\x0c\xce".b }
+      let(:authenticated_data) { "\x80\x40\xf1\x7b\x80\x41\xf8\xd3\x55\x01\xa0\xb2".b }
+      let(:key) { "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f".b }
+
+      before(:each) do
+        aes.initialization_vector = initialization_vector
+      end
+
+      context '#encrypt' do
+        subject { aes.encrypt(clear_text, authenticated_data) }
+        it { is_expected.to eq([cipher_text, tag]) }
+      end
+
+      context '#decrypt' do
+        subject { aes.decrypt(cipher_text, authenticated_data, tag) }
+        
+        context 'valid tag' do
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context 'invalid tag' do
+          let(:tag) { "\x89\x9d\x7f\x27\xbe\xb1\x6a\x91\x52\xcf\x76\x5e\xe4\x39\x0c\xcd".b }
+          it { expect { subject }.to raise_error }
+        end
+      end
+    end
   end
 
   context '192-bit' do
@@ -332,6 +364,38 @@ RSpec.describe Jason::Math::Cryptography::SymmetricKey::AdvancedEncryptionStanda
         context '9 byte payload' do
           subject { aes.encrypt(smaller_clear_text) }
           it { is_expected.to eq(smaller_cipher_text) }
+        end
+      end
+    end
+
+    context 'galois counter (gcm)' do
+      let(:mode) { 'gcm' }
+      let(:initialization_vector) { "\x51\x75\x3c\x65\x80\xc2\x72\x6f\x20\x71\x84\x14\x00\x00\x00\x00".b }
+      let(:clear_text) { "\x47\x61\x6c\x6c\x69\x61\x20\x65\x73\x74\x20\x6f\x6d\x6e\x69\x73\x20\x64\x69\x76\x69\x73\x61\x20\x69\x6e\x20\x70\x61\x72\x74\x65\x73\x20\x74\x72\x65\x73".b }
+      let(:cipher_text) { "7J\x8E*\x98\x1F\x83\xF0\xC3\t\xA3:\xD2\xA2\xD3D\x91M\xCD3I\x1C\x1A>\x9A\x11*\xD6(z\xAE\xD0\xD1\x89X\x06\x8A\x9B".b }
+      let(:tag) { "\xD0\xCD]\xF8\"\xE4\x05\x10g\xFB\xA6[\xDD\xC6\xD0\x0E".b }
+      let(:authenticated_data) { "\x80\x40\xf1\x7b\x80\x41\xf8\xd3\x55\x01\xa0\xb2".b }
+      let(:key) { "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17".b }
+
+      before(:each) do
+        aes.initialization_vector = initialization_vector
+      end
+
+      context '#encrypt' do
+        subject { aes.encrypt(clear_text, authenticated_data) }
+        it { is_expected.to eq([cipher_text, tag]) }
+      end
+
+      context '#decrypt' do
+        subject { aes.decrypt(cipher_text, authenticated_data, tag) }
+        
+        context 'valid tag' do
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context 'invalid tag' do
+          let(:tag) { "\x7a\xa3\xdb\x36\xdf\xff\xd6\xb0\xf9\xbb\x78\x78\xd7\xa7\x6c\x12".b }
+          it { expect { subject }.to raise_error }
         end
       end
     end
@@ -502,6 +566,38 @@ RSpec.describe Jason::Math::Cryptography::SymmetricKey::AdvancedEncryptionStanda
         context '9 byte payload' do
           subject { aes.encrypt(smaller_clear_text) }
           it { is_expected.to eq(smaller_cipher_text) }
+        end
+      end
+    end
+
+    context 'galois counter (gcm)' do
+      let(:mode) { 'gcm' }
+      let(:initialization_vector) { "\x51\x75\x3c\x65\x80\xc2\x72\x6f\x20\x71\x84\x14\x00\x00\x00\x00".b }
+      let(:clear_text) { "\x47\x61\x6c\x6c\x69\x61\x20\x65\x73\x74\x20\x6f\x6d\x6e\x69\x73\x20\x64\x69\x76\x69\x73\x61\x20\x69\x6e\x20\x70\x61\x72\x74\x65\x73\x20\x74\x72\x65\x73".b }
+      let(:cipher_text) { "\x32\xb1\xde\x78\xa8\x22\xfe\x12\xef\x9f\x78\xfa\x33\x2e\x33\xaa\xb1\x80\x12\x38\x9a\x58\xe2\xf3\xb5\x0b\x2a\x02\x76\xff\xae\x0f\x1b\xa6\x37\x99\xb8\x7b".b }
+      let(:tag) { "\x7a\xa3\xdb\x36\xdf\xff\xd6\xb0\xf9\xbb\x78\x78\xd7\xa7\x6c\x13".b }
+      let(:authenticated_data) { "\x80\x40\xf1\x7b\x80\x41\xf8\xd3\x55\x01\xa0\xb2".b }
+      let(:key) { "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f".b }
+
+      before(:each) do
+        aes.initialization_vector = initialization_vector
+      end
+
+      context '#encrypt' do
+        subject { aes.encrypt(clear_text, authenticated_data) }
+        it { is_expected.to eq([cipher_text, tag]) }
+      end
+
+      context '#decrypt' do
+        subject { aes.decrypt(cipher_text, authenticated_data, tag) }
+        
+        context 'valid tag' do
+          it { is_expected.to eq(clear_text) }
+        end
+
+        context 'invalid tag' do
+          let(:tag) { "\x7a\xa3\xdb\x36\xdf\xff\xd6\xb0\xf9\xbb\x78\x78\xd7\xa7\x6c\x12".b }
+          it { expect { subject }.to raise_error }
         end
       end
     end

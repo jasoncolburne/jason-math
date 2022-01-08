@@ -96,6 +96,27 @@ module Jason
               key_size: 8, # in 4-byte words
               openssl_algorithm: 'aes-256-ecb'
             }.freeze,
+            gcm_128: {
+              mode: :gcm,
+              bits: 128,
+              rounds: 10,
+              key_size: 4, # in 4-byte words
+              openssl_algorithm: 'aes-128-gcm'
+            }.freeze,
+            gcm_192: {
+              mode: :gcm,
+              bits: 192,
+              rounds: 12,
+              key_size: 6, # in 4-byte words
+              openssl_algorithm: 'aes-192-gcm'
+            }.freeze,
+            gcm_256: {
+              mode: :gcm,
+              bits: 256,
+              rounds: 14,
+              key_size: 8, # in 4-byte words
+              openssl_algorithm: 'aes-256-gcm'
+            }.freeze,
             ofb_128: {
               mode: :ofb,
               bits: 128,
@@ -172,7 +193,7 @@ module Jason
             0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
           ].freeze
 
-          def initialize(mode, key, use_openssl: false)
+          def initialize(mode, key, use_openssl: false) # rubocop:disable Metrics/MethodLength
             mode_details = MODE_DETAILS[mode]
 
             @use_openssl = use_openssl
@@ -188,19 +209,36 @@ module Jason
               @initialization_vector = "\x00" * @block_size
               @counter_limit = 2**(@block_size * 8)
               @key_schedule = expand_key(key)
+              auth_key = encrypt_ecb(@initialization_vector)[0..15]
+
+              if @mode.to_s.end_with?('gcm')
+                @gcm_multiplication_table = [] # for 8-bit
+                16.times do |i|
+                  row = []
+                  256.times do |j|
+                    row << galois_multiply_f_2_128(auth_key, j << (8 * i))
+                  end
+                  @gcm_multiplication_table << row
+                end
+              end
             end
           end
 
-          def encrypt(clear_text)
+          def encrypt(clear_text, authenticated_data = nil)
             return encrypt_openssl(clear_text) if @use_openssl
+            return send("encrypt_#{@mode}".to_sym, clear_text) if authenticated_data.nil?
 
-            send("encrypt_#{@mode}".to_sym, clear_text)
+            send("encrypt_#{@mode}".to_sym, clear_text, authenticated_data)
           end
 
-          def decrypt(cipher_text, strip_padding: true)
+          def decrypt(cipher_text, authenticated_data = nil, tag = nil, strip_padding: true)
             return decrypt_openssl(cipher_text) if @use_openssl
 
-            send("decrypt_#{@mode}".to_sym, cipher_text, strip_padding: strip_padding)
+            if authenticated_data.nil? || tag.nil?
+              return send("decrypt_#{@mode}".to_sym, cipher_text, strip_padding: strip_padding)
+            end
+
+            send("decrypt_#{@mode}".to_sym, cipher_text, authenticated_data, tag)
           end
 
           def generate_nonce(length = 16)
@@ -419,6 +457,56 @@ module Jason
             clear_text
           end
 
+          # Galois Counter (GCM)
+          # for gcm, use 12 bytes of entropy to lead your IV and pad with zeros
+
+          def encrypt_gcm(clear_text, authenticated_data)
+            length = clear_text.length
+            iterations = (length.to_f / @block_size).ceil
+            cipher_text = ''.b
+
+            increment_initialization_vector
+            initialization_vector = @initialization_vector.dup
+            increment_initialization_vector
+
+            iterations.times do |i|
+              ciphered_block = cipher(@initialization_vector)
+              to_xor = clear_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
+              cipher_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+              increment_initialization_vector
+            end
+
+            k0 = encrypt_ecb(initialization_vector)[0..15]
+            tag = ghash(authenticated_data, cipher_text)
+            tag = Utility.xor(tag, k0)
+
+            [cipher_text, tag]
+          end
+
+          def decrypt_gcm(cipher_text, authenticated_data, tag)
+            length = cipher_text.length
+            iterations = (length.to_f / @block_size).ceil
+            clear_text = ''.b
+
+            increment_initialization_vector
+
+            k0 = encrypt_ecb(@initialization_vector)[0..15]
+            computed_tag = ghash(authenticated_data, cipher_text)
+            computed_tag = Utility.xor(computed_tag, k0)
+            raise 'Data could not be authenticated' unless Cryptography.secure_compare(tag, computed_tag)
+
+            increment_initialization_vector
+
+            iterations.times do |i|
+              ciphered_block = cipher(@initialization_vector)
+              to_xor = cipher_text[(i * @block_size)..[(i + 1) * @block_size - 1, length - 1].min]
+              clear_text << Utility.xor(ciphered_block[0..(to_xor.length - 1)], to_xor)
+              increment_initialization_vector
+            end
+
+            clear_text
+          end
+
           # Core Routines
 
           def cipher(clear_text)
@@ -572,6 +660,44 @@ module Jason
 
           def inverse_sub_bytes(bytes)
             sub_bytes_core(bytes, INVERSE_S_BOX)
+          end
+
+          def ghash(authenticated_data, cipher_text)
+            to_hash = authenticated_data.b + "\x00".b * (@block_size - authenticated_data.b.length % @block_size)
+            to_hash += cipher_text + "\x00".b * (@block_size - cipher_text.length % @block_size)
+
+            tag = "\x00".b * @block_size
+
+            Cipher.split_into_blocks(to_hash, @block_size).each do |block|
+              tag = Utility.xor(tag, block)
+              tag = times_auth_key(tag)
+            end
+
+            lengths = [8 * authenticated_data.length, 8 * cipher_text.length].pack('Q>2')
+            tag = Utility.xor(tag, lengths)
+            times_auth_key(tag)
+          end
+
+          def times_auth_key(tag)
+            result = "\x00".b * @block_size
+
+            tag.bytes.reverse.each.with_index do |byte, i|
+              result = Utility.xor(result, @gcm_multiplication_table[i][byte])
+            end
+
+            result
+          end
+
+          def galois_multiply_f_2_128(x, y) # rubocop:disable Naming/VariableNumber
+            result = 0
+            x = Utility.byte_string_to_integer(x)
+
+            127.downto(0) do |i|
+              result ^= x * ((y >> i) & 1)  # branchless
+              x = (x >> 1) ^ ((x & 1) * 0xE1000000000000000000000000000000)
+            end
+
+            Utility.integer_to_byte_string(result).rjust(@block_size, "\x00")[-16..]
           end
 
           def decrypt_openssl(cipher_text)
