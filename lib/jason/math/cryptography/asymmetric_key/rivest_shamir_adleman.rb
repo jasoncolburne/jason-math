@@ -21,7 +21,7 @@ module Jason
             '3072': { # 128 bits of security
               key_length: 384 # in bytes
             }.freeze,
-            '4096': {
+            '4096': { # 152 bits of security
               key_length: 512 # in bytes
             }.freeze,
             '7680': { # 192 bits of security

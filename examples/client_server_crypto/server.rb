@@ -64,9 +64,9 @@ loop do
   puts "received public key: #{data[0..95].byte_string_to_hex}"
   partner_public_ecdh_key = Cryptography::AsymmetricKey::EllipticCurve::Point.from_byte_string(data[0..95])
   secret = ecc.compute_secret(my_private_ecdh_key, partner_public_ecdh_key)
-  secret = (secret.x ^ secret.y).to_byte_string.rjust(48, "\x00")
-  puts "computed shared secret: #{secret.byte_string_to_hex}" if DEBUG
-  key = secret[0..23] ^ secret[24..47]
+  extended_key = sha.digest(secret.to_byte_string(48))
+  puts "computed shared secret: #{extended_key.byte_string_to_hex}" if DEBUG
+  key = extended_key[0..23] ^ extended_key[24..47]
   puts "derived aes-gcm key: #{key.byte_string_to_hex}" if DEBUG
   aes = Cryptography::SymmetricKey::AdvancedEncryptionStandard.new(:gcm_192, key)
   puts "using initialization vector: #{initialization_vector.byte_string_to_hex}"
