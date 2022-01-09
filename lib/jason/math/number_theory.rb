@@ -403,7 +403,7 @@ module Jason
         [s0, t0, a]
       end
 
-      def self.modular_exponentiation(base, exponent, modulus, optimize: true)
+      def self.modular_exponentiation(base, exponent, modulus, optimize: false)
         if optimize
           base.to_bn.mod_exp(exponent, modulus).to_i
         else
