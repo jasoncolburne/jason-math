@@ -219,6 +219,10 @@ module Math # rubocop:disable Metrics/ModuleLength
     Jason::Math::NumberTheory.modular_exponentiation(base, exponent, modulus)
   end
 
+  def self.modular_inverse(n, modulus)
+    Jason::Math::NumberTheory.modular_inverse(n, modulus)
+  end
+
   # p must be prime
   def self.modular_square_roots(a, p)
     Jason::Math::NumberTheory.modular_square_roots(a, p)
@@ -375,6 +379,10 @@ class Integer
 
   def modular_exponentiation(exponent, modulus)
     Math.modular_exponentiation(self, exponent, modulus)
+  end
+
+  def modular_inverse(modulus)
+    Math.modular_inverse(self, modulus)
   end
 
   def modular_square_roots(prime)
