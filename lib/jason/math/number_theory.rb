@@ -104,7 +104,7 @@ module Jason
 
         loop do
           if candidate.nil?
-            candidate = SecureRandom.random_bytes(bytes / 2)
+            candidate = SecureRandom.random_bytes(bytes)
             candidate[0] = Utility.or(candidate[0], "\x80") # make it big
             candidate[-1] = Utility.or(candidate[-1], "\x01") # make it odd
             candidate = Utility.byte_string_to_integer(candidate)
