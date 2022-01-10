@@ -24,6 +24,10 @@ module Math # rubocop:disable Metrics/ModuleLength
     Jason::Math::Algebra.solve_quadratic(a, b, c)
   end
 
+  def self.root(x, n)
+    Jason::Math::Algebra.root(x, n)
+  end
+
   # analysis
   def self.collatz_sequence(n)
     Jason::Math::Analysis.collatz_sequence(n)
@@ -379,6 +383,10 @@ class Integer
 
   def root_as_continued_fraction
     Math.root_as_continued_fraction(self)
+  end
+
+  def root(n)
+    Math.root(self, n)
   end
 
   def totient
