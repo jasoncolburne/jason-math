@@ -13,6 +13,7 @@ require 'jason/math/cryptography/key_stretching/argon_2'
 require 'jason/math/cryptography/digest/message_digest'
 require 'jason/math/cryptography/digest/secure_hash_algorithm'
 require 'jason/math/cryptography/digest'
+require 'jason/math/cryptography/asymmetric_key/digital_signature_algorithm'
 require 'jason/math/cryptography/message_authentication/hashed_message_authentication_code'
 require 'jason/math/cryptography/key_agreement/diffie_hellman'
 
