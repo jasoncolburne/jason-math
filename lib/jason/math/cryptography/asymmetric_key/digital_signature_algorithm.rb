@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Jason
   module Math
     module Cryptography
@@ -75,18 +77,35 @@ module Jason
             }.freeze
           }.freeze
 
-          def initialize(hash_algorithm, parameter_set, p = nil, q = nil, g = nil, x = nil, y = nil) # rubocop:disable Metrics/ParameterLists
+          attr_reader :used_k_values
+
+          def initialize( # rubocop:disable Metrics/ParameterLists
+            hash_algorithm,
+            parameter_set,
+            p = nil, q = nil, g = nil,
+            x = nil, y = nil,
+            used_k_values = [],
+            validate_parameters: true
+          )
+            parameters = PARAMETERS[parameter_set]
+            parameters.each_pair do |key, value|
+              instance_variable_set("@#{key}", value)
+            end
+
+            if validate_parameters
+              raise 'invalid parameters' if (g % p).zero? || g % p == 1
+              raise 'insecure parameters' unless p.to_byte_string.length == @key_length
+            end
+
             @p = p
             @q = q
             @g = g
             @x = x
             @y = y
 
+            @used_k_values = used_k_values.to_set
+
             @digest = HASH_ALGORITHMS[hash_algorithm][:class].new(HASH_ALGORITHMS[hash_algorithm][:mode])
-            parameters = PARAMETERS[parameter_set]
-            parameters.each_pair do |key, value|
-              instance_variable_set("@#{key}", value)
-            end
           end
 
           def generate_parameters!
@@ -113,6 +132,7 @@ module Jason
           def generate_keypair!
             @x = SecureRandom.random_number(1..(@q - 1))
             @y = NumberTheory.modular_exponentiation(@g, @x, @p)
+            @used_k_values = Set[]
 
             [@x, @y]
           end
@@ -124,12 +144,16 @@ module Jason
 
             loop do
               k = SecureRandom.random_number(1..(@q - 1))
+              next if @used_k_values.include?(k)
 
               r = NumberTheory.modular_exponentiation(@g, k, @p) % @q
               next if r.zero?
 
               s = (NumberTheory.modular_inverse(k, @q) * (m + @x * r)) % @q
-              break unless s.zero?
+              next if s.zero?
+
+              @used_k_values << k
+              break
             end
 
             [r, s]
