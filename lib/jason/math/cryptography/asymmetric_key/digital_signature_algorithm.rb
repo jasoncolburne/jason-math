@@ -6,6 +6,7 @@ module Jason
       module AsymmetricKey
         # DSA
         class DigitalSignatureAlgorithm
+          # rubocop:disable Naming/VariableNumber
           HASH_ALGORITHMS = {
             sha_1: {
               class: Digest::SecureHashAlgorithm,
@@ -56,6 +57,7 @@ module Jason
               mode: :'2b'
             }.freeze
           }.freeze
+          # rubocop:enable Naming/VariableNumber
 
           # all length values in bytes
           PARAMETERS = {
@@ -73,7 +75,7 @@ module Jason
             }.freeze
           }.freeze
 
-          def initialize(hash_algorithm, parameter_set, p = nil, q = nil, g = nil, x = nil, y = nil)
+          def initialize(hash_algorithm, parameter_set, p = nil, q = nil, g = nil, x = nil, y = nil) # rubocop:disable Metrics/ParameterLists
             @p = p
             @q = q
             @g = g
@@ -90,7 +92,7 @@ module Jason
           def generate_parameters!
             @q = NumberTheory.large_random_prime(@modulus_length)
 
-            factor = (2 ** (@key_length * 8 - 1)) / @q 
+            factor = (2**(@key_length * 8 - 1)) / @q
             @p = nil
             loop do
               @p = @q * factor + 1
@@ -119,7 +121,7 @@ module Jason
             r = nil
             s = nil
             m = @digest.digest(message)[0..(@modulus_length - 1)].byte_string_to_integer
-  
+
             loop do
               k = SecureRandom.random_number(1..(@q - 1))
 
@@ -141,7 +143,8 @@ module Jason
             m = @digest.digest(message)[0..(@modulus_length - 1)].byte_string_to_integer
             u1 = (m * w) % @q
             u2 = (r * w) % @q
-            v = ((NumberTheory.modular_exponentiation(@g, u1, @p) * NumberTheory.modular_exponentiation(@y, u2, @p)) % @p) % @q
+            v = ((NumberTheory.modular_exponentiation(@g, u1, @p) *
+                  NumberTheory.modular_exponentiation(@y, u2, @p)) % @p) % @q
             v == r
           end
         end
