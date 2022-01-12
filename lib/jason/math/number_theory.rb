@@ -192,7 +192,25 @@ module Jason
         end
       end
 
-      def self.gcd(u, v)
+      def self.gcd(a, b)
+        # gcd(n, n) = n
+        return a if a == b
+
+        # gcd(0, n) = gcd(n, 0) = n
+        return a if b.zero?
+        return b if a.zero?
+
+        while b.positive?
+          q = a / b
+          r = a - q * b
+
+          a = b
+          b = r
+        end
+        a
+      end
+
+      def self.recursive_gcd(u, v)
         # gcd(n, n) = n
         return u if u == v
 
