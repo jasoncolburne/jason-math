@@ -6,164 +6,173 @@ module Jason
       module KeyEncapsulation
         # The Streamlined NTRU Prime suite
         class StreamlinedNTRUPrime
+          # Rings used by Streamlined NTRU Prime
           module Ring
+            # The Quotient ring over x^p - x - 1
             class NTRUQuotient
               attr_reader :field
-    
+
               def initialize(field)
                 @field = field
               end
-    
+
               def multiply(f, g)
                 raise 'input polynomials differ in length' unless f.length == g.length
-    
+
                 p = f.length
-    
+
                 fg = [0] * (p + p - 1)
-    
+
                 p.times do |i|
                   result = 0
-                  (i + 1).times { |j| result = @field.to_ZZ(result + f[j] * g[i - j]) }
+                  (i + 1).times { |j| result = @field.to_zz(result + f[j] * g[i - j]) }
                   fg[i] = result
                 end
-    
+
                 p.upto(p + p - 2) do |i|
                   result = 0
-                  (i - p + 1).upto(p - 1) { |j| result = @field.to_ZZ(result + f[j] * g[i - j]) }
+                  (i - p + 1).upto(p - 1) { |j| result = @field.to_zz(result + f[j] * g[i - j]) }
                   fg[i] = result
                 end
-    
+
                 (p + p - 2).downto(p) do |i|
-                  fg[i - p] = @field.to_ZZ(fg[i - p]+fg[i])
-                  fg[i - p + 1] = @field.to_ZZ(fg[i - p + 1] + fg[i])
+                  fg[i - p] = @field.to_zz(fg[i - p] + fg[i])
+                  fg[i - p + 1] = @field.to_zz(fg[i - p + 1] + fg[i])
                 end
-    
+
                 fg[0..(p - 1)]
               end
-    
+
               def scale(f, k)
-                f.map { |a| @field.to_ZZ(a * k) }
+                f.map { |a| @field.to_zz(a * k) }
               end
-    
-              # 1/e in R3
-              def reciprocal(e)
+
+              # 1/e in R/3
+              def reciprocal(e) # rubocop:disable Metrics/MethodLength
                 p = e.length
                 f = [0] * (p + 1)
                 g = e.reverse
                 v = [0] * (p + 1)
                 r = [0] * (p + 1)
-    
+
                 r[0] = 1
+
+                # this is the x^p - x - 1
                 f[0] = 1
                 f[p - 1] = -1
                 f[p] = -1
+
                 g << 0
-                              
+
                 delta = 1
-                (2 * p - 1).times do |loop|
+                (2 * p - 1).times do |_loop|
                   v.pop
                   v.unshift(0)
-    
+
                   sign = -g[0] * f[0]
-                  swap = (delta > 0 && !g[0].zero?) ? -1 : 0
+                  swap = delta.positive? && !g[0].zero? ? -1 : 0
                   delta ^= (swap & (delta ^ (-delta)))
                   delta += 1
-    
+
                   (p + 1).times do |i|
                     t = swap & (f[i] ^ g[i])
                     f[i] ^= t
                     g[i] ^= t
-    
+
                     t = swap & (v[i] ^ r[i])
                     v[i] ^= t
                     r[i] ^= t
                   end
-    
-                  (p + 1).times { |i| g[i] = @field.to_ZZ(g[i] + sign * f[i]) }
-                  (p + 1).times { |i| r[i] = @field.to_ZZ(r[i] + sign * v[i]) }
-    
+
+                  (p + 1).times { |i| g[i] = @field.to_zz(g[i] + sign * f[i]) }
+                  (p + 1).times { |i| r[i] = @field.to_zz(r[i] + sign * v[i]) }
+
                   g.shift
                   g << 0
                 end
-    
+
                 sign = f[0]
                 result = v.reverse[1..].map { |a| sign * a }
-    
+
                 delta.zero? ? result : nil
               end
-    
-              # 1/3e in Rq
-              def reciprocal_3(e)
+
+              # 1/3e in R/q
+              def reciprocal_3(e) # rubocop:disable Metrics/MethodLength,Naming/VariableNumber
                 p = e.length
                 f = [0] * (p + 1)
                 g = e.reverse
                 v = [0] * (p + 1)
                 r = [0] * (p + 1)
-    
+
                 r[0] = @field.reciprocal(3)
+
+                # again, here's the irreducible polynomial
                 f[0] = 1
                 f[p - 1] = -1
                 f[p] = -1
+
                 g << 0
-    
+
                 delta = 1
-    
-                (2 * p - 1).times do |loop|
+
+                (2 * p - 1).times do |_loop|
                   v.pop
                   v.unshift(0)
-    
-                  swap = (delta > 0 && !g[0].zero?) ? -1 : 0
+
+                  swap = delta.positive? && !g[0].zero? ? -1 : 0
                   delta ^= swap & (delta ^ (-delta))
                   delta += 1
-    
+
                   (p + 1).times do |i|
                     t = swap & (f[i] ^ g[i])
                     f[i] ^= t
                     g[i] ^= t
-    
+
                     t = swap & (v[i] ^ r[i])
                     v[i] ^= t
                     r[i] ^= t
                   end
-    
+
                   f0 = f[0]
                   g0 = g[0]
-                  (p + 1).times { |i| g[i] = @field.to_ZZ(f0 * g[i] - g0 * f[i]) }
-                  (p + 1).times { |i| r[i] = @field.to_ZZ(f0 * r[i] - g0 * v[i]) }
-    
+                  (p + 1).times { |i| g[i] = @field.to_zz(f0 * g[i] - g0 * f[i]) }
+                  (p + 1).times { |i| r[i] = @field.to_zz(f0 * r[i] - g0 * v[i]) }
+
                   g.shift
                   g << 0
                 end
-    
+
                 scale = @field.reciprocal(f[0])
-                result = v.reverse[1..].map { |a| @field.to_ZZ(scale * a) }
-    
+                result = v.reverse[1..].map { |a| @field.to_zz(scale * a) }
+
                 delta.zero? ? result : nil
               end
             end
           end
-    
+
+          # Just the basics
           class PrimeGaloisField
             attr_accessor :q, :q12
-    
+
             def initialize(q)
               raise 'q must be prime' unless NumberTheory.prime?(q)
-    
+
               @q = q
               @q12 = (q - 1) / 2
             end
-    
-            def to_ZZ(e)
+
+            def to_zz(e)
               (e + @q12) % @q - @q12
             end
-    
+
             def reciprocal(e)
-              ai = e        
-              (q - 3).times { ai = to_ZZ(e * ai) }
+              ai = e
+              (q - 3).times { ai = to_zz(e * ai) }
               ai
             end
           end
-    
+
           def generate_keypair
             pk, sk = z_keygen
             sk += pk
@@ -204,42 +213,43 @@ module Jason
             [c, r_enc]
           end
 
-          module Core
+          # Core
+          module Core # rubocop:disable Metrics/ModuleLength
             attr_reader :private_key, :public_key
 
             PARAMETERS = {
               sntrup653: {
                 p: 653,
                 q: 4621,
-                w: 288,
+                w: 288
               }.freeze,
               sntrup761: {
                 p: 761,
                 q: 4591,
-                w: 286,
+                w: 286
               }.freeze,
               sntrup857: {
                 p: 857,
                 q: 5167,
-                w: 322,
+                w: 322
               }.freeze,
               sntrup953: {
                 p: 953,
                 q: 6343,
-                w: 396,
+                w: 396
               }.freeze,
               sntrup1013: {
                 p: 1013,
                 q: 7177,
-                w: 448,
+                w: 448
               }.freeze,
               sntrup1277: {
                 p: 1277,
                 q: 7879,
-                w: 492,
-              }.freeze,
+                w: 492
+              }.freeze
             }.freeze
-    
+
             def initialize(parameter_set, private_key = nil, public_key = nil)
               PARAMETERS[parameter_set].each do |key, value|
                 instance_variable_set("@#{key}", value)
@@ -255,15 +265,16 @@ module Jason
               @small_bytes = (@p + 3) / 4
 
               self.private_key = private_key unless private_key.nil?
-              self.public_key = public_key unless public_key.nil?            
+              self.public_key = public_key unless public_key.nil?
             end
 
             def public_key=(s)
               @public_key = rq_decode(s)
             end
-    
+
             def private_key=(s)
-              @private_key = [small_decode(s[0..(@small_bytes - 1)]), small_decode(s[@small_bytes..(2 * @small_bytes - 1)])]
+              @private_key = [small_decode(s[0..(@small_bytes - 1)]),
+                              small_decode(s[@small_bytes..(2 * @small_bytes - 1)])]
               @public_key = rq_decode(s[(2 * @small_bytes)..-(33 + @small_bytes)])
               @rho = s[-(32 + @small_bytes)..-33]
               @cache = s[-32..]
@@ -271,7 +282,7 @@ module Jason
 
             private
 
-            def random_range_3
+            def random_range_3 # rubocop:disable Naming/VariableNumber
               (SecureRandom.random_number(0x3fffffff) * 3) >> 30
             end
 
@@ -286,11 +297,11 @@ module Jason
             def short_from_list(l)
               l = l[0..(@w - 1)].map { |a| a & (-2) } + l[@w..].map { |a| (a & (-3)) | 1 }
               l.sort!
-              l.map { |a| (a & 3) - 1}
+              l.map { |a| (a & 3) - 1 }
             end
 
             def round(g)
-              g.map { |a| a - @f3.to_ZZ(a) }
+              g.map { |a| a - @f3.to_zz(a) }
             end
 
             def weight(r)
@@ -307,7 +318,7 @@ module Jason
                 # compute 1/g in R/3
                 v = @r3.reciprocal(g)
               end
-              
+
               # generate uniform random f in Short
               f = random_short
 
@@ -327,7 +338,7 @@ module Jason
               c = cipher_text
               f, v = @private_key
               g = @rq.scale(@rq.multiply(c, f), 3) # g = 3cf in R/q
-              e = g.map { |a| @f3.to_ZZ(a) }
+              e = g.map { |a| @f3.to_zz(a) }
               r = @r3.multiply(e, v)
 
               default_r = @default_decryption_result.dup
@@ -336,27 +347,29 @@ module Jason
           end
           include Core
 
+          # Glue layer
           module Glue
             private
 
             def z_keygen
               public_key, private_key = keygen
               f, v = private_key
-    
+
               [rq_encode(public_key), small_encode(f) + small_encode(v)]
             end
-    
+
             def z_encrypt(r)
               rounded_encode(encrypt(r))
             end
-    
+
             def z_decrypt(c)
               decrypt(rounded_decode(c))
             end
           end
           include Glue
 
-          module Encoding
+          # Encoding
+          module Encoding # rubocop:disable Metrics/ModuleLength
             private
 
             def small_encode(f)
@@ -383,20 +396,20 @@ module Jason
                 f << (x & 3) - 1
                 x >>= 2
                 f << (x & 3) - 1
-                x >>= 2
               end
 
               f + [(s[-1].ord & 3) - 1]
             end
 
-            def encode(r, m)
+            # rubocop:disable Lint/UnderscorePrefixedVariableName
+            def encode(r, m) # rubocop:disable Metrics/MethodLength
               return [] if m.length.zero?
-              
+
               s = []
               if m.length == 1
                 _r = r[0]
                 _m = m[0]
-                
+
                 while _m > 1
                   s << (_r % 256)
                   _r /= 256
@@ -411,7 +424,7 @@ module Jason
                 _m = m[i] * m[i + 1]
                 _r = r[i] + m[i] * r[i + 1]
 
-                while _m >= 16384
+                while _m >= 16_384
                   s << (_r % 256)
                   _r /= 256
                   _m = (_m + 255) / 256
@@ -428,13 +441,11 @@ module Jason
 
               s + encode(r2, m2)
             end
-          
-            def decode(s, m)
+
+            def decode(s, m) # rubocop:disable Metrics/MethodLength
               return [] if m.length.zero?
 
-              if m.length == 1
-                return [s.length.times.map { |i| s[i] * (256 ** i) }.sum % m[0]]
-              end
+              return [s.length.times.map { |i| s[i] * (256**i) }.sum % m[0]] if m.length == 1
 
               k = 0
               bottom = []
@@ -444,7 +455,7 @@ module Jason
                 r = 0
                 t = 1
 
-                while _m >= 16384
+                while _m >= 16_384
                   r += s[k] * t
                   t *= 256
                   k += 1
@@ -469,9 +480,10 @@ module Jason
               r << r2[-1] if m.length.odd?
               r
             end
+            # rubocop:enable Lint/UnderscorePrefixedVariableName
 
             def rq_encode(r)
-              r = r.map { |a| @fq.to_ZZ(a) + @fq.q12 }
+              r = r.map { |a| @fq.to_zz(a) + @fq.q12 }
               m = [@q] * @p
               encode(r, m).pack('C*')
             end
@@ -483,7 +495,7 @@ module Jason
             end
 
             def rounded_encode(r)
-              r = r.map { |a| (@fq.to_ZZ(a) + @fq.q12) / 3 }
+              r = r.map { |a| (@fq.to_zz(a) + @fq.q12) / 3 }
               m = [(@q + 2) / 3 + 1] * @p
               encode(r, m).pack('C*')
             end
@@ -496,27 +508,28 @@ module Jason
           end
           include Encoding
 
+          # Hashing
           module Hashing
             private
 
             def hash(message)
               @sha512.digest(message)[0..31]
             end
-    
+
             def hash_prefix(n, message)
               hash(n.chr + message)
             end
-    
+
             def hash_confirm(r, k, cache = nil)
               cache = hash_prefix(4, k) if cache.nil?
               r = hash_prefix(3, r)
               hash_prefix(2, r + cache)
             end
-    
+
             def hash_session(b, y, z)
               y = hash_prefix(3, y)
               hash_prefix(b, y + z)
-            end  
+            end
           end
           include Hashing
         end
