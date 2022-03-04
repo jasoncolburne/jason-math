@@ -173,6 +173,7 @@ module Jason
             @r3 = Ring::NTRUQuotient.new(@f3)
             @rq = Ring::NTRUQuotient.new(@fq)
 
+            @default_decryption_result = ([1] * @w + [0] * (@p - @w)).freeze
             @small_bytes = (@p + 3) / 4
 
             self.private_key = private_key unless private_key.nil?
@@ -294,8 +295,7 @@ module Jason
               e = g.map { |a| @f3.to_zz(a) }
               r = @r3.multiply(e, v)
 
-              default_r = @default_decryption_result.dup
-              weight(r) == @w ? r : default_r
+              weight(r) == @w ? r : @default_decryption_result
             end
           end
           include Core
