@@ -246,7 +246,7 @@ module Jason
           end
 
           # Core
-          module Core # rubocop:disable Metrics/ModuleLength
+          module Core
             attr_reader :private_key, :public_key
 
             # post quantum security is approximately 10% lower
