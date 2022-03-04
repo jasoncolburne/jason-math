@@ -217,33 +217,34 @@ module Jason
           module Core # rubocop:disable Metrics/ModuleLength
             attr_reader :private_key, :public_key
 
+            # post quantum security is approximately 10% lower
             PARAMETERS = {
-              sntrup653: {
+              sntrup653: { # 129 bits of security
                 p: 653,
                 q: 4621,
                 w: 288
               }.freeze,
-              sntrup761: {
+              sntrup761: { # 153 bits of security
                 p: 761,
                 q: 4591,
                 w: 286
               }.freeze,
-              sntrup857: {
+              sntrup857: { # 175 bits of security
                 p: 857,
                 q: 5167,
                 w: 322
               }.freeze,
-              sntrup953: {
+              sntrup953: { # 196 bits of security
                 p: 953,
                 q: 6343,
                 w: 396
               }.freeze,
-              sntrup1013: {
+              sntrup1013: { # 210 bits of security
                 p: 1013,
                 q: 7177,
                 w: 448
               }.freeze,
-              sntrup1277: {
+              sntrup1277: { # 270 bits of security
                 p: 1277,
                 q: 7879,
                 w: 492

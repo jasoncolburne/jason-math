@@ -35,7 +35,7 @@ rescue RuntimeError
 end
 
 socket = TCPSocket.new('0.0.0.0', ARGV.first || 1337)
-params = :sntrup1277
+params = :sntrup1277 # should have used sntrup1013 to better match aes-192 @ post quantum levels
 
 sntrup = Cryptography::KeyEncapsulation::StreamlinedNTRUPrime.new(params, client_private_key)
 
