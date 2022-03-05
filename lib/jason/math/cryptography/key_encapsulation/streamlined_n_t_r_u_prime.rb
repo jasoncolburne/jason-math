@@ -173,6 +173,38 @@ module Jason
             end
           end
 
+          # public api is here
+
+          def initialize(parameter_set, private_key = nil, public_key = nil)
+            PARAMETERS[parameter_set].each do |key, value|
+              instance_variable_set("@#{key}", value)
+            end
+
+            @sha512 = Digest::SecureHashAlgorithm.new(:'512')
+
+            @f3 = PrimeGaloisField.new(3)
+            @fq = PrimeGaloisField.new(@q)
+            @r3 = Ring::NTRUQuotient.new(@f3)
+            @rq = Ring::NTRUQuotient.new(@fq)
+
+            @small_bytes = (@p + 3) / 4
+
+            self.private_key = private_key unless private_key.nil?
+            self.public_key = public_key unless public_key.nil?
+          end
+
+          def public_key=(s)
+            @public_key = rq_decode(s)
+          end
+
+          def private_key=(s)
+            @private_key = [small_decode(s[0..(@small_bytes - 1)]),
+                            small_decode(s[@small_bytes..(2 * @small_bytes - 1)])]
+            @public_key = rq_decode(s[(2 * @small_bytes)..-(33 + @small_bytes)])
+            @rho = s[-(32 + @small_bytes)..-33]
+            @cache = s[-32..]
+          end
+
           def generate_keypair
             pk, sk = z_keygen
             sk += pk
@@ -214,7 +246,7 @@ module Jason
           end
 
           # Core
-          module Core # rubocop:disable Metrics/ModuleLength
+          module Core
             attr_reader :private_key, :public_key
 
             # post quantum security is approximately 10% lower
@@ -250,36 +282,6 @@ module Jason
                 w: 492
               }.freeze
             }.freeze
-
-            def initialize(parameter_set, private_key = nil, public_key = nil)
-              PARAMETERS[parameter_set].each do |key, value|
-                instance_variable_set("@#{key}", value)
-              end
-
-              @sha512 = Digest::SecureHashAlgorithm.new(:'512')
-
-              @f3 = PrimeGaloisField.new(3)
-              @fq = PrimeGaloisField.new(@q)
-              @r3 = Ring::NTRUQuotient.new(@f3)
-              @rq = Ring::NTRUQuotient.new(@fq)
-
-              @small_bytes = (@p + 3) / 4
-
-              self.private_key = private_key unless private_key.nil?
-              self.public_key = public_key unless public_key.nil?
-            end
-
-            def public_key=(s)
-              @public_key = rq_decode(s)
-            end
-
-            def private_key=(s)
-              @private_key = [small_decode(s[0..(@small_bytes - 1)]),
-                              small_decode(s[@small_bytes..(2 * @small_bytes - 1)])]
-              @public_key = rq_decode(s[(2 * @small_bytes)..-(33 + @small_bytes)])
-              @rho = s[-(32 + @small_bytes)..-33]
-              @cache = s[-32..]
-            end
 
             private
 
