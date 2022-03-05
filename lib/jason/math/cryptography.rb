@@ -16,6 +16,7 @@ require 'jason/math/cryptography/digest'
 require 'jason/math/cryptography/asymmetric_key/digital_signature_algorithm'
 require 'jason/math/cryptography/message_authentication/hashed_message_authentication_code'
 require 'jason/math/cryptography/key_agreement/diffie_hellman'
+require 'jason/math/cryptography/key_encapsulation/streamlined_n_t_r_u_prime'
 
 module Jason
   module Math
