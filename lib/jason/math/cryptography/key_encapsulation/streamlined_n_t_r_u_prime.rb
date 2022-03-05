@@ -88,7 +88,7 @@ module Jason
 
                 delta = 1
 
-                (2 * p - 1).times do |_loop|
+                (2 * p - 1).times do
                   v.pop
                   v.unshift(0)
 
