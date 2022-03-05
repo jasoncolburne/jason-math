@@ -123,6 +123,42 @@ module Jason
             end
           end
 
+          attr_reader :private_key, :public_key
+
+          # post quantum security is approximately 10% lower
+          PARAMETERS = {
+            sntrup653: { # 129 bits of security
+              p: 653,
+              q: 4621,
+              w: 288
+            }.freeze,
+            sntrup761: { # 153 bits of security
+              p: 761,
+              q: 4591,
+              w: 286
+            }.freeze,
+            sntrup857: { # 175 bits of security
+              p: 857,
+              q: 5167,
+              w: 322
+            }.freeze,
+            sntrup953: { # 196 bits of security
+              p: 953,
+              q: 6343,
+              w: 396
+            }.freeze,
+            sntrup1013: { # 210 bits of security
+              p: 1013,
+              q: 7177,
+              w: 448
+            }.freeze,
+            sntrup1277: { # 270 bits of security
+              p: 1277,
+              q: 7879,
+              w: 492
+            }.freeze
+          }.freeze
+
           # public api is here
 
           def initialize(parameter_set, private_key = nil, public_key = nil)
@@ -197,42 +233,6 @@ module Jason
 
           # Core
           module Core
-            attr_reader :private_key, :public_key
-
-            # post quantum security is approximately 10% lower
-            PARAMETERS = {
-              sntrup653: { # 129 bits of security
-                p: 653,
-                q: 4621,
-                w: 288
-              }.freeze,
-              sntrup761: { # 153 bits of security
-                p: 761,
-                q: 4591,
-                w: 286
-              }.freeze,
-              sntrup857: { # 175 bits of security
-                p: 857,
-                q: 5167,
-                w: 322
-              }.freeze,
-              sntrup953: { # 196 bits of security
-                p: 953,
-                q: 6343,
-                w: 396
-              }.freeze,
-              sntrup1013: { # 210 bits of security
-                p: 1013,
-                q: 7177,
-                w: 448
-              }.freeze,
-              sntrup1277: { # 270 bits of security
-                p: 1277,
-                q: 7879,
-                w: 492
-              }.freeze
-            }.freeze
-
             private
 
             def random_range_3 # rubocop:disable Naming/VariableNumber
