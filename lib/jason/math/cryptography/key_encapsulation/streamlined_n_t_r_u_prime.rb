@@ -6,6 +6,28 @@ module Jason
       module KeyEncapsulation
         # The Streamlined NTRU Prime suite
         class StreamlinedNTRUPrime
+          # Just the basics
+          class PrimeGaloisField
+            attr_accessor :q, :q12
+
+            def initialize(q)
+              raise 'q must be prime' unless NumberTheory.prime?(q)
+
+              @q = q
+              @q12 = (q - 1) / 2
+            end
+
+            def to_zz(e)
+              (e + @q12) % @q - @q12
+            end
+
+            def reciprocal(e)
+              ai = e
+              (q - 3).times { ai = to_zz(e * ai) }
+              ai
+            end
+          end
+
           # Rings used by Streamlined NTRU Prime
           module Ring
             # The Quotient ring over x^p - x - 1
@@ -47,65 +69,15 @@ module Jason
                 f.map { |a| @field.to_zz(a * k) }
               end
 
-              # 1/e in R/3
-              def reciprocal(e) # rubocop:disable Metrics/MethodLength
+              # 1/ne in R/q, where n is in Z
+              def reciprocal(e, n) # rubocop:disable Metrics/MethodLength
                 p = e.length
                 f = [0] * (p + 1)
                 g = e.reverse
                 v = [0] * (p + 1)
                 r = [0] * (p + 1)
 
-                r[0] = 1
-
-                # this is the x^p - x - 1
-                f[0] = 1
-                f[p - 1] = -1
-                f[p] = -1
-
-                g << 0
-
-                delta = 1
-                (2 * p - 1).times do |_loop|
-                  v.pop
-                  v.unshift(0)
-
-                  sign = -g[0] * f[0]
-                  swap = delta.positive? && !g[0].zero? ? -1 : 0
-                  delta ^= (swap & (delta ^ (-delta)))
-                  delta += 1
-
-                  (p + 1).times do |i|
-                    t = swap & (f[i] ^ g[i])
-                    f[i] ^= t
-                    g[i] ^= t
-
-                    t = swap & (v[i] ^ r[i])
-                    v[i] ^= t
-                    r[i] ^= t
-                  end
-
-                  (p + 1).times { |i| g[i] = @field.to_zz(g[i] + sign * f[i]) }
-                  (p + 1).times { |i| r[i] = @field.to_zz(r[i] + sign * v[i]) }
-
-                  g.shift
-                  g << 0
-                end
-
-                sign = f[0]
-                result = v.reverse[1..].map { |a| sign * a }
-
-                delta.zero? ? result : nil
-              end
-
-              # 1/3e in R/q
-              def reciprocal_3(e) # rubocop:disable Metrics/MethodLength,Naming/VariableNumber
-                p = e.length
-                f = [0] * (p + 1)
-                g = e.reverse
-                v = [0] * (p + 1)
-                r = [0] * (p + 1)
-
-                r[0] = @field.reciprocal(3)
+                r[0] = @field.reciprocal(n)
 
                 # again, here's the irreducible polynomial
                 f[0] = 1
@@ -148,28 +120,6 @@ module Jason
 
                 delta.zero? ? result : nil
               end
-            end
-          end
-
-          # Just the basics
-          class PrimeGaloisField
-            attr_accessor :q, :q12
-
-            def initialize(q)
-              raise 'q must be prime' unless NumberTheory.prime?(q)
-
-              @q = q
-              @q12 = (q - 1) / 2
-            end
-
-            def to_zz(e)
-              (e + @q12) % @q - @q12
-            end
-
-            def reciprocal(e)
-              ai = e
-              (q - 3).times { ai = to_zz(e * ai) }
-              ai
             end
           end
 
@@ -319,14 +269,14 @@ module Jason
               while v.nil?
                 g = random_small
                 # compute 1/g in R/3
-                v = @r3.reciprocal(g)
+                v = @r3.reciprocal(g, 1)
               end
 
               # generate uniform random f in Short
               f = random_short
 
               # compute h = g/(3f) in R/q
-              h = @rq.multiply(g, @rq.reciprocal_3(f))
+              h = @rq.multiply(g, @rq.reciprocal(f, 3))
 
               @private_key = [f, v].freeze
               @public_key = h
