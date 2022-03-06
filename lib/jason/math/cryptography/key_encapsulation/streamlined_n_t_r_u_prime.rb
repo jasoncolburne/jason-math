@@ -8,7 +8,7 @@ module Jason
         class StreamlinedNTRUPrime
           # Just the basics
           class PrimeGaloisField
-            attr_accessor :q, :q12
+            attr_reader :q12
 
             def initialize(q)
               raise 'q must be prime' unless NumberTheory.prime?(q)
@@ -23,7 +23,7 @@ module Jason
 
             def reciprocal(e)
               ai = e
-              (q - 3).times { ai = to_zz(e * ai) }
+              (@q - 3).times { ai = to_zz(e * ai) }
               ai
             end
           end
