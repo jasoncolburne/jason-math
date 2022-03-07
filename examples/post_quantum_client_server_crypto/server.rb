@@ -21,7 +21,7 @@ class SecretManager
   def self.[](label)
     raise "unexpected label" unless label == :sntrup_private_key
 
-    File.read('./server.key').b
+    @sntrup_private_key ||= File.read('./server.key').b
   end
 end
 
