@@ -19,11 +19,14 @@ params = :sntrup1277
 # we'll pretend we have a secure way of getting this key
 class SecretManager
   def self.[](label)
-    raise "unexpected label" unless label == :server_signing_key
+    raise "unexpected label" unless label == :sntrup_private_key
 
     File.read('./server.key').b
   end
 end
+
+sntrup = Cryptography::KeyEncapsulation::StreamlinedNTRUPrime.new(params)
+client_public_key = File.read('./client.pub').b
 
 loop do
   begin
@@ -33,8 +36,7 @@ loop do
     break
   end
 
-  sntrup = Cryptography::KeyEncapsulation::StreamlinedNTRUPrime.new(params, nil, File.read('./client.pub').b)
-
+  sntrup.public_key = client_public_key
   cipher_text, server_generated_session_key_component = sntrup.encapsulate
   puts "encapsulated server generated session key: #{server_generated_session_key_component.byte_string_to_hex}" if DEBUG
 
@@ -44,7 +46,7 @@ loop do
   initialization_vector = data[0..15]
   cipher_text = data[16..]
 
-  sntrup.private_key = SecretManager[:server_signing_key]
+  sntrup.private_key = SecretManager[:sntrup_private_key]
   client_generated_session_key_component = sntrup.decapsulate(cipher_text)
 
   puts "decapsulated client generated session key: #{client_generated_session_key_component.byte_string_to_hex}" if DEBUG
